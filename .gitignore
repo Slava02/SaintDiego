@@ -23,3 +23,14 @@ go.work.sum
 
 # env file
 .env
+
+
+.DS_Store
+
+## ide
+.idea/
+.vscode/
+
+## internals
+/booking-service
+configs/config.toml

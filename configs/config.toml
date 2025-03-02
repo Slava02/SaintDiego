@@ -1,0 +1,27 @@
+[global]
+name = "booking-service"
+env = "dev"
+
+[log]
+level = "info"
+
+[servers]
+[servers.debug]
+addr = ":8079"
+
+[servers.client]
+addr = ":8080"
+allow_origins = ["http://localhost:3011", "http://localhost:3000"]
+
+[servers.client.required_access]
+resource = "ui-client"
+role = "booking-client"
+
+[clients]
+[clients.keycloak]
+base_path = "http://localhost:3010"
+realm = "SaintDiego"
+client_id = "booking-service"
+client_secret = "yxsVyBXLGlTDcFuigwzZ3pixSpV8vL5c"
+debug_mode = true
+
