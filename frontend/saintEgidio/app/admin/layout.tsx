@@ -1,7 +1,7 @@
 import type React from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { CalendarIcon, List, LogOut, Users } from "lucide-react"
+import { List, LogOut } from "lucide-react"
 
 export default function AdminLayout({
   children,
@@ -31,7 +31,7 @@ export default function AdminLayout({
           <nav className="p-4 space-y-2">
             <Link href="/admin/schedule">
               <Button variant="ghost" className="w-full justify-start">
-                <CalendarIcon className="h-4 w-4 mr-2" />
+                <List className="h-4 w-4 mr-2" />
                 Расписание
               </Button>
             </Link>
@@ -39,12 +39,6 @@ export default function AdminLayout({
               <Button variant="ghost" className="w-full justify-start">
                 <List className="h-4 w-4 mr-2" />
                 Мероприятия
-              </Button>
-            </Link>
-            <Link href="/admin/visitors">
-              <Button variant="ghost" className="w-full justify-start">
-                <Users className="h-4 w-4 mr-2" />
-                Посетители
               </Button>
             </Link>
           </nav>

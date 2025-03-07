@@ -252,6 +252,9 @@ export default function ProfilePage() {
           <TabsTrigger value="services" className="flex-1">
             Доступные услуги
           </TabsTrigger>
+          <TabsTrigger value="my-events" className="flex-1">
+            Мои мероприятия
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="history">
@@ -264,24 +267,47 @@ export default function ProfilePage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Дата</TableHead>
-                    <TableHead>Время</TableHead>
-                    <TableHead>Тип услуги</TableHead>
+                    <TableHead>Услуга</TableHead>
                     <TableHead>Статус</TableHead>
-                    <TableHead>Комментарий</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {userEvents.map((event) => (
-                    <TableRow key={event.id}>
-                      <TableCell>{event.date.toLocaleDateString("ru-RU")}</TableCell>
-                      <TableCell>{event.date.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}</TableCell>
-                      <TableCell>
-                        <Badge className={getEventTypeColor(event.type)}>{getEventTypeLabel(event.type)}</Badge>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(event.status)}</TableCell>
-                      <TableCell>{event.comment || "-"}</TableCell>
-                    </TableRow>
-                  ))}
+                  <TableRow>
+                    <TableCell>2024-03-14 18:00:00</TableCell>
+                    <TableCell>Стирка (Цветной)</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
+                        Запланировано
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>2023-09-03 13:00:00</TableCell>
+                    <TableCell>Стирка (Гиляровского)</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">
+                        Выполнено
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>2023-01-26 19:00:00</TableCell>
+                    <TableCell>Просто прийти (Цветной)</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">
+                        Выполнено
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>2023-01-27 14:30:00</TableCell>
+                    <TableCell>Кормежка (Ясная)</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">
+                        Выполнено
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
                 </TableBody>
               </Table>
             </CardContent>
@@ -310,6 +336,141 @@ export default function ProfilePage() {
             />
           </div>
         </TabsContent>
+
+        <TabsContent value="my-events">
+          <Card>
+            <CardHeader>
+              <CardTitle>Предстоящие мероприятия</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Дата</TableHead>
+                    <TableHead>Мероприятие</TableHead>
+                    <TableHead>Тип</TableHead>
+                    <TableHead>Место</TableHead>
+                    <TableHead>Статус</TableHead>
+                    <TableHead className="text-right">Действия</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {userEvents
+                    .filter((event) => event.status === "upcoming")
+                    .map((event) => (
+                      <TableRow key={event.id}>
+                        <TableCell>
+                          {event.date.toLocaleDateString("ru-RU")}{" "}
+                          {event.date.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}
+                        </TableCell>
+                        <TableCell className="font-medium">{event.title}</TableCell>
+                        <TableCell>
+                          <Badge className={getEventTypeColor(event.type)}>{getEventTypeLabel(event.type)}</Badge>
+                        </TableCell>
+                        <TableCell>{event.location}</TableCell>
+                        <TableCell>{getStatusBadge(event.status)}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end items-center space-x-2">
+                            <Button variant="ghost" size="sm" onClick={() => handleViewParticipants(event)}>
+                              <Users className="h-4 w-4 mr-2" />
+                              Участники
+                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedEvent(event)
+                                    handleMarkAsNoShow()
+                                  }}
+                                >
+                                  <AlertTriangle className="h-4 w-4 mr-2 text-red-500" />
+                                  <span className="text-red-500">Отметить как неявку</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedEvent(event)
+                                    setParticipantComment(event.comment || "")
+                                    handleAddComment()
+                                  }}
+                                >
+                                  <MessageSquare className="h-4 w-4 mr-2 text-amber-500" />
+                                  <span>Добавить комментарий</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedEvent(event)
+                                    handleRemoveFromEvent()
+                                  }}
+                                >
+                                  <UserMinus className="h-4 w-4 mr-2 text-gray-500" />
+                                  <span>Отменить запись</span>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  {userEvents.filter((event) => event.status === "upcoming").length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-4 text-muted-foreground">
+                        Нет предстоящих мероприятий
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Прошедшие мероприятия</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* Заменяем таблицу на карточки для прошедших мероприятий */}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {userEvents
+                  .filter((event) => event.status !== "upcoming")
+                  .map((event) => (
+                    <Card key={event.id} className="bg-gray-100 opacity-80">
+                      <CardContent className="p-4">
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-start">
+                            <h4 className="font-medium text-foreground">{event.title}</h4>
+                            {getStatusBadge(event.status)}
+                          </div>
+                          <div className="text-sm">
+                            <p>Дата: {event.date.toLocaleDateString("ru-RU")}</p>
+                            <p>
+                              Время: {event.date.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}
+                            </p>
+                            <p>Место: {event.location}</p>
+                          </div>
+                          <Badge className={getEventTypeColor(event.type)}>{getEventTypeLabel(event.type)}</Badge>
+                          {event.comment && (
+                            <p className="text-sm mt-2 border-t pt-2">
+                              <span className="font-medium">Комментарий:</span> {event.comment}
+                            </p>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                {userEvents.filter((event) => event.status !== "upcoming").length === 0 && (
+                  <div className="col-span-full text-center py-4 text-muted-foreground border rounded-md">
+                    Нет прошедших мероприятий
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
 
       {/* Модальное окно для просмотра участников мероприятия */}
@@ -321,7 +482,7 @@ export default function ProfilePage() {
             </DialogTitle>
           </DialogHeader>
 
-          <ParticipantTable participants={mockParticipants} onUpdate={() => { }} onRemove={() => { }} />
+          <ParticipantTable participants={mockParticipants} onUpdate={() => {}} onRemove={() => {}} />
         </DialogContent>
       </Dialog>
 

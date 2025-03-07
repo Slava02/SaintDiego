@@ -1,430 +1,720 @@
 "use client"
 
-import { useState } from "react"
-import { AdminCalendar } from "@/components/admin/calendar"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Plus, Edit, Trash2 } from "lucide-react"
-import { format } from "date-fns"
-import { ru } from "date-fns/locale"
-import { EventForm } from "@/components/admin/event-form"
-import { RecurrenceModal } from "@/components/admin/recurrence-modal"
-import { EditEventModal } from "@/components/admin/edit-event-modal"
+import { Plus, Search, Filter, Calendar } from "lucide-react"
+import { format, isAfter } from "date-fns"
+import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar as CalendarComponent } from "@/components/ui/calendar"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { EventForm } from "@/components/admin/event-form"
+import { EventCard } from "@/components/admin/event-card"
+import { EventTable } from "@/components/admin/event-table"
+import { ActivateEventModal } from "@/components/admin/activate-event-modal"
 
 interface Event {
   id: string
   title: string
-  type: string
-  start: Date
-  end: Date
-  capacity: number
-  registered: number
-  status: "open" | "full"
-  bookingWindow?: number
+  date: Date | null
+  location: string
+  maxParticipants: number
+  registeredParticipants: number
+  status: "active" | "archived"
+  type: "single" | "recurring"
   recurrence?: {
-    type: string
-    interval: number
-    end: {
-      type: string
-      date?: Date
-      count?: number
-      indefinite?: boolean
-    }
+    frequency: "daily" | "weekly" | "monthly"
+    endDate?: Date
+    infinite: boolean
   }
+  services: Service[]
+}
+
+interface Service {
+  id: string
+  name: string
+  time: string
+  capacity: number
+  bookingWindow: number
+  registeredParticipants: number
+}
+
+interface Location {
+  id: string
+  name: string
+  address: string
+  description?: string
+}
+
+interface FilterState {
+  dateRange: {
+    from: Date | undefined
+    to: Date | undefined
+  }
+  eventType: "all" | "single" | "recurring"
+  status: "active" | "archived" | "all"
+  searchQuery: string
+  service: string
 }
 
 export default function SchedulePage() {
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const [events, setEvents] = useState<Event[]>([])
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([])
   const [showEventModal, setShowEventModal] = useState(false)
-  const [showRecurrenceModal, setShowRecurrenceModal] = useState(false)
-  const [showEventDetails, setShowEventDetails] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [createNewEvent, setCreateNewEvent] = useState(false)
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const [tempEvent, setTempEvent] = useState<Event | null>(null)
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [activeTab, setActiveTab] = useState<"active" | "archived">("active")
+  const [showFilters, setShowFilters] = useState(false)
+  const [showActivateModal, setShowActivateModal] = useState(false)
+  const [eventToActivate, setEventToActivate] = useState<Event | null>(null)
+  const [filters, setFilters] = useState<FilterState>({
+    dateRange: { from: undefined, to: undefined },
+    eventType: "all",
+    status: "all",
+    searchQuery: "",
+    service: "all",
+  })
+  const [availableServices, setAvailableServices] = useState<{ id: string; name: string }[]>([])
 
-  // Mock events data
-  const [events, setEvents] = useState<Event[]>([
-    {
-      id: "1",
-      title: "Медицинская консультация",
-      type: "medical",
-      start: new Date(2025, 2, 10, 10, 0),
-      end: new Date(2025, 2, 10, 11, 0),
-      capacity: 15,
-      registered: 10,
-      status: "open",
-      bookingWindow: 14,
-      recurrence: {
-        type: "weekly",
-        interval: 1,
-        end: {
-          type: "indefinite",
-          indefinite: true,
-        },
-      },
-    },
-    {
-      id: "2",
-      title: "Выдача одежды",
-      type: "clothing",
-      start: new Date(2025, 2, 11, 14, 0),
-      end: new Date(2025, 2, 11, 16, 0),
-      capacity: 20,
-      registered: 20,
-      status: "full",
-      bookingWindow: 14,
-    },
-    {
-      id: "3",
-      title: "Консультация психолога",
-      type: "psychology",
-      start: new Date(2025, 2, 12, 12, 0),
-      end: new Date(2025, 2, 12, 13, 0),
-      capacity: 5,
-      registered: 3,
-      status: "open",
-      bookingWindow: 14,
-    },
-    {
-      id: "4",
-      title: "Юридическая помощь",
-      type: "legal",
-      start: new Date(2025, 2, 13, 15, 0),
-      end: new Date(2025, 2, 13, 17, 0),
-      capacity: 10,
-      registered: 8,
-      status: "open",
-      bookingWindow: 14,
-    },
+  // Мок-данные для мест
+  const [locations, setLocations] = useState<Location[]>([
+    { id: "1", name: "Цветной", address: "Цветной бульвар, 25", description: "Основной центр" },
+    { id: "2", name: "Гиляровского", address: "ул. Гиляровского, 65", description: "Филиал №1" },
+    { id: "3", name: "Ясная", address: "ул. Ясная, 10", description: "Филиал №2" },
   ])
 
-  const handleEventSelect = (event: Event) => {
-    setSelectedEvent(event)
-    setShowEventDetails(true)
-    setCreateNewEvent(false)
-  }
+  // Мок-данные для услуг
+  const serviceOptions = [
+    { id: "s1", name: "Терапевт", defaultCapacity: 15, defaultBookingWindow: 14 },
+    { id: "s2", name: "Психолог", defaultCapacity: 10, defaultBookingWindow: 7 },
+    { id: "s3", name: "Зимняя одежда", defaultCapacity: 25, defaultBookingWindow: 14 },
+    { id: "s4", name: "Летняя одежда", defaultCapacity: 25, defaultBookingWindow: 14 },
+    { id: "s5", name: "Консультация юриста", defaultCapacity: 20, defaultBookingWindow: 10 },
+    { id: "s6", name: "Продуктовые наборы", defaultCapacity: 100, defaultBookingWindow: 21 },
+  ]
+
+  // Мок-данные для событий
+  useEffect(() => {
+    const mockEvents: Event[] = [
+      {
+        id: "1",
+        title: "Медицинская консультация",
+        date: new Date(2025, 2, 10, 10, 0),
+        location: "Цветной",
+        maxParticipants: 30,
+        registeredParticipants: 12,
+        status: "active",
+        type: "single",
+        services: [
+          {
+            id: "1-1",
+            name: "Терапевт",
+            time: "10:00-12:00",
+            capacity: 15,
+            bookingWindow: 14,
+            registeredParticipants: 8,
+          },
+          {
+            id: "1-2",
+            name: "Психолог",
+            time: "12:00-14:00",
+            capacity: 10,
+            bookingWindow: 7,
+            registeredParticipants: 4,
+          },
+        ],
+      },
+      {
+        id: "2",
+        title: "Выдача одежды",
+        date: new Date(2025, 2, 15, 14, 0),
+        location: "Гиляровского",
+        maxParticipants: 50,
+        registeredParticipants: 50,
+        status: "active",
+        type: "single",
+        services: [
+          {
+            id: "2-1",
+            name: "Зимняя одежда",
+            time: "14:00-16:00",
+            capacity: 25,
+            bookingWindow: 14,
+            registeredParticipants: 25,
+          },
+          {
+            id: "2-2",
+            name: "Летняя одежда",
+            time: "16:00-18:00",
+            capacity: 25,
+            bookingWindow: 14,
+            registeredParticipants: 25,
+          },
+        ],
+      },
+      {
+        id: "3",
+        title: "Юридическая помощь",
+        date: new Date(2024, 11, 5, 9, 0),
+        location: "Ясная",
+        maxParticipants: 20,
+        registeredParticipants: 15,
+        status: "archived",
+        type: "single",
+        services: [
+          {
+            id: "3-1",
+            name: "Консультация юриста",
+            time: "09:00-13:00",
+            capacity: 20,
+            bookingWindow: 10,
+            registeredParticipants: 15,
+          },
+        ],
+      },
+      {
+        id: "4",
+        title: "Еженедельная продуктовая помощь",
+        date: new Date(2025, 3, 20, 11, 0),
+        location: "Цветной",
+        maxParticipants: 100,
+        registeredParticipants: 45,
+        status: "active",
+        type: "recurring",
+        recurrence: {
+          frequency: "weekly",
+          infinite: true,
+        },
+        services: [
+          {
+            id: "4-1",
+            name: "Продуктовые наборы",
+            time: "11:00-15:00",
+            capacity: 100,
+            bookingWindow: 21,
+            registeredParticipants: 45,
+          },
+        ],
+      },
+      {
+        id: "5",
+        title: "Ежемесячная консультация психолога",
+        date: new Date(2025, 2, 5, 13, 0),
+        location: "Гиляровского",
+        maxParticipants: 15,
+        registeredParticipants: 8,
+        status: "active",
+        type: "recurring",
+        recurrence: {
+          frequency: "monthly",
+          endDate: new Date(2025, 8, 5),
+          infinite: false,
+        },
+        services: [
+          {
+            id: "5-1",
+            name: "Психолог",
+            time: "13:00-17:00",
+            capacity: 15,
+            bookingWindow: 14,
+            registeredParticipants: 8,
+          },
+        ],
+      },
+      {
+        id: "6",
+        title: "Архивное разовое событие",
+        date: new Date(2024, 1, 15, 10, 0),
+        location: "Цветной",
+        maxParticipants: 25,
+        registeredParticipants: 20,
+        status: "archived",
+        type: "single",
+        services: [
+          {
+            id: "6-1",
+            name: "Терапевт",
+            time: "10:00-12:00",
+            capacity: 15,
+            bookingWindow: 14,
+            registeredParticipants: 12,
+          },
+          {
+            id: "6-2",
+            name: "Консультация юриста",
+            time: "12:00-14:00",
+            capacity: 10,
+            bookingWindow: 7,
+            registeredParticipants: 8,
+          },
+        ],
+      },
+      {
+        id: "7",
+        title: "Архивное повторяющееся событие",
+        date: new Date(2024, 2, 1, 14, 0),
+        location: "Ясная",
+        maxParticipants: 40,
+        registeredParticipants: 35,
+        status: "archived",
+        type: "recurring",
+        recurrence: {
+          frequency: "weekly",
+          endDate: new Date(2024, 5, 1),
+          infinite: false,
+        },
+        services: [
+          {
+            id: "7-1",
+            name: "Продуктовые наборы",
+            time: "14:00-16:00",
+            capacity: 40,
+            bookingWindow: 14,
+            registeredParticipants: 35,
+          },
+        ],
+      },
+    ]
+
+    setEvents(mockEvents)
+  }, [])
+
+  // Собираем все уникальные услуги из событий для фильтра
+  useEffect(() => {
+    const services = new Set<string>()
+    events.forEach((event) => {
+      event.services.forEach((service) => {
+        services.add(service.name)
+      })
+    })
+
+    const servicesList = Array.from(services).map((name, index) => ({
+      id: `service-${index}`,
+      name,
+    }))
+
+    setAvailableServices(servicesList)
+  }, [events])
+
+  // Обновление фильтров при изменении активной вкладки
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      status: activeTab === "active" ? "active" : "archived",
+    }))
+  }, [activeTab])
+
+  // Фильтрация событий
+  useEffect(() => {
+    let filtered = [...events]
+
+    // Фильтр по статусу
+    if (filters.status !== "all") {
+      filtered = filtered.filter((event) => event.status === filters.status)
+    }
+
+    // Фильтр по типу события
+    if (filters.eventType !== "all") {
+      filtered = filtered.filter((event) => event.type === filters.eventType)
+    }
+
+    // Фильтр по услуге
+    if (filters.service !== "all") {
+      filtered = filtered.filter((event) => event.services.some((service) => service.name === filters.service))
+    }
+
+    // Фильтр по диапазону дат (только для разовых событий)
+    if (filters.dateRange.from || filters.dateRange.to) {
+      filtered = filtered.filter((event) => {
+        // Пропускаем повторяющиеся события при фильтрации по дате
+        if (event.type === "recurring") return true
+
+        if (!event.date) return false
+
+        const eventDate = new Date(event.date)
+
+        if (filters.dateRange.from && filters.dateRange.to) {
+          return eventDate >= filters.dateRange.from && eventDate <= filters.dateRange.to
+        } else if (filters.dateRange.from) {
+          return eventDate >= filters.dateRange.from
+        } else if (filters.dateRange.to) {
+          return eventDate <= filters.dateRange.to
+        }
+
+        return true
+      })
+    }
+
+    // Поиск
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        (event) => event.title.toLowerCase().includes(query) || event.location.toLowerCase().includes(query),
+      )
+    }
+
+    setFilteredEvents(filtered)
+  }, [events, filters])
 
   const handleCreateEvent = () => {
     setSelectedEvent(null)
-    setCreateNewEvent(true)
+    setIsEditing(false)
     setShowEventModal(true)
   }
 
-  const handleEditEvent = () => {
-    if (selectedEvent) {
-      setShowEventDetails(false)
-      setShowEditModal(true)
-    }
+  const handleEditEvent = (event: Event) => {
+    setSelectedEvent(event)
+    setIsEditing(true)
+    setShowEventModal(true)
   }
 
-  const handleShowRecurrenceModal = () => {
-    setShowRecurrenceModal(true)
-  }
-
-  const handleEventUpdate = (event: Event) => {
-    setEvents((prev) => prev.map((e) => (e.id === event.id ? event : e)))
-    setShowEditModal(false)
-    setShowEventDetails(false)
-  }
-
-  const handleEventDelete = () => {
-    if (selectedEvent) {
-      setEvents((prev) => prev.filter((e) => e.id !== selectedEvent.id))
-      setShowDeleteDialog(false)
-      setShowEventDetails(false)
-    }
-  }
-
-  const handleEventCreate = (event: Event) => {
-    setTempEvent(event)
-
-    if (event.recurrence) {
-      setShowRecurrenceModal(true)
+  const handleSaveEvent = (event: Event) => {
+    if (isEditing && selectedEvent) {
+      // Обновление существующего события
+      setEvents((prev) => prev.map((e) => (e.id === selectedEvent.id ? event : e)))
     } else {
-      finalizeEventCreation(event)
+      // Создание нового события
+      const newEvent = {
+        ...event,
+        id: Date.now().toString(),
+        status: "active" as const,
+      }
+      setEvents((prev) => [...prev, newEvent])
     }
-  }
-
-  const finalizeEventCreation = (event: Event) => {
-    setEvents((prev) => [...prev, { ...event, id: Date.now().toString() }])
     setShowEventModal(false)
-    setShowRecurrenceModal(false)
-    setTempEvent(null)
   }
 
-  const handleRecurrenceSave = (recurrencePattern: any) => {
-    if (tempEvent) {
-      const updatedEvent = {
-        ...tempEvent,
-        recurrence: recurrencePattern,
-        bookingWindow: recurrencePattern.bookingWindow || tempEvent.bookingWindow,
-      }
-      finalizeEventCreation(updatedEvent)
-    } else if (selectedEvent && showEditModal) {
-      // Обновление настроек повторения для существующего мероприятия
-      const updatedEvent = {
-        ...selectedEvent,
-        recurrence: recurrencePattern,
-        bookingWindow: recurrencePattern.bookingWindow || selectedEvent.bookingWindow,
-      }
-      handleEventUpdate(updatedEvent)
-      setShowRecurrenceModal(false)
+  const handleDeleteEvent = (eventId: string) => {
+    setEvents((prev) => prev.filter((event) => event.id !== eventId))
+  }
+
+  const handleArchiveEvent = (eventId: string) => {
+    setEvents((prev) => prev.map((event) => (event.id === eventId ? { ...event, status: "archived" } : event)))
+  }
+
+  const handleActivateEvent = (event: Event) => {
+    if (event.type === "recurring") {
+      // Для повторяющихся событий - просто активируем
+      setEvents((prev) => prev.map((e) => (e.id === event.id ? { ...e, status: "active" } : e)))
+    } else {
+      // Для разовых событий - открываем модальное окно для выбора новой даты
+      setEventToActivate(event)
+      setShowActivateModal(true)
     }
   }
 
-  const getEventTypeLabel = (type: string) => {
-    switch (type) {
-      case "medical":
-        return "Медицинская помощь"
-      case "clothing":
-        return "Выдача одежды"
-      case "psychology":
-        return "Психологическая помощь"
-      case "legal":
-        return "Юридическая помощь"
-      default:
-        return type
-    }
+  const handleConfirmActivation = (event: Event, newDate: Date) => {
+    setEvents((prev) => prev.map((e) => (e.id === event.id ? { ...e, status: "active", date: newDate } : e)))
+    setShowActivateModal(false)
+    setEventToActivate(null)
   }
 
-  const getEventTypeColor = (type: string) => {
-    switch (type) {
-      case "medical":
-        return "bg-blue-100 text-blue-800"
-      case "clothing":
-        return "bg-green-100 text-green-800"
-      case "psychology":
-        return "bg-purple-100 text-purple-800"
-      case "legal":
-        return "bg-amber-100 text-amber-800"
-      default:
-        return "bg-gray-100 text-gray-800"
+  const handleAddLocation = (location: Omit<Location, "id">) => {
+    const newLocation = {
+      ...location,
+      id: `loc-${Date.now()}`,
     }
+    setLocations((prev) => [...prev, newLocation])
+    return newLocation
   }
 
-  const getRecurrenceLabel = (recurrence: any) => {
-    if (!recurrence) return "Одиночное мероприятие"
-
-    let label = ""
-
-    switch (recurrence.type) {
-      case "daily":
-        label = `Ежедневно`
-        break
-      case "weekly":
-        label = `Еженедельно`
-        break
-      case "monthly":
-        label = `Ежемесячно`
-        break
-      default:
-        label = recurrence.type
-    }
-
-    if (recurrence.interval > 1) {
-      label += ` (каждые ${recurrence.interval} ${
-        recurrence.type === "daily" ? "дней" : recurrence.type === "weekly" ? "недель" : "месяцев"
-      })`
-    }
-
-    if (recurrence.end) {
-      if (recurrence.end.indefinite) {
-        label += ", бессрочно"
-      } else if (recurrence.end.count) {
-        label += `, ${recurrence.end.count} раз`
-      } else if (recurrence.end.date) {
-        label += `, до ${format(new Date(recurrence.end.date), "dd.MM.yyyy")}`
-      }
-    }
-
-    return label
+  const clearFilters = () => {
+    setFilters({
+      dateRange: { from: undefined, to: undefined },
+      eventType: "all",
+      status: activeTab === "active" ? "active" : "archived",
+      searchQuery: "",
+      service: "all",
+    })
   }
+
+  // Автоматическое архивирование прошедших разовых событий
+  useEffect(() => {
+    const now = new Date()
+    setEvents((prev) =>
+      prev.map((event) => {
+        if (event.type === "single" && event.date && event.status === "active") {
+          if (!isAfter(event.date, now)) {
+            return { ...event, status: "archived" }
+          }
+        }
+        return event
+      }),
+    )
+  }, [])
 
   return (
     <div className="space-y-6 relative">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h1 className="text-3xl font-bold">Управление расписанием</h1>
+        <Button onClick={handleCreateEvent} className="bg-green-600 hover:bg-green-700">
+          <Plus className="h-4 w-4 mr-2" />
+          Создать событие
+        </Button>
       </div>
 
-      <Tabs defaultValue="calendar" className="w-full">
-        <TabsList>
-          <TabsTrigger value="calendar">Календарь</TabsTrigger>
-          <TabsTrigger value="daily">По дням</TabsTrigger>
+      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
+        <div className="relative flex-1">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Поиск по названию или месту..."
+            className="pl-8"
+            value={filters.searchQuery}
+            onChange={(e) => setFilters((prev) => ({ ...prev, searchQuery: e.target.value }))}
+          />
+        </div>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setShowFilters(!showFilters)}
+          className={showFilters ? "bg-secondary" : ""}
+        >
+          <Filter className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {showFilters && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Диапазон дат</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start text-left">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {filters.dateRange.from
+                        ? filters.dateRange.to
+                          ? `${format(filters.dateRange.from, "dd.MM.yyyy")} - ${format(filters.dateRange.to, "dd.MM.yyyy")}`
+                          : `С ${format(filters.dateRange.from, "dd.MM.yyyy")}`
+                        : filters.dateRange.to
+                          ? `По ${format(filters.dateRange.to, "dd.MM.yyyy")}`
+                          : "Выберите даты"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <CalendarComponent
+                      mode="range"
+                      selected={{
+                        from: filters.dateRange.from,
+                        to: filters.dateRange.to,
+                      }}
+                      onSelect={(range) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          dateRange: {
+                            from: range?.from,
+                            to: range?.to,
+                          },
+                        }))
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Тип события</label>
+                <Select
+                  value={filters.eventType}
+                  onValueChange={(value) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      eventType: value as "all" | "single" | "recurring",
+                    }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Все типы" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Все типы</SelectItem>
+                    <SelectItem value="single">Разовые</SelectItem>
+                    <SelectItem value="recurring">Повторяющиеся</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Услуга</label>
+                <Select
+                  value={filters.service}
+                  onValueChange={(value) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      service: value,
+                    }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Все услуги" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Все услуги</SelectItem>
+                    {availableServices.map((service) => (
+                      <SelectItem key={service.id} value={service.name}>
+                        {service.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="md:col-span-3 flex justify-end">
+                <Button variant="ghost" onClick={clearFilters}>
+                  Сбросить фильтры
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <Tabs
+        defaultValue="active"
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as "active" | "archived")}
+      >
+        <TabsList className="mb-4">
+          <TabsTrigger value="active">Активные</TabsTrigger>
+          <TabsTrigger value="archived">Архивные</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="calendar" className="space-y-4">
+        <TabsContent value="active">
           <Card>
             <CardHeader>
-              <CardTitle>Календарь мероприятий</CardTitle>
+              <CardTitle>
+                Активные события
+                <Badge className="ml-2">{filteredEvents.length}</Badge>
+              </CardTitle>
             </CardHeader>
-            <CardContent className="pt-0">
-              <AdminCalendar events={events} onEventSelect={handleEventSelect} />
+            <CardContent>
+              {filteredEvents.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  Нет активных событий, соответствующих заданным критериям
+                </div>
+              ) : (
+                <div className="hidden md:block">
+                  <EventTable
+                    events={filteredEvents}
+                    onEdit={handleEditEvent}
+                    onDelete={handleDeleteEvent}
+                    onArchive={handleArchiveEvent}
+                    isActive={true}
+                  />
+                </div>
+              )}
+
+              {/* Мобильное представление */}
+              <div className="md:hidden">
+                <div className="space-y-4">
+                  {filteredEvents.map((event) => (
+                    <EventCard
+                      key={event.id}
+                      event={event}
+                      onEdit={() => handleEditEvent(event)}
+                      onDelete={() => handleDeleteEvent(event.id)}
+                      onArchive={() => handleArchiveEvent(event.id)}
+                      isActive={true}
+                    />
+                  ))}
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="daily">
+        <TabsContent value="archived">
           <Card>
             <CardHeader>
-              <CardTitle>Мероприятия по дням</CardTitle>
+              <CardTitle>
+                Архивные события
+                <Badge className="ml-2">{filteredEvents.length}</Badge>
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-muted-foreground">
-                Представление по дням находится в разработке
+              {filteredEvents.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  Нет архивных событий, соответствующих заданным критериям
+                </div>
+              ) : (
+                <div className="hidden md:block">
+                  <EventTable
+                    events={filteredEvents}
+                    onEdit={handleEditEvent}
+                    onDelete={handleDeleteEvent}
+                    onActivate={handleActivateEvent}
+                    isActive={false}
+                  />
+                </div>
+              )}
+
+              {/* Мобильное представление */}
+              <div className="md:hidden">
+                <div className="space-y-4">
+                  {filteredEvents.map((event) => (
+                    <EventCard
+                      key={event.id}
+                      event={event}
+                      onEdit={() => handleEditEvent(event)}
+                      onDelete={() => handleDeleteEvent(event.id)}
+                      onActivate={() => handleActivateEvent(event)}
+                      isActive={false}
+                    />
+                  ))}
+                </div>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
 
-      {/* Floating Action Button */}
-      <div className="fixed bottom-6 right-6 z-10">
-        <Button
-          onClick={handleCreateEvent}
-          size="lg"
-          className="h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all bg-blue-500 hover:bg-blue-600"
-        >
-          <Plus className="h-6 w-6" />
-          <span className="sr-only">Создать мероприятие</span>
-        </Button>
-      </div>
-
-      {/* Event Details Modal */}
-      <Dialog open={showEventDetails} onOpenChange={setShowEventDetails}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Детали мероприятия</DialogTitle>
-          </DialogHeader>
-
-          {selectedEvent && (
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <h3 className="text-xl font-semibold">{selectedEvent.title}</h3>
-                <div className="flex flex-wrap gap-2">
-                  <Badge className={getEventTypeColor(selectedEvent.type)}>
-                    {getEventTypeLabel(selectedEvent.type)}
-                  </Badge>
-                  <Badge
-                    className={
-                      selectedEvent.status === "open" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                    }
-                  >
-                    {selectedEvent.status === "open" ? "Открыто" : "Заполнено"}
-                  </Badge>
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Дата:</span>
-                  <span className="font-medium">{format(selectedEvent.start, "dd.MM.yyyy", { locale: ru })}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Время:</span>
-                  <span className="font-medium">
-                    {format(selectedEvent.start, "HH:mm")} - {format(selectedEvent.end, "HH:mm")}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Вместимость:</span>
-                  <span className="font-medium">
-                    {selectedEvent.registered}/{selectedEvent.capacity}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Повторение:</span>
-                  <span className="font-medium">{getRecurrenceLabel(selectedEvent.recurrence)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Окно бронирования:</span>
-                  <span className="font-medium">{selectedEvent.bookingWindow || 14} дней</span>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Button className="flex-1" onClick={handleEditEvent}>
-                  <Edit className="h-4 w-4 mr-2" />
-                  Редактировать
-                </Button>
-                <Button variant="destructive" className="flex-1" onClick={() => setShowDeleteDialog(true)}>
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Удалить
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Event Creation Modal */}
+      {/* Модальное окно создания/редактирования события */}
       <Dialog open={showEventModal} onOpenChange={setShowEventModal}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{createNewEvent ? "Создание мероприятия" : "Редактирование мероприятия"}</DialogTitle>
+            <DialogTitle>{isEditing ? "Редактирование события" : "Создание события"}</DialogTitle>
           </DialogHeader>
-
           <EventForm
-            isCreating={createNewEvent}
             event={selectedEvent}
-            onShowRecurrence={handleShowRecurrenceModal}
-            onSubmit={createNewEvent ? handleEventCreate : handleEventUpdate}
+            locations={locations}
+            availableServices={serviceOptions}
+            onSave={handleSaveEvent}
             onCancel={() => setShowEventModal(false)}
+            onAddLocation={handleAddLocation}
           />
         </DialogContent>
       </Dialog>
 
-      {/* Event Edit Modal */}
-      {selectedEvent && (
-        <EditEventModal
-          event={selectedEvent}
-          onUpdate={handleEventUpdate}
-          onDelete={handleEventDelete}
-          onClose={() => setShowEditModal(false)}
-          onShowRecurrence={handleShowRecurrenceModal}
-          open={showEditModal}
+      {/* Модальное окно активации разового события */}
+      {eventToActivate && (
+        <ActivateEventModal
+          event={eventToActivate}
+          open={showActivateModal}
+          onClose={() => {
+            setShowActivateModal(false)
+            setEventToActivate(null)
+          }}
+          onConfirm={handleConfirmActivation}
         />
       )}
 
-      {/* Recurrence Modal */}
-      <RecurrenceModal
-        bookingWindow={tempEvent?.bookingWindow || selectedEvent?.bookingWindow || 14}
-        recurrence={tempEvent?.recurrence || selectedEvent?.recurrence}
-        onSave={handleRecurrenceSave}
-        onClose={() => setShowRecurrenceModal(false)}
-        open={showRecurrenceModal}
-      />
-
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Удалить мероприятие</AlertDialogTitle>
-            <AlertDialogDescription>
-              Вы уверены, что хотите удалить это мероприятие? Это действие нельзя отменить.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Отмена</AlertDialogCancel>
-            <AlertDialogAction onClick={handleEventDelete} className="bg-red-500 hover:bg-red-600">
-              Удалить
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Floating Action Button для мобильных устройств */}
+      <div className="md:hidden fixed bottom-6 right-6 z-10">
+        <Button
+          onClick={handleCreateEvent}
+          size="lg"
+          className="h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all bg-green-600 hover:bg-green-700"
+        >
+          <Plus className="h-6 w-6" />
+          <span className="sr-only">Создать событие</span>
+        </Button>
+      </div>
     </div>
   )
 }

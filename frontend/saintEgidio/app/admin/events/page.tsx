@@ -1,119 +1,91 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { EventTable, EventFilters, type EventFiltersState } from "@/components/admin/event-table"
-import { ParticipantTable } from "@/components/admin/participant-table"
+import { EventList } from "@/components/admin/event-list"
+import { EventFilters } from "@/components/admin/event-filters"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { EditEventModal } from "@/components/admin/edit-event-modal"
 import { ExportModule } from "@/components/admin/export-module"
-
-interface Event {
-  id: string
-  title: string
-  type: string
-  start: Date
-  end: Date
-  capacity: number
-  registered: number
-  status: "open" | "full"
-}
-
-interface Participant {
-  id: string
-  name: string
-  surname: string
-  phone: string
-  status: "attended" | "no-show" | "pending"
-  comment: string
-}
+import { ParticipantManagementModal } from "@/components/admin/participant-management-modal"
+import { Badge } from "@/components/ui/badge"
+import { Event, EventFiltersState } from "@/types/event"
 
 export default function EventsPage() {
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming")
   const [filters, setFilters] = useState<EventFiltersState>({
-    dateRange: { from: undefined, to: undefined },
     eventType: "all",
-    status: "all",
+    place: "all",
+    participant: "",
   })
-
   const [events, setEvents] = useState<Event[]>([])
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([])
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [showParticipants, setShowParticipants] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
 
-  // Mock participants data
-  const [participants, setParticipants] = useState<Participant[]>([
-    {
-      id: "1",
-      name: "Виктор",
-      surname: "Толстихин",
-      phone: "+7 (123) 456-78-90",
-      status: "attended",
-      comment: "",
-    },
-    {
-      id: "2",
-      name: "Анна",
-      surname: "Петрова",
-      phone: "+7 (987) 654-32-10",
-      status: "no-show",
-      comment: "Не пришла без предупреждения",
-    },
-    {
-      id: "3",
-      name: "Сергей",
-      surname: "Иванов",
-      phone: "+7 (555) 123-45-67",
-      status: "pending",
-      comment: "Нужна дополнительная помощь",
-    },
-  ])
-
   // Mock events data
   useEffect(() => {
+    const now = new Date()
+    const tomorrow = new Date(now)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    const nextWeek = new Date(now)
+    nextWeek.setDate(nextWeek.getDate() + 7)
+
     const mockEvents: Event[] = [
       {
         id: "1",
         title: "Медицинская консультация",
-        type: "medical",
-        start: new Date(2025, 2, 10, 10, 0),
-        end: new Date(2025, 2, 10, 11, 0),
+        type: "single",
+        start: tomorrow,
+        place: "Цветной",
         capacity: 15,
-        registered: 10,
-        status: "open",
+        status: "active",
+        services: [
+          {
+            id: "1-1",
+            name: "Терапевт",
+            time: "10:00-12:00",
+            capacity: 10,
+            bookingWindow: 14,
+            registered: 5,
+            type: "medical"
+          }
+        ]
       },
       {
         id: "2",
         title: "Выдача одежды",
-        type: "clothing",
-        start: new Date(2025, 2, 11, 14, 0),
-        end: new Date(2025, 2, 11, 16, 0),
+        type: "recurring",
+        start: nextWeek,
+        place: "Гиляровского",
         capacity: 20,
-        registered: 20,
-        status: "full",
-      },
-      {
-        id: "3",
-        title: "Консультация психолога",
-        type: "psychology",
-        start: new Date(2025, 2, 12, 12, 0),
-        end: new Date(2025, 2, 12, 13, 0),
-        capacity: 5,
-        registered: 3,
-        status: "open",
-      },
-      {
-        id: "4",
-        title: "Юридическая помощь (прошедшее)",
-        type: "legal",
-        start: new Date(2025, 1, 13, 15, 0),
-        end: new Date(2025, 1, 13, 17, 0),
-        capacity: 10,
-        registered: 8,
-        status: "open",
-      },
+        status: "active",
+        services: [
+          {
+            id: "2-1",
+            name: "Зимняя одежда",
+            time: "14:00-16:00",
+            capacity: 10,
+            bookingWindow: 14,
+            registered: 8,
+            type: "clothing"
+          },
+          {
+            id: "2-2",
+            name: "Летняя одежда",
+            time: "16:00-18:00",
+            capacity: 10,
+            bookingWindow: 14,
+            registered: 6,
+            type: "clothing"
+          }
+        ],
+        recurrence: {
+          type: "weekly",
+          interval: 1
+        }
+      }
     ]
 
     setEvents(mockEvents)
@@ -129,14 +101,17 @@ export default function EventsPage() {
       if (activeTab === "past" && event.start >= now) return false
 
       // Filter by event type
-      if (filters.eventType !== "all" && event.type !== filters.eventType) return false
+      if (filters.eventType !== "all" && !event.services.some(service => service.type === filters.eventType)) return false
 
-      // Filter by status
-      if (filters.status !== "all" && event.status !== filters.status) return false
+      // Filter by place
+      if (filters.place !== "all" && event.place !== filters.place) return false
 
-      // Filter by date range
-      if (filters.dateRange.from && event.start < filters.dateRange.from) return false
-      if (filters.dateRange.to && event.start > filters.dateRange.to) return false
+      // Filter by participant
+      if (filters.participant) {
+        // In a real app, this would check if the participant is registered for this event
+        // For this example, we'll just filter based on the event ID
+        if (event.id !== "1" && event.id !== "3") return false
+      }
 
       return true
     })
@@ -161,14 +136,6 @@ export default function EventsPage() {
   const handleEventUpdate = (updatedEvent: Event) => {
     setEvents((prev) => prev.map((e) => (e.id === updatedEvent.id ? updatedEvent : e)))
     setShowEditModal(false)
-  }
-
-  const handleParticipantUpdate = (participant: Participant) => {
-    setParticipants((prev) => prev.map((p) => (p.id === participant.id ? participant : p)))
-  }
-
-  const handleParticipantRemove = (participantId: string) => {
-    setParticipants((prev) => prev.filter((p) => p.id !== participantId))
   }
 
   return (
@@ -201,14 +168,17 @@ export default function EventsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Список мероприятий</CardTitle>
+              <CardTitle>
+                Список мероприятий
+                <Badge className="ml-2">{filteredEvents.length}</Badge>
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <EventTable
+              <EventList
                 events={filteredEvents}
                 onViewParticipants={handleViewParticipants}
-                onEditEvent={handleEditEvent}
-                onDeleteEvent={handleDeleteEvent}
+                onEdit={handleEditEvent}
+                onDelete={handleDeleteEvent}
               />
             </CardContent>
           </Card>
@@ -226,15 +196,17 @@ export default function EventsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Архив мероприятий</CardTitle>
+              <CardTitle>
+                Архив мероприятий
+                <Badge className="ml-2">{filteredEvents.length}</Badge>
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <EventTable
+              <EventList
                 events={filteredEvents}
                 onViewParticipants={handleViewParticipants}
-                onEditEvent={handleEditEvent}
-                onDeleteEvent={handleDeleteEvent}
-                isPastEvents={activeTab === "past"}
+                onEdit={handleEditEvent}
+                onDelete={handleDeleteEvent}
               />
             </CardContent>
           </Card>
@@ -244,28 +216,23 @@ export default function EventsPage() {
         </TabsContent>
       </Tabs>
 
-      <Dialog open={showParticipants} onOpenChange={setShowParticipants}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>
-              Участники: {selectedEvent?.title} ({selectedEvent && new Date(selectedEvent.start).toLocaleDateString()})
-            </DialogTitle>
-          </DialogHeader>
+      {/* Модальное окно управления участниками */}
+      {selectedEvent && (
+        <ParticipantManagementModal
+          event={selectedEvent}
+          open={showParticipants}
+          onClose={() => setShowParticipants(false)}
+        />
+      )}
 
-          <ParticipantTable
-            participants={participants}
-            onUpdate={handleParticipantUpdate}
-            onRemove={handleParticipantRemove}
-          />
-        </DialogContent>
-      </Dialog>
-
+      {/* Модальное окно редактирования события */}
       {showEditModal && selectedEvent && (
         <EditEventModal
           event={selectedEvent}
           onUpdate={handleEventUpdate}
           onDelete={handleDeleteEvent}
           onClose={() => setShowEditModal(false)}
+          open={showEditModal}
         />
       )}
     </div>
