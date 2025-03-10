@@ -38,7 +38,7 @@ interface Participant {
   id: string
   name: string
   surname: string
-  phone: string
+  telegramId: string
   status: "attended" | "no-show" | "pending"
 }
 
@@ -62,21 +62,21 @@ export function ParticipantManagementModal({ event, open, onClose }: Participant
       id: "1",
       name: "Виктор",
       surname: "Толстихин",
-      phone: "+7 (123) 456-78-90",
+      telegramId: "@volunteer1",
       status: "attended",
     },
     {
       id: "2",
       name: "Анна",
       surname: "Петрова",
-      phone: "+7 (987) 654-32-10",
+      telegramId: "@volunteer2",
       status: "no-show",
     },
     {
       id: "3",
       name: "Сергей",
       surname: "Иванов",
-      phone: "+7 (555) 123-45-67",
+      telegramId: "@volunteer3",
       status: "pending",
     },
   ])
@@ -108,21 +108,21 @@ export function ParticipantManagementModal({ event, open, onClose }: Participant
           id: "p1",
           name: "Виктор",
           surname: "Толстихин",
-          phone: "+7 (123) 456-78-90",
+          telegramId: "@volunteer1",
           status: "attended",
         },
         {
           id: "p2",
           name: "Анна",
           surname: "Петрова",
-          phone: "+7 (987) 654-32-10",
+          telegramId: "@volunteer2",
           status: "no-show",
         },
         {
           id: "p3",
           name: "Сергей",
           surname: "Иванов",
-          phone: "+7 (555) 123-45-67",
+          telegramId: "@volunteer3",
           status: "pending",
         },
       ]
@@ -163,7 +163,7 @@ export function ParticipantManagementModal({ event, open, onClose }: Participant
   // Обработка выбора пользователя из результатов поиска
   const handleUserSelect = (user: User) => {
     // Проверяем, не зарегистрирован ли уже этот пользователь
-    if (participants.some(p => p.phone === user.phone)) {
+    if (participants.some(p => p.telegramId === user.phone)) {
       alert("Этот пользователь уже зарегистрирован на мероприятие")
       return
     }
@@ -173,7 +173,7 @@ export function ParticipantManagementModal({ event, open, onClose }: Participant
       id: `p${Date.now()}`,
       name: user.name,
       surname: user.surname,
-      phone: user.phone,
+      telegramId: user.phone,
       status: "pending"
     }
 
@@ -305,8 +305,9 @@ export function ParticipantManagementModal({ event, open, onClose }: Participant
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[50px]"></TableHead>
+                <TableHead>ID</TableHead>
                 <TableHead>ФИО</TableHead>
-                <TableHead>Телефон</TableHead>
+                <TableHead>Волонтер (Telegram)</TableHead>
                 <TableHead>Статус</TableHead>
               </TableRow>
             </TableHeader>
@@ -319,10 +320,11 @@ export function ParticipantManagementModal({ event, open, onClose }: Participant
                       onCheckedChange={() => handleSelectParticipant(participant.id)}
                     />
                   </TableCell>
+                  <TableCell className="font-mono text-sm">{participant.id}</TableCell>
                   <TableCell>
                     {participant.name} {participant.surname}
                   </TableCell>
-                  <TableCell>{participant.phone}</TableCell>
+                  <TableCell>{participant.telegramId}</TableCell>
                   <TableCell>
                     <span
                       className={cn(

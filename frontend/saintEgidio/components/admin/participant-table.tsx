@@ -18,6 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Checkbox } from "@/components/ui/checkbox"
 
 export interface Participant {
   id: string
@@ -37,6 +38,7 @@ export interface ParticipantTableProps {
 export function ParticipantTable({ participants, onUpdate, onRemove }: ParticipantTableProps) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editValues, setEditValues] = useState<Partial<Participant>>({})
+  const [selectedParticipants, setSelectedParticipants] = useState<string[]>([])
 
   const handleEditStart = (participant: Participant) => {
     setEditingId(participant.id)
@@ -108,6 +110,14 @@ export function ParticipantTable({ participants, onUpdate, onRemove }: Participa
     }
   }
 
+  const handleSelectParticipant = (participantId: string) => {
+    if (selectedParticipants.includes(participantId)) {
+      setSelectedParticipants(selectedParticipants.filter((id) => id !== participantId))
+    } else {
+      setSelectedParticipants([...selectedParticipants, participantId])
+    }
+  }
+
   return (
     <div>
       {participants.length === 0 ? (
@@ -116,8 +126,9 @@ export function ParticipantTable({ participants, onUpdate, onRemove }: Participa
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Имя</TableHead>
-              <TableHead>Фамилия</TableHead>
+              <TableHead className="w-[50px]"></TableHead>
+              <TableHead>ID</TableHead>
+              <TableHead>ФИО</TableHead>
               <TableHead>Телефон</TableHead>
               <TableHead>Статус</TableHead>
               <TableHead>Комментарий</TableHead>
@@ -128,32 +139,16 @@ export function ParticipantTable({ participants, onUpdate, onRemove }: Participa
             {participants.map((participant) => (
               <TableRow key={participant.id}>
                 <TableCell>
-                  {editingId === participant.id ? (
-                    <Input value={editValues.name || ""} onChange={(e) => handleInputChange("name", e.target.value)} />
-                  ) : (
-                    participant.name
-                  )}
+                  <Checkbox
+                    checked={selectedParticipants.includes(participant.id)}
+                    onCheckedChange={() => handleSelectParticipant(participant.id)}
+                  />
                 </TableCell>
+                <TableCell className="font-mono text-sm">{participant.id}</TableCell>
                 <TableCell>
-                  {editingId === participant.id ? (
-                    <Input
-                      value={editValues.surname || ""}
-                      onChange={(e) => handleInputChange("surname", e.target.value)}
-                    />
-                  ) : (
-                    participant.surname
-                  )}
+                  {participant.name} {participant.surname}
                 </TableCell>
-                <TableCell>
-                  {editingId === participant.id ? (
-                    <Input
-                      value={editValues.phone || ""}
-                      onChange={(e) => handleInputChange("phone", e.target.value)}
-                    />
-                  ) : (
-                    participant.phone
-                  )}
-                </TableCell>
+                <TableCell>{participant.phone}</TableCell>
                 <TableCell>
                   {editingId === participant.id ? (
                     <Select

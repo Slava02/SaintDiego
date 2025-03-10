@@ -32,8 +32,8 @@ interface ExportFields {
   eventDate: boolean
   participantName: boolean
   participantPhone: boolean
-  participantStatus: boolean
-  participantComment: boolean
+  telegramId: boolean
+  participantId: boolean
 }
 
 interface Event {
@@ -52,9 +52,8 @@ interface Participant {
   name: string
   surname: string
   phone: string
-  status: "attended" | "no-show" | "pending"
-  comment: string
   registrationDate: Date
+  telegramId: string
   event: Event
 }
 
@@ -71,8 +70,8 @@ export function ExportModule() {
     eventDate: true,
     participantName: true,
     participantPhone: true,
-    participantStatus: true,
-    participantComment: true,
+    telegramId: true,
+    participantId: true,
   })
 
   const [showPreview, setShowPreview] = useState(false)
@@ -84,9 +83,8 @@ export function ExportModule() {
       name: "Виктор",
       surname: "Толстихин",
       phone: "+7 (123) 456-78-90",
-      status: "attended",
-      comment: "",
       registrationDate: new Date(2025, 1, 15),
+      telegramId: "@volunteer1",
       event: {
         id: "1",
         title: "Медицинская консультация",
@@ -103,9 +101,8 @@ export function ExportModule() {
       name: "Анна",
       surname: "Петрова",
       phone: "+7 (987) 654-32-10",
-      status: "no-show",
-      comment: "Не пришла без предупреждения",
       registrationDate: new Date(2025, 1, 20),
+      telegramId: "@volunteer2",
       event: {
         id: "2",
         title: "Выдача одежды",
@@ -122,9 +119,8 @@ export function ExportModule() {
       name: "Сергей",
       surname: "Иванов",
       phone: "+7 (555) 123-45-67",
-      status: "pending",
-      comment: "Нужна дополнительная помощь",
       registrationDate: new Date(2025, 2, 1),
+      telegramId: "@volunteer3",
       event: {
         id: "3",
         title: "Консультация психолога",
@@ -153,7 +149,7 @@ export function ExportModule() {
   }
 
   const handleGeneratePreview = () => {
-    setShowPreview(true)
+    setShowPreview(!showPreview)
   }
 
   const handleExportToExcel = () => {
@@ -181,32 +177,6 @@ export function ExportModule() {
     }
   }
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "attended":
-        return "Присутствовал"
-      case "no-show":
-        return "Не явился"
-      case "pending":
-        return "Ожидается"
-      default:
-        return status
-    }
-  }
-
-  const getStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case "attended":
-        return "bg-green-100 text-green-800"
-      case "no-show":
-        return "bg-red-100 text-red-800"
-      case "pending":
-        return "bg-yellow-100 text-yellow-800"
-      default:
-        return "bg-gray-100"
-    }
-  }
-
   // Filter participants based on current filters
   const filteredParticipants = mockParticipants.filter((participant) => {
     // Filter by event type
@@ -219,11 +189,6 @@ export function ExportModule() {
       return false
     }
     if (filters.dateRange.to && participant.event.start > filters.dateRange.to) {
-      return false
-    }
-
-    // Filter by participant status
-    if (filters.participantStatus !== "all" && participant.status !== filters.participantStatus) {
       return false
     }
 
@@ -258,24 +223,6 @@ export function ExportModule() {
                   <SelectItem value="clothing">Выдача одежды</SelectItem>
                   <SelectItem value="psychology">Психологическая помощь</SelectItem>
                   <SelectItem value="legal">Юридическая помощь</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Статус участника</Label>
-              <Select
-                value={filters.participantStatus}
-                onValueChange={(value) => handleFilterChange("participantStatus", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Все статусы" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Все статусы</SelectItem>
-                  <SelectItem value="attended">Присутствовал</SelectItem>
-                  <SelectItem value="no-show">Не явился</SelectItem>
-                  <SelectItem value="pending">Ожидается</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -397,20 +344,20 @@ export function ExportModule() {
 
             <div className="flex items-center space-x-2">
               <Checkbox
-                id="field-participant-status"
-                checked={fields.participantStatus}
-                onCheckedChange={() => handleFieldToggle("participantStatus")}
+                id="field-telegram-id"
+                checked={fields.telegramId}
+                onCheckedChange={() => handleFieldToggle("telegramId")}
               />
-              <Label htmlFor="field-participant-status">Статус</Label>
+              <Label htmlFor="field-telegram-id">Волонтер (Telegram)</Label>
             </div>
 
             <div className="flex items-center space-x-2">
               <Checkbox
-                id="field-participant-comment"
-                checked={fields.participantComment}
-                onCheckedChange={() => handleFieldToggle("participantComment")}
+                id="field-participant-id"
+                checked={fields.participantId}
+                onCheckedChange={() => handleFieldToggle("participantId")}
               />
-              <Label htmlFor="field-participant-comment">Комментарий</Label>
+              <Label htmlFor="field-participant-id">ID участника</Label>
             </div>
           </div>
         </CardContent>
@@ -447,10 +394,10 @@ export function ExportModule() {
                   <TableRow>
                     {fields.eventType && <TableHead>Тип мероприятия</TableHead>}
                     {fields.eventDate && <TableHead>Дата мероприятия</TableHead>}
+                    {fields.participantId && <TableHead>ID участника</TableHead>}
                     {fields.participantName && <TableHead>Участник</TableHead>}
                     {fields.participantPhone && <TableHead>Телефон</TableHead>}
-                    {fields.participantStatus && <TableHead>Статус</TableHead>}
-                    {fields.participantComment && <TableHead>Комментарий</TableHead>}
+                    {fields.telegramId && <TableHead>Волонтер</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -458,20 +405,14 @@ export function ExportModule() {
                     <TableRow key={participant.id}>
                       {fields.eventType && <TableCell>{getEventTypeLabel(participant.event.type)}</TableCell>}
                       {fields.eventDate && <TableCell>{format(participant.event.start, "dd.MM.yyyy HH:mm")}</TableCell>}
+                      {fields.participantId && <TableCell>{participant.id}</TableCell>}
                       {fields.participantName && (
                         <TableCell>
                           {participant.name} {participant.surname}
                         </TableCell>
                       )}
                       {fields.participantPhone && <TableCell>{participant.phone}</TableCell>}
-                      {fields.participantStatus && (
-                        <TableCell>
-                          <Badge className={getStatusBadgeClass(participant.status)}>
-                            {getStatusLabel(participant.status)}
-                          </Badge>
-                        </TableCell>
-                      )}
-                      {fields.participantComment && <TableCell>{participant.comment || "-"}</TableCell>}
+                      {fields.telegramId && <TableCell>{participant.telegramId}</TableCell>}
                     </TableRow>
                   ))}
                 </TableBody>

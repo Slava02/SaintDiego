@@ -51,10 +51,6 @@ interface Location {
 }
 
 interface FilterState {
-  dateRange: {
-    from: Date | undefined
-    to: Date | undefined
-  }
   eventType: "all" | "single" | "recurring"
   status: "active" | "archived" | "all"
   searchQuery: string
@@ -72,7 +68,6 @@ export default function SchedulePage() {
   const [showActivateModal, setShowActivateModal] = useState(false)
   const [eventToActivate, setEventToActivate] = useState<Event | null>(null)
   const [filters, setFilters] = useState<FilterState>({
-    dateRange: { from: undefined, to: undefined },
     eventType: "all",
     status: "all",
     searchQuery: "",
@@ -327,28 +322,6 @@ export default function SchedulePage() {
       filtered = filtered.filter((event) => event.services.some((service) => service.name === filters.service))
     }
 
-    // Фильтр по диапазону дат (только для разовых событий)
-    if (filters.dateRange.from || filters.dateRange.to) {
-      filtered = filtered.filter((event) => {
-        // Пропускаем повторяющиеся события при фильтрации по дате
-        if (event.type === "recurring") return true
-
-        if (!event.date) return false
-
-        const eventDate = new Date(event.date)
-
-        if (filters.dateRange.from && filters.dateRange.to) {
-          return eventDate >= filters.dateRange.from && eventDate <= filters.dateRange.to
-        } else if (filters.dateRange.from) {
-          return eventDate >= filters.dateRange.from
-        } else if (filters.dateRange.to) {
-          return eventDate <= filters.dateRange.to
-        }
-
-        return true
-      })
-    }
-
     // Поиск
     if (filters.searchQuery) {
       const query = filters.searchQuery.toLowerCase()
@@ -424,9 +397,8 @@ export default function SchedulePage() {
 
   const clearFilters = () => {
     setFilters({
-      dateRange: { from: undefined, to: undefined },
       eventType: "all",
-      status: activeTab === "active" ? "active" : "archived",
+      status: "all",
       searchQuery: "",
       service: "all",
     })
@@ -481,43 +453,6 @@ export default function SchedulePage() {
         <Card>
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Диапазон дат</label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      {filters.dateRange.from
-                        ? filters.dateRange.to
-                          ? `${format(filters.dateRange.from, "dd.MM.yyyy")} - ${format(filters.dateRange.to, "dd.MM.yyyy")}`
-                          : `С ${format(filters.dateRange.from, "dd.MM.yyyy")}`
-                        : filters.dateRange.to
-                          ? `По ${format(filters.dateRange.to, "dd.MM.yyyy")}`
-                          : "Выберите даты"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <CalendarComponent
-                      mode="range"
-                      selected={{
-                        from: filters.dateRange.from,
-                        to: filters.dateRange.to,
-                      }}
-                      onSelect={(range) =>
-                        setFilters((prev) => ({
-                          ...prev,
-                          dateRange: {
-                            from: range?.from,
-                            to: range?.to,
-                          },
-                        }))
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
               <div className="space-y-2">
                 <label className="text-sm font-medium">Тип события</label>
                 <Select

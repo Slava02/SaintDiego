@@ -413,7 +413,9 @@ export default function VisitorsPage() {
                               <div className="font-medium">
                                 {visitor.name} {visitor.surname}
                               </div>
+                              <div className="text-sm text-muted-foreground">ID: {visitor.id}</div>
                               <div className="text-sm text-muted-foreground">Карта №{visitor.cardNumber}</div>
+                              <div className="text-sm">{visitor.group}</div>
                             </div>
                           </div>
                         </CommandItem>
@@ -449,6 +451,7 @@ export default function VisitorsPage() {
                         <div className="font-medium">
                           {visitor.name} {visitor.surname}
                         </div>
+                        <div className="text-sm text-muted-foreground">ID: {visitor.id}</div>
                         <div className="text-sm text-muted-foreground">Карта №{visitor.cardNumber}</div>
                         <div className="text-sm">{visitor.group}</div>
                       </div>
@@ -484,6 +487,7 @@ export default function VisitorsPage() {
                     <h3 className="text-xl font-semibold text-center">
                       {selectedVisitor.name} {selectedVisitor.surname}
                     </h3>
+                    <p className="text-muted-foreground text-center">ID: {selectedVisitor.id}</p>
                     <p className="text-muted-foreground text-center">Карта №{selectedVisitor.cardNumber}</p>
                     <div className="mt-2">{getStatusBadge(selectedVisitor.status || "active")}</div>
                   </div>
@@ -562,7 +566,7 @@ export default function VisitorsPage() {
 
                   <TabsContent value="upcoming">
                     {selectedVisitor.events &&
-                    selectedVisitor.events.filter((e) => e.status === "upcoming").length > 0 ? (
+                      selectedVisitor.events.filter((e) => e.status === "upcoming").length > 0 ? (
                       <Table>
                         <TableHeader>
                           <TableRow>
@@ -606,7 +610,7 @@ export default function VisitorsPage() {
 
                   <TabsContent value="attended">
                     {selectedVisitor.events &&
-                    selectedVisitor.events.filter((e) => e.status !== "upcoming").length > 0 ? (
+                      selectedVisitor.events.filter((e) => e.status !== "upcoming").length > 0 ? (
                       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                         {selectedVisitor.events
                           .filter((event) => event.status !== "upcoming")
@@ -671,6 +675,7 @@ export default function VisitorsPage() {
                       <span className="font-medium">
                         {participant.name} {participant.surname}
                       </span>
+                      <span className="text-sm text-muted-foreground">(ID: {participant.id})</span>
                     </div>
                   </TableCell>
                   <TableCell>

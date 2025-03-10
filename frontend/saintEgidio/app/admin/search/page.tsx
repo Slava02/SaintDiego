@@ -177,6 +177,10 @@ export default function SearchPage() {
                   <h3 className="text-lg font-medium mb-2">Личные данные</h3>
                   <div className="space-y-1">
                     <div className="flex justify-between">
+                      <span className="text-muted-foreground">ID:</span>
+                      <span className="font-medium">{selectedParticipant.id}</span>
+                    </div>
+                    <div className="flex justify-between">
                       <span className="text-muted-foreground">Имя:</span>
                       <span className="font-medium">{selectedParticipant.name}</span>
                     </div>
