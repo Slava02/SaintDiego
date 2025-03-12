@@ -12,288 +12,164 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { EventForm } from "@/components/admin/event-form"
-import { EventCard } from "@/components/admin/event-card"
-import { EventTable } from "@/components/admin/event-table"
-import { ActivateEventModal } from "@/components/admin/activate-event-modal"
-
-interface Event {
-  id: string
-  title: string
-  date: Date | null
-  location: string
-  maxParticipants: number
-  registeredParticipants: number
-  status: "active" | "archived"
-  type: "single" | "recurring"
-  recurrence?: {
-    frequency: "daily" | "weekly" | "monthly"
-    endDate?: Date
-    infinite: boolean
-  }
-  services: Service[]
-}
-
-interface Service {
-  id: string
-  name: string
-  time: string
-  capacity: number
-  bookingWindow: number
-  registeredParticipants: number
-}
-
-interface Location {
-  id: string
-  name: string
-  address: string
-  description?: string
-}
+import { TimeSlot, Service, Location, LocationType, ServiceType } from "@/types/event"
+import { TimeSlotForm } from "@/components/admin/time-slot-form"
+import { TimeSlotCard } from "@/components/admin/time-slot-card"
+import { TimeSlotTable } from "@/components/admin/time-slot-table"
+import { ActivateTimeSlotModal } from "@/components/admin/activate-time-slot-modal"
 
 interface FilterState {
-  eventType: "all" | "single" | "recurring"
+  type: "all" | "single" | "recurring"
   status: "active" | "archived" | "all"
   searchQuery: string
   service: string
 }
 
 export default function SchedulePage() {
-  const [events, setEvents] = useState<Event[]>([])
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([])
-  const [showEventModal, setShowEventModal] = useState(false)
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
+  const [filteredTimeSlots, setFilteredTimeSlots] = useState<TimeSlot[]>([])
+  const [showTimeSlotModal, setShowTimeSlotModal] = useState(false)
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [activeTab, setActiveTab] = useState<"active" | "archived">("active")
   const [showFilters, setShowFilters] = useState(false)
   const [showActivateModal, setShowActivateModal] = useState(false)
-  const [eventToActivate, setEventToActivate] = useState<Event | null>(null)
+  const [timeSlotToActivate, setTimeSlotToActivate] = useState<TimeSlot | null>(null)
   const [filters, setFilters] = useState<FilterState>({
-    eventType: "all",
+    type: "all",
     status: "all",
     searchQuery: "",
     service: "all",
   })
-  const [availableServices, setAvailableServices] = useState<{ id: string; name: string }[]>([])
+  const [availableServices, setAvailableServices] = useState<Service[]>([])
 
   // Мок-данные для мест
-  const [locations, setLocations] = useState<Location[]>([
-    { id: "1", name: "Цветной", address: "Цветной бульвар, 25", description: "Основной центр" },
-    { id: "2", name: "Гиляровского", address: "ул. Гиляровского, 65", description: "Филиал №1" },
-    { id: "3", name: "Ясная", address: "ул. Ясная, 10", description: "Филиал №2" },
+  const [locations] = useState<Location[]>([
+    { id: "1", name: "Цветной", address: "Цветной бульвар, 25" },
+    { id: "2", name: "Гиляровского", address: "ул. Гиляровского, 65" },
+    { id: "3", name: "Ясная", address: "ул. Ясная, 10" },
   ])
 
   // Мок-данные для услуг
-  const serviceOptions = [
-    { id: "s1", name: "Терапевт", defaultCapacity: 15, defaultBookingWindow: 14 },
-    { id: "s2", name: "Психолог", defaultCapacity: 10, defaultBookingWindow: 7 },
-    { id: "s3", name: "Зимняя одежда", defaultCapacity: 25, defaultBookingWindow: 14 },
-    { id: "s4", name: "Летняя одежда", defaultCapacity: 25, defaultBookingWindow: 14 },
-    { id: "s5", name: "Консультация юриста", defaultCapacity: 20, defaultBookingWindow: 10 },
-    { id: "s6", name: "Продуктовые наборы", defaultCapacity: 100, defaultBookingWindow: 21 },
+  const serviceOptions: Service[] = [
+    {
+      id: "s1",
+      name: "Терапевт",
+      type: "medical",
+      defaultCapacity: 15,
+      defaultBookingWindow: 14
+    },
+    {
+      id: "s2",
+      name: "Психолог",
+      type: "psychology",
+      defaultCapacity: 10,
+      defaultBookingWindow: 7
+    },
+    {
+      id: "s3",
+      name: "Зимняя одежда",
+      type: "clothing",
+      defaultCapacity: 25,
+      defaultBookingWindow: 14
+    },
+    {
+      id: "s4",
+      name: "Летняя одежда",
+      type: "clothing",
+      defaultCapacity: 25,
+      defaultBookingWindow: 14
+    },
+    {
+      id: "s5",
+      name: "Консультация юриста",
+      type: "legal",
+      defaultCapacity: 20,
+      defaultBookingWindow: 10
+    }
   ]
 
-  // Мок-данные для событий
+  // Мок-данные для временных слотов
   useEffect(() => {
-    const mockEvents: Event[] = [
+    const mockTimeSlots: TimeSlot[] = [
       {
         id: "1",
         title: "Медицинская консультация",
-        date: new Date(2025, 2, 10, 10, 0),
-        location: "Цветной",
-        maxParticipants: 30,
-        registeredParticipants: 12,
-        status: "active",
         type: "single",
+        locationId: "1",
+        location: "Цветной",
+        capacity: 30,
+        startDate: "2025-03-10T10:00:00",
+        endDate: "2025-03-10T14:00:00",
+        status: "active",
         services: [
           {
-            id: "1-1",
-            name: "Терапевт",
-            time: "10:00-12:00",
+            serviceId: "s1",
             capacity: 15,
-            bookingWindow: 14,
-            registeredParticipants: 8,
+            bookingWindow: 14
           },
           {
-            id: "1-2",
-            name: "Психолог",
-            time: "12:00-14:00",
+            serviceId: "s2",
             capacity: 10,
-            bookingWindow: 7,
-            registeredParticipants: 4,
-          },
-        ],
+            bookingWindow: 7
+          }
+        ]
       },
       {
         id: "2",
         title: "Выдача одежды",
-        date: new Date(2025, 2, 15, 14, 0),
-        location: "Гиляровского",
-        maxParticipants: 50,
-        registeredParticipants: 50,
-        status: "active",
         type: "single",
+        locationId: "2",
+        location: "Гиляровского",
+        capacity: 50,
+        startDate: "2025-03-15T14:00:00",
+        endDate: "2025-03-15T18:00:00",
+        status: "active",
         services: [
           {
-            id: "2-1",
-            name: "Зимняя одежда",
-            time: "14:00-16:00",
+            serviceId: "s3",
             capacity: 25,
-            bookingWindow: 14,
-            registeredParticipants: 25,
+            bookingWindow: 14
           },
           {
-            id: "2-2",
-            name: "Летняя одежда",
-            time: "16:00-18:00",
+            serviceId: "s4",
             capacity: 25,
-            bookingWindow: 14,
-            registeredParticipants: 25,
-          },
-        ],
+            bookingWindow: 14
+          }
+        ]
       },
       {
         id: "3",
-        title: "Юридическая помощь",
-        date: new Date(2024, 11, 5, 9, 0),
-        location: "Ясная",
-        maxParticipants: 20,
-        registeredParticipants: 15,
-        status: "archived",
-        type: "single",
-        services: [
-          {
-            id: "3-1",
-            name: "Консультация юриста",
-            time: "09:00-13:00",
-            capacity: 20,
-            bookingWindow: 10,
-            registeredParticipants: 15,
-          },
-        ],
-      },
-      {
-        id: "4",
         title: "Еженедельная продуктовая помощь",
-        date: new Date(2025, 3, 20, 11, 0),
-        location: "Цветной",
-        maxParticipants: 100,
-        registeredParticipants: 45,
-        status: "active",
         type: "recurring",
+        locationId: "1",
+        location: "Цветной",
+        capacity: 100,
+        startDate: "2025-04-20T11:00:00",
+        endDate: "2025-04-20T15:00:00",
+        status: "active",
         recurrence: {
           frequency: "weekly",
-          infinite: true,
+          interval: 1,
+          endType: "never"
         },
         services: [
           {
-            id: "4-1",
-            name: "Продуктовые наборы",
-            time: "11:00-15:00",
+            serviceId: "s5",
             capacity: 100,
-            bookingWindow: 21,
-            registeredParticipants: 45,
-          },
-        ],
-      },
-      {
-        id: "5",
-        title: "Ежемесячная консультация психолога",
-        date: new Date(2025, 2, 5, 13, 0),
-        location: "Гиляровского",
-        maxParticipants: 15,
-        registeredParticipants: 8,
-        status: "active",
-        type: "recurring",
-        recurrence: {
-          frequency: "monthly",
-          endDate: new Date(2025, 8, 5),
-          infinite: false,
-        },
-        services: [
-          {
-            id: "5-1",
-            name: "Психолог",
-            time: "13:00-17:00",
-            capacity: 15,
-            bookingWindow: 14,
-            registeredParticipants: 8,
-          },
-        ],
-      },
-      {
-        id: "6",
-        title: "Архивное разовое событие",
-        date: new Date(2024, 1, 15, 10, 0),
-        location: "Цветной",
-        maxParticipants: 25,
-        registeredParticipants: 20,
-        status: "archived",
-        type: "single",
-        services: [
-          {
-            id: "6-1",
-            name: "Терапевт",
-            time: "10:00-12:00",
-            capacity: 15,
-            bookingWindow: 14,
-            registeredParticipants: 12,
-          },
-          {
-            id: "6-2",
-            name: "Консультация юриста",
-            time: "12:00-14:00",
-            capacity: 10,
-            bookingWindow: 7,
-            registeredParticipants: 8,
-          },
-        ],
-      },
-      {
-        id: "7",
-        title: "Архивное повторяющееся событие",
-        date: new Date(2024, 2, 1, 14, 0),
-        location: "Ясная",
-        maxParticipants: 40,
-        registeredParticipants: 35,
-        status: "archived",
-        type: "recurring",
-        recurrence: {
-          frequency: "weekly",
-          endDate: new Date(2024, 5, 1),
-          infinite: false,
-        },
-        services: [
-          {
-            id: "7-1",
-            name: "Продуктовые наборы",
-            time: "14:00-16:00",
-            capacity: 40,
-            bookingWindow: 14,
-            registeredParticipants: 35,
-          },
-        ],
-      },
+            bookingWindow: 21
+          }
+        ]
+      }
     ]
 
-    setEvents(mockEvents)
+    setTimeSlots(mockTimeSlots)
   }, [])
 
-  // Собираем все уникальные услуги из событий для фильтра
+  // Собираем все уникальные услуги из временных слотов для фильтра
   useEffect(() => {
-    const services = new Set<string>()
-    events.forEach((event) => {
-      event.services.forEach((service) => {
-        services.add(service.name)
-      })
-    })
-
-    const servicesList = Array.from(services).map((name, index) => ({
-      id: `service-${index}`,
-      name,
-    }))
-
-    setAvailableServices(servicesList)
-  }, [events])
+    setAvailableServices(serviceOptions)
+  }, [])
 
   // Обновление фильтров при изменении активной вкладки
   useEffect(() => {
@@ -303,118 +179,121 @@ export default function SchedulePage() {
     }))
   }, [activeTab])
 
-  // Фильтрация событий
+  // Фильтрация временных слотов
   useEffect(() => {
-    let filtered = [...events]
+    let filtered = [...timeSlots]
 
     // Фильтр по статусу
     if (filters.status !== "all") {
-      filtered = filtered.filter((event) => event.status === filters.status)
+      filtered = filtered.filter((slot) => slot.status === filters.status)
     }
 
-    // Фильтр по типу события
-    if (filters.eventType !== "all") {
-      filtered = filtered.filter((event) => event.type === filters.eventType)
+    // Фильтр по типу временного слота
+    if (filters.type !== "all") {
+      filtered = filtered.filter((slot) => slot.type === filters.type)
     }
 
     // Фильтр по услуге
     if (filters.service !== "all") {
-      filtered = filtered.filter((event) => event.services.some((service) => service.name === filters.service))
+      filtered = filtered.filter((slot) =>
+        slot.services.some((service) => {
+          const serviceInfo = serviceOptions.find(s => s.id === service.serviceId)
+          return serviceInfo?.name === filters.service
+        })
+      )
     }
 
     // Поиск
     if (filters.searchQuery) {
       const query = filters.searchQuery.toLowerCase()
       filtered = filtered.filter(
-        (event) => event.title.toLowerCase().includes(query) || event.location.toLowerCase().includes(query),
+        (slot) => slot.title.toLowerCase().includes(query) || slot.location.toLowerCase().includes(query)
       )
     }
 
-    setFilteredEvents(filtered)
-  }, [events, filters])
+    setFilteredTimeSlots(filtered)
+  }, [timeSlots, filters])
 
-  const handleCreateEvent = () => {
-    setSelectedEvent(null)
+  const handleCreateTimeSlot = () => {
+    setSelectedTimeSlot(null)
     setIsEditing(false)
-    setShowEventModal(true)
+    setShowTimeSlotModal(true)
   }
 
-  const handleEditEvent = (event: Event) => {
-    setSelectedEvent(event)
+  const handleEditTimeSlot = (timeSlot: TimeSlot) => {
+    setSelectedTimeSlot(timeSlot)
     setIsEditing(true)
-    setShowEventModal(true)
+    setShowTimeSlotModal(true)
   }
 
-  const handleSaveEvent = (event: Event) => {
-    if (isEditing && selectedEvent) {
-      // Обновление существующего события
-      setEvents((prev) => prev.map((e) => (e.id === selectedEvent.id ? event : e)))
+  const handleSaveTimeSlot = (timeSlot: TimeSlot) => {
+    if (isEditing && selectedTimeSlot) {
+      // Обновление существующего временного слота
+      setTimeSlots((prev) => prev.map((slot) => (slot.id === selectedTimeSlot.id ? timeSlot : slot)))
     } else {
-      // Создание нового события
-      const newEvent = {
-        ...event,
-        id: Date.now().toString(),
+      // Создание нового временного слота
+      const newTimeSlot = {
+        ...timeSlot,
+        id: `ts_${Date.now()}`,
         status: "active" as const,
       }
-      setEvents((prev) => [...prev, newEvent])
+      setTimeSlots((prev) => [...prev, newTimeSlot])
     }
-    setShowEventModal(false)
+    setShowTimeSlotModal(false)
   }
 
-  const handleDeleteEvent = (eventId: string) => {
-    setEvents((prev) => prev.filter((event) => event.id !== eventId))
+  const handleDeleteTimeSlot = (timeSlotId: string) => {
+    setTimeSlots((prev) => prev.filter((slot) => slot.id !== timeSlotId))
   }
 
-  const handleArchiveEvent = (eventId: string) => {
-    setEvents((prev) => prev.map((event) => (event.id === eventId ? { ...event, status: "archived" } : event)))
+  const handleArchiveTimeSlot = (timeSlotId: string) => {
+    setTimeSlots((prev) => prev.map((slot) => (slot.id === timeSlotId ? { ...slot, status: "archived" } : slot)))
   }
 
-  const handleActivateEvent = (event: Event) => {
-    if (event.type === "recurring") {
-      // Для повторяющихся событий - просто активируем
-      setEvents((prev) => prev.map((e) => (e.id === event.id ? { ...e, status: "active" } : e)))
+  const handleActivateTimeSlot = (timeSlot: TimeSlot) => {
+    if (timeSlot.type === "recurring") {
+      // Для повторяющихся слотов - просто активируем
+      setTimeSlots((prev) => prev.map((slot) => (slot.id === timeSlot.id ? { ...slot, status: "active" } : slot)))
     } else {
-      // Для разовых событий - открываем модальное окно для выбора новой даты
-      setEventToActivate(event)
+      // Для разовых слотов - открываем модальное окно для выбора новой даты
+      setTimeSlotToActivate(timeSlot)
       setShowActivateModal(true)
     }
   }
 
-  const handleConfirmActivation = (event: Event, newDate: Date) => {
-    setEvents((prev) => prev.map((e) => (e.id === event.id ? { ...e, status: "active", date: newDate } : e)))
-    setShowActivateModal(false)
-    setEventToActivate(null)
-  }
+  const handleConfirmActivation = (timeSlot: TimeSlot, newStartDate: string) => {
+    const duration = new Date(timeSlot.endDate).getTime() - new Date(timeSlot.startDate).getTime()
+    const newEndDate = new Date(new Date(newStartDate).getTime() + duration).toISOString()
 
-  const handleAddLocation = (location: Omit<Location, "id">) => {
-    const newLocation = {
-      ...location,
-      id: `loc-${Date.now()}`,
-    }
-    setLocations((prev) => [...prev, newLocation])
-    return newLocation
+    setTimeSlots((prev) => prev.map((slot) => (
+      slot.id === timeSlot.id
+        ? { ...slot, status: "active", startDate: newStartDate, endDate: newEndDate }
+        : slot
+    )))
+    setShowActivateModal(false)
+    setTimeSlotToActivate(null)
   }
 
   const clearFilters = () => {
     setFilters({
-      eventType: "all",
+      type: "all",
       status: "all",
       searchQuery: "",
       service: "all",
     })
   }
 
-  // Автоматическое архивирование прошедших разовых событий
+  // Автоматическое архивирование прошедших разовых временных слотов
   useEffect(() => {
     const now = new Date()
-    setEvents((prev) =>
-      prev.map((event) => {
-        if (event.type === "single" && event.date && event.status === "active") {
-          if (!isAfter(event.date, now)) {
-            return { ...event, status: "archived" }
+    setTimeSlots((prev) =>
+      prev.map((slot) => {
+        if (slot.type === "single" && slot.status === "active") {
+          if (!isAfter(new Date(slot.endDate), now)) {
+            return { ...slot, status: "archived" }
           }
         }
-        return event
+        return slot
       }),
     )
   }, [])
@@ -423,9 +302,9 @@ export default function SchedulePage() {
     <div className="space-y-6 relative">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h1 className="text-3xl font-bold">Управление расписанием</h1>
-        <Button onClick={handleCreateEvent} className="bg-green-600 hover:bg-green-700">
+        <Button onClick={handleCreateTimeSlot} className="bg-green-600 hover:bg-green-700">
           <Plus className="h-4 w-4 mr-2" />
-          Создать событие
+          Создать временной слот
         </Button>
       </div>
 
@@ -454,13 +333,13 @@ export default function SchedulePage() {
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Тип события</label>
+                <label className="text-sm font-medium">Тип слота</label>
                 <Select
-                  value={filters.eventType}
+                  value={filters.type}
                   onValueChange={(value) =>
                     setFilters((prev) => ({
                       ...prev,
-                      eventType: value as "all" | "single" | "recurring",
+                      type: value as "all" | "single" | "recurring",
                     }))
                   }
                 >
@@ -524,23 +403,24 @@ export default function SchedulePage() {
           <Card>
             <CardHeader>
               <CardTitle>
-                Активные события
-                <Badge className="ml-2">{filteredEvents.length}</Badge>
+                Активные временные слоты
+                <Badge className="ml-2">{filteredTimeSlots.length}</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {filteredEvents.length === 0 ? (
+              {filteredTimeSlots.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
-                  Нет активных событий, соответствующих заданным критериям
+                  Нет активных временных слотов, соответствующих заданным критериям
                 </div>
               ) : (
                 <div className="hidden md:block">
-                  <EventTable
-                    events={filteredEvents}
-                    onEdit={handleEditEvent}
-                    onDelete={handleDeleteEvent}
-                    onArchive={handleArchiveEvent}
+                  <TimeSlotTable
+                    timeSlots={filteredTimeSlots}
+                    onEdit={handleEditTimeSlot}
+                    onDelete={handleDeleteTimeSlot}
+                    onArchive={handleArchiveTimeSlot}
                     isActive={true}
+                    services={serviceOptions}
                   />
                 </div>
               )}
@@ -548,14 +428,15 @@ export default function SchedulePage() {
               {/* Мобильное представление */}
               <div className="md:hidden">
                 <div className="space-y-4">
-                  {filteredEvents.map((event) => (
-                    <EventCard
-                      key={event.id}
-                      event={event}
-                      onEdit={() => handleEditEvent(event)}
-                      onDelete={() => handleDeleteEvent(event.id)}
-                      onArchive={() => handleArchiveEvent(event.id)}
+                  {filteredTimeSlots.map((timeSlot) => (
+                    <TimeSlotCard
+                      key={timeSlot.id}
+                      timeSlot={timeSlot}
+                      onEdit={() => handleEditTimeSlot(timeSlot)}
+                      onDelete={() => handleDeleteTimeSlot(timeSlot.id)}
+                      onArchive={() => handleArchiveTimeSlot(timeSlot.id)}
                       isActive={true}
+                      services={serviceOptions}
                     />
                   ))}
                 </div>
@@ -568,23 +449,24 @@ export default function SchedulePage() {
           <Card>
             <CardHeader>
               <CardTitle>
-                Архивные события
-                <Badge className="ml-2">{filteredEvents.length}</Badge>
+                Архивные временные слоты
+                <Badge className="ml-2">{filteredTimeSlots.length}</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {filteredEvents.length === 0 ? (
+              {filteredTimeSlots.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
-                  Нет архивных событий, соответствующих заданным критериям
+                  Нет архивных временных слотов, соответствующих заданным критериям
                 </div>
               ) : (
                 <div className="hidden md:block">
-                  <EventTable
-                    events={filteredEvents}
-                    onEdit={handleEditEvent}
-                    onDelete={handleDeleteEvent}
-                    onActivate={handleActivateEvent}
+                  <TimeSlotTable
+                    timeSlots={filteredTimeSlots}
+                    onEdit={handleEditTimeSlot}
+                    onDelete={handleDeleteTimeSlot}
+                    onActivate={handleActivateTimeSlot}
                     isActive={false}
+                    services={serviceOptions}
                   />
                 </div>
               )}
@@ -592,14 +474,15 @@ export default function SchedulePage() {
               {/* Мобильное представление */}
               <div className="md:hidden">
                 <div className="space-y-4">
-                  {filteredEvents.map((event) => (
-                    <EventCard
-                      key={event.id}
-                      event={event}
-                      onEdit={() => handleEditEvent(event)}
-                      onDelete={() => handleDeleteEvent(event.id)}
-                      onActivate={() => handleActivateEvent(event)}
+                  {filteredTimeSlots.map((timeSlot) => (
+                    <TimeSlotCard
+                      key={timeSlot.id}
+                      timeSlot={timeSlot}
+                      onEdit={() => handleEditTimeSlot(timeSlot)}
+                      onDelete={() => handleDeleteTimeSlot(timeSlot.id)}
+                      onActivate={() => handleActivateTimeSlot(timeSlot)}
                       isActive={false}
+                      services={serviceOptions}
                     />
                   ))}
                 </div>
@@ -609,31 +492,30 @@ export default function SchedulePage() {
         </TabsContent>
       </Tabs>
 
-      {/* Модальное окно создания/редактирования события */}
-      <Dialog open={showEventModal} onOpenChange={setShowEventModal}>
+      {/* Модальное окно создания/редактирования временного слота */}
+      <Dialog open={showTimeSlotModal} onOpenChange={setShowTimeSlotModal}>
         <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{isEditing ? "Редактирование события" : "Создание события"}</DialogTitle>
+            <DialogTitle>{isEditing ? "Редактирование временного слота" : "Создание временного слота"}</DialogTitle>
           </DialogHeader>
-          <EventForm
-            event={selectedEvent}
+          <TimeSlotForm
+            timeSlot={selectedTimeSlot}
             locations={locations}
             availableServices={serviceOptions}
-            onSave={handleSaveEvent}
-            onCancel={() => setShowEventModal(false)}
-            onAddLocation={handleAddLocation}
+            onSave={handleSaveTimeSlot}
+            onCancel={() => setShowTimeSlotModal(false)}
           />
         </DialogContent>
       </Dialog>
 
-      {/* Модальное окно активации разового события */}
-      {eventToActivate && (
-        <ActivateEventModal
-          event={eventToActivate}
+      {/* Модальное окно активации разового временного слота */}
+      {timeSlotToActivate && (
+        <ActivateTimeSlotModal
+          timeSlot={timeSlotToActivate}
           open={showActivateModal}
           onClose={() => {
             setShowActivateModal(false)
-            setEventToActivate(null)
+            setTimeSlotToActivate(null)
           }}
           onConfirm={handleConfirmActivation}
         />
@@ -642,12 +524,12 @@ export default function SchedulePage() {
       {/* Floating Action Button для мобильных устройств */}
       <div className="md:hidden fixed bottom-6 right-6 z-10">
         <Button
-          onClick={handleCreateEvent}
+          onClick={handleCreateTimeSlot}
           size="lg"
           className="h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all bg-green-600 hover:bg-green-700"
         >
           <Plus className="h-6 w-6" />
-          <span className="sr-only">Создать событие</span>
+          <span className="sr-only">Создать временной слот</span>
         </Button>
       </div>
     </div>

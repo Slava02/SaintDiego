@@ -1090,7 +1090,7 @@ DROP TABLE IF EXISTS `service_type`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `service_type` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `created_by_id` int(11) DEFAULT NULL,
+  `created_by_id` int(11)  NULL,
   `updated_by_id` int(11) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   `pay` tinyint(1) DEFAULT NULL,
