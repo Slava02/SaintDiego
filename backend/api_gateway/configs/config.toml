@@ -1,0 +1,18 @@
+[global]
+name = "api-gateway"
+env = "dev"
+
+[log]
+level = "info"
+
+[servers]
+[servers.debug]
+addr = ":8079"
+
+[servers.apiGW]
+addr = ":8080"
+allow_origins = ["http://localhost:3011", "http://localhost:3000"]
+
+[apiGW]
+addr = ":8080"
+allow_origins = ["http://localhost:3011", "http://localhost:3000"]
