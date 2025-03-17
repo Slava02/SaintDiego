@@ -16,6 +16,11 @@ import (
 	"github.com/Slava02/SaintDiego/proto/events"
 )
 
+//go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options
+type Options struct {
+	client events.EventServiceClient `option:"mandatory" validate:"required"`
+}
+
 type UseCase struct {
 	client events.EventServiceClient
 }
@@ -27,10 +32,14 @@ const (
 
 var _ v1.IScheduleUseCase = (*UseCase)(nil)
 
-func New(client events.EventServiceClient) *UseCase {
-	return &UseCase{
-		client: client,
+func New(opts Options) (*UseCase, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, fmt.Errorf("validate options: %v", err)
 	}
+
+	return &UseCase{
+		client: opts.client,
+	}, nil
 }
 
 //nolint:godox // Legitimate TODO for future implementation

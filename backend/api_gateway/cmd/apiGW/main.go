@@ -13,15 +13,10 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/Slava02/SaintDiego/internal/config"
-	"github.com/Slava02/SaintDiego/internal/interceptors"
 	server "github.com/Slava02/SaintDiego/internal/server"
 	serverdebug "github.com/Slava02/SaintDiego/internal/server-debug"
 	v1 "github.com/Slava02/SaintDiego/internal/server/v1"
-	"github.com/Slava02/SaintDiego/internal/usecases/schedule"
-	"github.com/Slava02/SaintDiego/pkg/grpc_client"
-	logger2 "github.com/Slava02/SaintDiego/pkg/logger"
-	"github.com/Slava02/SaintDiego/proto/events"
-	"github.com/opentracing/opentracing-go"
+	logger "github.com/Slava02/SaintDiego/pkg/logger"
 )
 
 var configPath = flag.String("config", "configs/config.toml", "Path to config file")
@@ -43,11 +38,11 @@ func run() (errReturned error) {
 		return fmt.Errorf("parse and validate config %q: %v", *configPath, err)
 	}
 
-	logger2.MustInit(
-		logger2.NewOptions(cfg.Log.Level,
-			logger2.WithEnv(cfg.Global.Env),
+	logger.MustInit(
+		logger.NewOptions(cfg.Log.Level,
+			logger.WithEnv(cfg.Global.Env),
 		))
-	defer logger2.Sync()
+	defer logger.Sync()
 
 	lg := zap.L().Named(cfg.Global.Name)
 
@@ -61,33 +56,12 @@ func run() (errReturned error) {
 		return fmt.Errorf("get swagger: %v", err)
 	}
 
-	// Initialize the interceptor manager
-	interceptorManager, err := interceptors.NewInterceptorManager(interceptors.NewOptions(lg, opentracing.GlobalTracer()))
-	if err != nil {
-		return fmt.Errorf("create interceptor manager: %v", err)
-	}
-
-	eventsConn, err := grpc_client.NewGRPCClientServiceConn(ctx, interceptorManager, cfg.Servers.APIGW.Addr)
-	if err != nil {
-		return fmt.Errorf("grpc_client.NewGRPCClientServiceConn: %v", err)
-	}
-	defer eventsConn.Close()
-
-	eventsSerivceClient := events.NewEventServiceClient(eventsConn)
-
-	scheduleUseCase := schedule.New(eventsSerivceClient)
-
-	v1Handlers, err := v1.NewHandlers(v1.NewOptions(scheduleUseCase))
-	if err != nil {
-		return fmt.Errorf("create v1 handlers: %v", err)
-	}
-
 	srv, err := server.New(server.NewOptions(
 		lg,
 		cfg.Servers.APIGW.Addr,
 		cfg.Servers.APIGW.AllowOrigins,
 		v1Swagger,
-		&v1Handlers,
+		cfg.Servers.GRPC.EventsAddr,
 	))
 	if err != nil {
 		return fmt.Errorf("build server: %v", err)

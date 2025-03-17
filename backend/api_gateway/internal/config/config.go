@@ -1,10 +1,9 @@
 package config
 
 type Config struct {
-	Global  GlobalConfig      `toml:"global"`
-	Log     LogConfig         `toml:"log"`
-	Servers ServersConfig     `toml:"servers"`
-	APIGW   APIGWServerConfig `toml:"apiGW"`
+	Global  GlobalConfig  `toml:"global"`
+	Log     LogConfig     `toml:"log"`
+	Servers ServersConfig `toml:"servers"`
 }
 
 type GlobalConfig struct {
@@ -19,6 +18,7 @@ type LogConfig struct {
 type ServersConfig struct {
 	Debug DebugServerConfig `toml:"debug"`
 	APIGW APIGWServerConfig `toml:"apiGW"`
+	GRPC  GRPC              `toml:"grpc"`
 }
 
 type DebugServerConfig struct {
@@ -28,4 +28,8 @@ type DebugServerConfig struct {
 type APIGWServerConfig struct {
 	Addr         string   `toml:"addr" validate:"required,hostname_port"`
 	AllowOrigins []string `toml:"allow_origins" validate:"required,dive,url"`
+}
+
+type GRPC struct {
+	EventsAddr string `toml:"eventsAddr"  validate:"required,hostname_port"`
 }
