@@ -14,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Slava02/SaintDiego/internal/types"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/labstack/echo/v4"
 	"github.com/oapi-codegen/runtime"
@@ -67,17 +66,11 @@ type CreateLocationRequest struct {
 	Name    string `json:"name"`
 }
 
-// CreateServiceTypeRequest defines model for CreateServiceTypeRequest.
-type CreateServiceTypeRequest struct {
-	Description *string `json:"description,omitempty"`
-	Name        string  `json:"name"`
-}
-
 // CreateTimeSlotRequest defines model for CreateTimeSlotRequest.
 type CreateTimeSlotRequest struct {
 	Capacity   int                       `json:"capacity"`
 	EndDate    time.Time                 `json:"endDate"`
-	LocationId types.LocationID          `json:"locationId"`
+	LocationId int                       `json:"locationId"`
 	Recurrence *Recurrence               `json:"recurrence,omitempty"`
 	Services   []TimeSlotService         `json:"services"`
 	StartDate  time.Time                 `json:"startDate"`
@@ -90,16 +83,16 @@ type CreateTimeSlotRequestType string
 
 // Error defines model for Error.
 type Error struct {
-	Code    string                  `json:"code"`
-	Details *map[string]interface{} `json:"details,omitempty"`
-	Message string                  `json:"message"`
+	Code    string  `json:"code"`
+	Details *string `json:"details,omitempty"`
+	Message string  `json:"message"`
 }
 
 // Location defines model for Location.
 type Location struct {
-	Address *string          `json:"address,omitempty"`
-	Id      types.LocationID `json:"id"`
-	Name    string           `json:"name"`
+	Address *string `json:"address,omitempty"`
+	Id      int     `json:"id"`
+	Name    string  `json:"name"`
 }
 
 // Recurrence defines model for Recurrence.
@@ -118,16 +111,16 @@ type RecurrenceFrequency string
 
 // ServiceType defines model for ServiceType.
 type ServiceType struct {
-	Id   types.ServiceTypeID `json:"id"`
-	Name string              `json:"name"`
+	Id   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 // TimeSlot defines model for TimeSlot.
 type TimeSlot struct {
 	Capacity   int               `json:"capacity"`
 	EndDate    time.Time         `json:"endDate"`
-	Id         types.TimeSlotID  `json:"id"`
-	LocationId types.LocationID  `json:"locationId"`
+	Id         int               `json:"id"`
+	LocationId int               `json:"locationId"`
 	Recurrence *Recurrence       `json:"recurrence,omitempty"`
 	Services   []TimeSlotService `json:"services"`
 	StartDate  time.Time         `json:"startDate"`
@@ -144,10 +137,10 @@ type TimeSlotType string
 
 // TimeSlotService defines model for TimeSlotService.
 type TimeSlotService struct {
-	BookingWindow int                 `json:"bookingWindow"`
-	Capacity      int                 `json:"capacity"`
-	ServiceTypeId types.ServiceTypeID `json:"serviceTypeId"`
-	Time          time.Time           `json:"time"`
+	BookingWindow int       `json:"bookingWindow"`
+	Capacity      int       `json:"capacity"`
+	ServiceTypeId int       `json:"serviceTypeId"`
+	Time          time.Time `json:"time"`
 }
 
 // GetTimeSlotsParams defines parameters for GetTimeSlots.
@@ -180,24 +173,30 @@ type ServerInterface interface {
 	// Получение списка услуг
 	// (GET /services)
 	GetServices(ctx echo.Context) error
+	// Получение информации об услуге по идентификатору
+	// (GET /services/{id})
+	GetServicesId(ctx echo.Context, id int) error
 	// Получение списка временных слотов
-	// (GET /time-slots)
+	// (GET /timeSlots)
 	GetTimeSlots(ctx echo.Context, params GetTimeSlotsParams) error
 	// Создание нового временного слота
-	// (POST /time-slots)
+	// (POST /timeSlots)
 	PostTimeSlots(ctx echo.Context) error
 	// Удаление временного слота
-	// (DELETE /time-slots/{id})
-	DeleteTimeSlotsId(ctx echo.Context, id string) error
+	// (DELETE /timeSlots/{id})
+	DeleteTimeSlotsId(ctx echo.Context, id int) error
+	// Получение временного слота по идентификатору
+	// (GET /timeSlots/{id})
+	GetTimeSlotsId(ctx echo.Context, id int) error
 	// Обновление временного слота
-	// (PUT /time-slots/{id})
-	PutTimeSlotsId(ctx echo.Context, id string) error
+	// (PUT /timeSlots/{id})
+	PutTimeSlotsId(ctx echo.Context, id int) error
 	// Активация временного слота
-	// (PATCH /time-slots/{id}/activate)
-	PatchTimeSlotsIdActivate(ctx echo.Context, id string) error
+	// (PATCH /timeSlots/{id}/activate)
+	PatchTimeSlotsIdActivate(ctx echo.Context, id int) error
 	// Архивация временного слота
-	// (PATCH /time-slots/{id}/archive)
-	PatchTimeSlotsIdArchive(ctx echo.Context, id string) error
+	// (PATCH /timeSlots/{id}/archive)
+	PatchTimeSlotsIdArchive(ctx echo.Context, id int) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -235,6 +234,24 @@ func (w *ServerInterfaceWrapper) GetServices(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetServices(ctx)
+	return err
+}
+
+// GetServicesId converts echo context to params.
+func (w *ServerInterfaceWrapper) GetServicesId(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetServicesId(ctx, id)
 	return err
 }
 
@@ -287,7 +304,7 @@ func (w *ServerInterfaceWrapper) PostTimeSlots(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) DeleteTimeSlotsId(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id string
+	var id int
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -301,11 +318,29 @@ func (w *ServerInterfaceWrapper) DeleteTimeSlotsId(ctx echo.Context) error {
 	return err
 }
 
+// GetTimeSlotsId converts echo context to params.
+func (w *ServerInterfaceWrapper) GetTimeSlotsId(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetTimeSlotsId(ctx, id)
+	return err
+}
+
 // PutTimeSlotsId converts echo context to params.
 func (w *ServerInterfaceWrapper) PutTimeSlotsId(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id string
+	var id int
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -323,7 +358,7 @@ func (w *ServerInterfaceWrapper) PutTimeSlotsId(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) PatchTimeSlotsIdActivate(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id string
+	var id int
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -341,7 +376,7 @@ func (w *ServerInterfaceWrapper) PatchTimeSlotsIdActivate(ctx echo.Context) erro
 func (w *ServerInterfaceWrapper) PatchTimeSlotsIdArchive(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id string
+	var id int
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -386,49 +421,49 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/locations", wrapper.GetLocations)
 	router.POST(baseURL+"/locations", wrapper.PostLocations)
 	router.GET(baseURL+"/services", wrapper.GetServices)
-	router.GET(baseURL+"/time-slots", wrapper.GetTimeSlots)
-	router.POST(baseURL+"/time-slots", wrapper.PostTimeSlots)
-	router.DELETE(baseURL+"/time-slots/:id", wrapper.DeleteTimeSlotsId)
-	router.PUT(baseURL+"/time-slots/:id", wrapper.PutTimeSlotsId)
-	router.PATCH(baseURL+"/time-slots/:id/activate", wrapper.PatchTimeSlotsIdActivate)
-	router.PATCH(baseURL+"/time-slots/:id/archive", wrapper.PatchTimeSlotsIdArchive)
+	router.GET(baseURL+"/services/:id", wrapper.GetServicesId)
+	router.GET(baseURL+"/timeSlots", wrapper.GetTimeSlots)
+	router.POST(baseURL+"/timeSlots", wrapper.PostTimeSlots)
+	router.DELETE(baseURL+"/timeSlots/:id", wrapper.DeleteTimeSlotsId)
+	router.GET(baseURL+"/timeSlots/:id", wrapper.GetTimeSlotsId)
+	router.PUT(baseURL+"/timeSlots/:id", wrapper.PutTimeSlotsId)
+	router.PATCH(baseURL+"/timeSlots/:id/activate", wrapper.PatchTimeSlotsIdActivate)
+	router.PATCH(baseURL+"/timeSlots/:id/archive", wrapper.PatchTimeSlotsIdArchive)
 
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"ZeN6/Xq91loinfXO7wEAAP//XVeNhjEmAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
