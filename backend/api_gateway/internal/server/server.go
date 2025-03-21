@@ -4,11 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/Slava02/SaintDiego/internal/interceptors"
-	"github.com/Slava02/SaintDiego/internal/usecases/schedule"
-	"github.com/Slava02/SaintDiego/pkg/grpc_client"
-	"github.com/Slava02/SaintDiego/proto/events"
-	"github.com/opentracing/opentracing-go"
 	"net/http"
 	"time"
 
@@ -27,7 +22,6 @@ import (
 const (
 	readHeaderTimeout = time.Second
 	shutdownTimeout   = 3 * time.Second
-	nameServer        = "server-apiGW"
 )
 
 //go:generate options-gen -out-filename=server_options.gen.go -from-struct=Options
@@ -36,14 +30,13 @@ type Options struct {
 	serverAddr   string      `option:"mandatory" validate:"required,hostname_port"`
 	allowOrigins []string    `option:"mandatory" validate:"min=1"`
 	v1Swagger    *openapi3.T `option:"mandatory" validate:"required"`
-	eventsAddr   string      `option:"mandatory" validate:"required,hostname_port"`
+	v1Handlers   v1.Handlers `option:"mandatory" validate:"required"`
 }
 
 type Server struct {
-	lg         *zap.Logger
-	srv        *http.Server
-	v1Group    *echo.Group
-	eventsAddr string
+	lg      *zap.Logger
+	srv     *http.Server
+	v1Group *echo.Group
 }
 
 func New(opts Options) (*Server, error) {
@@ -68,6 +61,7 @@ func New(opts Options) (*Server, error) {
 			AuthenticationFunc:  openapi3filter.NoopAuthenticationFunc,
 		},
 	}))
+	v1.RegisterHandlers(v1Group, opts.v1Handlers)
 
 	return &Server{
 		lg: zap.L().Named("server-apiGW"),
@@ -76,42 +70,12 @@ func New(opts Options) (*Server, error) {
 			Handler:           e,
 			ReadHeaderTimeout: readHeaderTimeout,
 		},
-		v1Group:    v1Group,
-		eventsAddr: opts.eventsAddr,
+		v1Group: v1Group,
 	}, nil
 }
 
 func (s *Server) Run(ctx context.Context) error {
 	eg, ctx := errgroup.WithContext(ctx)
-
-	lg := zap.L().Named(nameServer)
-
-	interceptorManager, err := interceptors.NewInterceptorManager(
-		interceptors.NewOptions(lg, opentracing.GlobalTracer()),
-	)
-	if err != nil {
-		return fmt.Errorf("create interceptor manager: %v", err)
-	}
-
-	eventsConn, err := grpc_client.NewGRPCClientServiceConn(ctx, interceptorManager, s.eventsAddr)
-	if err != nil {
-		return fmt.Errorf("grpc_client.NewGRPCClientServiceConn: %v", err)
-	}
-	defer eventsConn.Close()
-
-	eventsSerivceClient := events.NewEventServiceClient(eventsConn)
-
-	scheduleUseCase, err := schedule.New(schedule.NewOptions(eventsSerivceClient))
-	if err != nil {
-		return fmt.Errorf("create scheduleUseCase: %v", err)
-	}
-
-	v1Handlers, err := v1.NewHandlers(v1.NewOptions(scheduleUseCase))
-	if err != nil {
-		return fmt.Errorf("create v1 handlers: %v", err)
-	}
-
-	v1.RegisterHandlers(s.v1Group, &v1Handlers)
 
 	eg.Go(func() error {
 		<-ctx.Done()

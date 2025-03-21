@@ -16,20 +16,10 @@ type LogConfig struct {
 }
 
 type ServersConfig struct {
-	Debug DebugServerConfig `toml:"debug"`
 	APIGW APIGWServerConfig `toml:"apiGW"`
-	GRPC  GRPC              `toml:"grpc"`
-}
-
-type DebugServerConfig struct {
-	Addr string `toml:"addr" validate:"required,hostname_port"`
 }
 
 type APIGWServerConfig struct {
 	Addr         string   `toml:"addr" validate:"required,hostname_port"`
 	AllowOrigins []string `toml:"allow_origins" validate:"required,dive,url"`
-}
-
-type GRPC struct {
-	EventsAddr string `toml:"eventsAddr"  validate:"required,hostname_port"`
 }

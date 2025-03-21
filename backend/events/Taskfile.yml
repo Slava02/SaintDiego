@@ -4,10 +4,13 @@ version: "3"
 silent: true
 
 vars:
-  GO_MODULE: github.com/Slava02/SaintDiego
+  GO_MODULE: github.com/Slava02/SaintDiego/backend/events
   GO_FILES:
     sh: find . -type f -name '*.go' -not -path "./vendor/*" -not -path "*.gen.go" | tr "\n" " "
-  GO_CMD: ./cmd/apiGW
+  GO_CMD: ./cmd/main.go
+
+  PROTO_PATH: api/events.proto
+  PROTO_DST: pkg/pb
 
   GOLANGCI_LINT_VERSION: v1.62.2
   GOLANGCI_LINT_CACHE:
@@ -17,18 +20,12 @@ vars:
     github.com/daixiang0/gci@v0.13.5
     github.com/kazhuravlev/options-gen/cmd/options-gen@v0.33.1
     mvdan.cc/gofumpt@v0.7.0
-    github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.4.1
     go.uber.org/mock/mockgen@v0.5.0
-    github.com/onsi/ginkgo/v2/ginkgo@v2.9.1
 
   DOCKER_COMPOSE_PATHS: |
     ./deploy/local/docker-compose.yml
 
   DOCKER_COMPOSE_CMD: docker compose -f {{ .DOCKER_COMPOSE_PATHS | trim | splitLines | join " -f " }}
-
-  V1_SRC: ./api/v1.swagger.yml
-  V1_DST: ./internal/server/v1/server.gen.go
-  V1_PKG: v1
 
 tasks:
   default:
@@ -90,13 +87,11 @@ tasks:
   generate:
     - echo "Run go generate..."
     - go generate ./...
-    - task: gen:api
+    - task: gen:pb
 
-  gen:api:
+  gen:pb:
     cmds:
-      - echo "Generate server..."
-      - oapi-codegen -old-config-style -generate skip-prune,types,server,spec -package {{.V1_PKG}} {{.V1_SRC}} > {{.V1_DST}}
-      - task: tidy
+      - protoc --proto_path=. --go_out={{.PROTO_DST}} --go_opt=paths=source_relative --go-grpc_out={{.PROTO_DST}} --go-grpc_opt=paths=source_relative {{.PROTO_PATH}}
 
   deps:
     cmds:
