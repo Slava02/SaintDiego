@@ -3,6 +3,7 @@ module github.com/Slava02/SaintDiego/backend/api_gateway
 go 1.23.3
 
 require (
+	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250322122958-7ceb40161a91
 	github.com/getkin/kin-openapi v0.131.0
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/kazhuravlev/options-gen v0.33.2
@@ -17,7 +18,6 @@ require (
 )
 
 require (
-	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250322121030-3ea0bcc15274 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect

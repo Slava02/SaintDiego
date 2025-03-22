@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
-	api "github.com/Slava02/SaintDiego/backend/events/pkg/pb"
+	pb "github.com/Slava02/SaintDiego/backend/events/pkg/pb"
 	"google.golang.org/grpc"
 )
 
@@ -34,13 +34,13 @@ func New(opts Options) (*UseCase, error) {
 }
 
 type IEventsClient interface {
-	CreateTimeSlot(ctx context.Context, req *api.CreateTimeSlotRequest, opts ...grpc.CallOption) (*api.TimeSlot, error)
-	GetTimeSlots(ctx context.Context, req *api.GetTimeSlotsRequest, opts ...grpc.CallOption) (*api.GetTimeSlotsResponse, error)
-	GetTimeSlot(ctx context.Context, req *api.GetTimeSlotRequest) (*api.TimeSlot, error)
-	DeleteTimeSlot(ctx context.Context, req *api.DeleteTimeSlotRequest, opts ...grpc.CallOption) (*api.DeleteTimeSlotResponse, error)
-	ActivateTimeSlot(ctx context.Context, req *api.ActivateTimeSlotRequest, opts ...grpc.CallOption) (*api.TimeSlot, error)
-	ArchiveTimeSlot(ctx context.Context, req *api.ArchiveTimeSlotRequest, opts ...grpc.CallOption) (*api.TimeSlot, error)
-	UpdateTimeSlot(ctx context.Context, req *api.UpdateTimeSlotRequest, opts ...grpc.CallOption) (*api.TimeSlot, error)
+	CreateTimeSlot(ctx context.Context, req *pb.CreateTimeSlotRequest, opts ...grpc.CallOption) (*pb.TimeSlot, error)
+	GetTimeSlots(ctx context.Context, req *pb.GetTimeSlotsRequest, opts ...grpc.CallOption) (*pb.GetTimeSlotsResponse, error)
+	GetTimeSlot(ctx context.Context, req *pb.GetTimeSlotRequest, opts ...grpc.CallOption) (*pb.TimeSlot, error)
+	DeleteTimeSlot(ctx context.Context, req *pb.DeleteTimeSlotRequest, opts ...grpc.CallOption) (*pb.DeleteTimeSlotResponse, error)
+	ActivateTimeSlot(ctx context.Context, req *pb.ActivateTimeSlotRequest, opts ...grpc.CallOption) (*pb.TimeSlot, error)
+	ArchiveTimeSlot(ctx context.Context, req *pb.ArchiveTimeSlotRequest, opts ...grpc.CallOption) (*pb.TimeSlot, error)
+	UpdateTimeSlot(ctx context.Context, req *pb.UpdateTimeSlotRequest, opts ...grpc.CallOption) (*pb.TimeSlot, error)
 }
 
 func (u UseCase) CreateTimeSlot(ctx context.Context, req *CreateTimeSlotReq) (*models.TimeSlot, error) {
