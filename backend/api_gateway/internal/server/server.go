@@ -39,9 +39,8 @@ type Options struct {
 }
 
 type Server struct {
-	lg      *zap.Logger
-	srv     *http.Server
-	v1Group *echo.Group
+	lg  *zap.Logger
+	srv *http.Server
 }
 
 func New(opts Options) (*Server, error) {
