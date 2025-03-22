@@ -18,7 +18,8 @@ func NewOptions(
 	serverAddr string,
 	allowOrigins []string,
 	v1Swagger *openapi3.T,
-	v1Handlers v1.Handlers,
+	eventsAddr string,
+	v1Handlers v1.ServerInterface,
 	options ...OptOptionsSetter,
 ) Options {
 	o := Options{}
@@ -32,6 +33,8 @@ func NewOptions(
 	o.allowOrigins = allowOrigins
 
 	o.v1Swagger = v1Swagger
+
+	o.eventsAddr = eventsAddr
 
 	o.v1Handlers = v1Handlers
 
@@ -47,6 +50,7 @@ func (o *Options) Validate() error {
 	errs.Add(errors461e464ebed9.NewValidationError("serverAddr", _validate_Options_serverAddr(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("allowOrigins", _validate_Options_allowOrigins(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("v1Swagger", _validate_Options_v1Swagger(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("eventsAddr", _validate_Options_eventsAddr(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("v1Handlers", _validate_Options_v1Handlers(o)))
 	return errs.AsError()
 }
@@ -75,6 +79,13 @@ func _validate_Options_allowOrigins(o *Options) error {
 func _validate_Options_v1Swagger(o *Options) error {
 	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.v1Swagger, "required"); err != nil {
 		return fmt461e464ebed9.Errorf("field `v1Swagger` did not pass the test: %w", err)
+	}
+	return nil
+}
+
+func _validate_Options_eventsAddr(o *Options) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.eventsAddr, "required,hostname_port"); err != nil {
+		return fmt461e464ebed9.Errorf("field `eventsAddr` did not pass the test: %w", err)
 	}
 	return nil
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	api "github.com/Slava02/SaintDiego/backend/events/pkg/pb/api"
+	"google.golang.org/grpc"
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
 )
@@ -29,8 +30,8 @@ func New(opts Options) (*UseCase, error) {
 }
 
 type IEventsClient interface {
-	GetServices(ctx context.Context, req *api.GetServicesRequest) (*api.GetServicesResponse, error)
-	GetService(ctx context.Context, req *api.GetServiceRequest) (*api.ServiceType, error)
+	GetServices(ctx context.Context, req *api.GetServicesRequest, opts ...grpc.CallOption) (*api.GetServicesResponse, error)
+	GetService(ctx context.Context, req *api.GetServiceByIdRequest) (*api.ServiceType, error)
 }
 
 func (u UseCase) GetServices(ctx context.Context) ([]*models.Service, error) {

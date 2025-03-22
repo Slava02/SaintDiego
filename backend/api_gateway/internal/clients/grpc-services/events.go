@@ -15,7 +15,7 @@ const (
 	connectionTimeout = 5 * time.Second
 )
 
-//go:generate options-gen -out-filename=events_options.gen.go -from-struct=Options
+//go:generate options-gen -out-filename=events_options.gen.go -from-struct=EventsClientOptions
 type EventsClientOptions struct {
 	ServerAddr string
 }

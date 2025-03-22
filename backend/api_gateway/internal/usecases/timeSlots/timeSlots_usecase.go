@@ -6,6 +6,7 @@ import (
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
 	api "github.com/Slava02/SaintDiego/backend/events/pkg/pb/api"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -33,13 +34,13 @@ func New(opts Options) (*UseCase, error) {
 }
 
 type IEventsClient interface {
-	CreateTimeSlot(ctx context.Context, req *api.CreateTimeSlotRequest) (*api.TimeSlot, error)
-	GetTimeSlots(ctx context.Context, req *api.GetTimeSlotsRequest) (*api.GetTimeSlotsResponse, error)
+	CreateTimeSlot(ctx context.Context, req *api.CreateTimeSlotRequest, opts ...grpc.CallOption) (*api.TimeSlot, error)
+	GetTimeSlots(ctx context.Context, req *api.GetTimeSlotsRequest, opts ...grpc.CallOption) (*api.GetTimeSlotsResponse, error)
 	GetTimeSlot(ctx context.Context, req *api.GetTimeSlotRequest) (*api.TimeSlot, error)
-	DeleteTimeSlot(ctx context.Context, req *api.DeleteTimeSlotRequest) (*api.DeleteTimeSlotResponse, error)
-	ActivateTimeSlot(ctx context.Context, req *api.ActivateTimeSlotRequest) (*api.TimeSlot, error)
-	ArchiveTimeSlot(ctx context.Context, req *api.ArchiveTimeSlotRequest) (*api.TimeSlot, error)
-	UpdateTimeSlot(ctx context.Context, req *api.UpdateTimeSlotRequest) (*api.TimeSlot, error)
+	DeleteTimeSlot(ctx context.Context, req *api.DeleteTimeSlotRequest, opts ...grpc.CallOption) (*api.DeleteTimeSlotResponse, error)
+	ActivateTimeSlot(ctx context.Context, req *api.ActivateTimeSlotRequest, opts ...grpc.CallOption) (*api.TimeSlot, error)
+	ArchiveTimeSlot(ctx context.Context, req *api.ArchiveTimeSlotRequest, opts ...grpc.CallOption) (*api.TimeSlot, error)
+	UpdateTimeSlot(ctx context.Context, req *api.UpdateTimeSlotRequest, opts ...grpc.CallOption) (*api.TimeSlot, error)
 }
 
 func (u UseCase) CreateTimeSlot(ctx context.Context, req *CreateTimeSlotReq) (*models.TimeSlot, error) {

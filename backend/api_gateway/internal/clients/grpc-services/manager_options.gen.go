@@ -8,13 +8,13 @@ import (
 	validator461e464ebed9 "github.com/kazhuravlev/options-gen/pkg/validator"
 )
 
-type OptOptionsSetter func(o *Options)
+type OptManagerOptionsSetter func(o *ManagerOptions)
 
-func NewOptions(
+func NewManagerOptions(
 	EventsAddr string,
-	options ...OptOptionsSetter,
-) Options {
-	o := Options{}
+	options ...OptManagerOptionsSetter,
+) ManagerOptions {
+	o := ManagerOptions{}
 
 	// Setting defaults from field tag (if present)
 
@@ -26,13 +26,13 @@ func NewOptions(
 	return o
 }
 
-func (o *Options) Validate() error {
+func (o *ManagerOptions) Validate() error {
 	errs := new(errors461e464ebed9.ValidationErrors)
-	errs.Add(errors461e464ebed9.NewValidationError("EventsAddr", _validate_Options_EventsAddr(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("EventsAddr", _validate_ManagerOptions_EventsAddr(o)))
 	return errs.AsError()
 }
 
-func _validate_Options_EventsAddr(o *Options) error {
+func _validate_ManagerOptions_EventsAddr(o *ManagerOptions) error {
 	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.EventsAddr, "required"); err != nil {
 		return fmt461e464ebed9.Errorf("field `EventsAddr` did not pass the test: %w", err)
 	}

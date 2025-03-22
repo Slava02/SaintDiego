@@ -4,17 +4,22 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/Slava02/SaintDiego/backend/api_gateway/pkg/closer"
-	"github.com/labstack/echo/v4"
 	"net/http"
 	"time"
 
+	oapimdlwr "github.com/oapi-codegen/echo-middleware"
+
+	"github.com/Slava02/SaintDiego/backend/api_gateway/pkg/closer"
+	"github.com/labstack/echo/v4"
+
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/labstack/echo/v4/middleware"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/middlewares"
+	v1 "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1"
 )
 
 const (
@@ -25,11 +30,12 @@ const (
 
 //go:generate options-gen -out-filename=server_options.gen.go -from-struct=Options
 type Options struct {
-	logger       *zap.Logger `option:"mandatory" validate:"required"`
-	serverAddr   string      `option:"mandatory" validate:"required,hostname_port"`
-	allowOrigins []string    `option:"mandatory" validate:"min=1"`
-	v1Swagger    *openapi3.T `option:"mandatory" validate:"required"`
-	eventsAddr   string      `option:"mandatory" validate:"required,hostname_port"`
+	logger       *zap.Logger        `option:"mandatory" validate:"required"`
+	serverAddr   string             `option:"mandatory" validate:"required,hostname_port"`
+	allowOrigins []string           `option:"mandatory" validate:"min=1"`
+	v1Swagger    *openapi3.T        `option:"mandatory" validate:"required"`
+	eventsAddr   string             `option:"mandatory" validate:"required,hostname_port"`
+	v1Handlers   v1.ServerInterface `option:"mandatory" validate:"required"`
 }
 
 type Server struct {
@@ -53,7 +59,14 @@ func New(opts Options) (*Server, error) {
 		}),
 	)
 
-	v1Group := e.Group("v1")
+	v1Api := e.Group("v1", oapimdlwr.OapiRequestValidatorWithOptions(opts.v1Swagger, &oapimdlwr.Options{
+		Options: openapi3filter.Options{
+			ExcludeRequestBody:  false,
+			ExcludeResponseBody: true,
+			AuthenticationFunc:  openapi3filter.NoopAuthenticationFunc,
+		},
+	}))
+	v1.RegisterHandlers(v1Api, opts.v1Handlers)
 
 	return &Server{
 		lg: zap.L().Named("server-apiGW"),
@@ -62,7 +75,6 @@ func New(opts Options) (*Server, error) {
 			Handler:           e,
 			ReadHeaderTimeout: readHeaderTimeout,
 		},
-		v1Group: v1Group,
 	}, nil
 }
 

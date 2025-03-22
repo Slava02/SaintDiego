@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	api "github.com/Slava02/SaintDiego/backend/events/pkg/pb/api"
+	"google.golang.org/grpc"
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
 )
@@ -29,8 +30,8 @@ func New(opts Options) (*UseCase, error) {
 }
 
 type IEventsClient interface {
-	GetLocations(ctx context.Context, req *api.GetLocationsRequest) (*api.GetLocationsResponse, error)
-	CreateLocation(ctx context.Context, req *api.CreateLocationRequest) (*api.Location, error)
+	GetLocations(ctx context.Context, req *api.GetLocationsRequest, opts ...grpc.CallOption) (*api.GetLocationsResponse, error)
+	CreateLocation(ctx context.Context, req *api.CreateLocationRequest, opts ...grpc.CallOption) (*api.Location, error)
 }
 
 func (u UseCase) GetLocations(ctx context.Context) ([]*models.Location, error) {

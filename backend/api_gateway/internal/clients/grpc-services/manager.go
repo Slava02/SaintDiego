@@ -8,12 +8,12 @@ type Manager struct {
 	eventsClient *EventsClient
 }
 
-//go:generate options-gen -out-filename=manager_options.gen.go -from-struct=Options
-type Options struct {
+//go:generate options-gen -out-filename=manager_options.gen.go -from-struct=ManagerOptions
+type ManagerOptions struct {
 	EventsAddr string `option:"mandatory" validate:"required"`
 }
 
-func NewManager(opts Options) (*Manager, error) {
+func NewManager(opts ManagerOptions) (*Manager, error) {
 	eventsClient, err := NewEventsClient(EventsClientOptions{
 		ServerAddr: opts.EventsAddr,
 	})
