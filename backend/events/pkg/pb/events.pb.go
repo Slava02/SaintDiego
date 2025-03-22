@@ -229,8 +229,8 @@ func (x *CreateTimeSlotRequest) GetRecurrence() *Recurrence {
 
 type UpdateTimeSlotRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	TimeSlot      *TimeSlot              `protobuf:"bytes,2,opt,name=timeSlot,proto3" json:"timeSlot,omitempty"`
+	Id            int64     `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	TimeSlot      *TimeSlot `protobuf:"bytes,2,opt,name=timeSlot,proto3" json:"timeSlot,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -774,9 +774,9 @@ type TimeSlot struct {
 	Capacity      int32                  `protobuf:"varint,5,opt,name=capacity,proto3" json:"capacity,omitempty"`
 	StartDate     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=startDate,proto3" json:"startDate,omitempty"`
 	EndDate       *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=endDate,proto3" json:"endDate,omitempty"`
-	Status        string                 `protobuf:"bytes,8,opt,name=status,proto3" json:"status,omitempty"`
-	Services      []*TimeSlotService     `protobuf:"bytes,9,rep,name=services,proto3" json:"services,omitempty"`
-	Recurrence    *Recurrence            `protobuf:"bytes,10,opt,name=recurrence,proto3" json:"recurrence,omitempty"`
+	Status        string             `protobuf:"bytes,8,opt,name=status,proto3" json:"status,omitempty"`
+	Services      []*TimeSlotService `protobuf:"bytes,9,rep,name=services,proto3" json:"services,omitempty"`
+	Recurrence    *Recurrence        `protobuf:"bytes,10,opt,name=recurrence,proto3" json:"recurrence,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
