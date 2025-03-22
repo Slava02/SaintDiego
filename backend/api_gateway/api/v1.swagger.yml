@@ -1,0 +1,491 @@
+openapi: 3.0.0
+info:
+  title: Saint Egidio Admin API
+  description: API для управления временными слотами, локациями и услугами в административной панели Saint Egidio
+  version: 1.0.0
+servers:
+  - url: https://localhost:8080/v1
+    description: Development server
+paths:
+  /locations:
+    get:
+      summary: Получение списка локаций
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Location"
+                maxItems: 100
+        "401":
+          description: Не авторизован
+        "403":
+          description: Нет доступа
+
+    post:
+      summary: Создание новой локации
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLocationRequest"
+        required: true
+      responses:
+        "201":
+          description: Локация успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Location"
+        "400":
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Нет доступа
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /services:
+    get:
+      summary: Получение списка услуг
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServiceType"
+                maxItems: 100
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Нет доступа
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /services/{id}:
+    get:
+      summary: Получение информации об услуге по идентификатору
+      parameters:
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceType"
+
+  /timeSlots:
+    get:
+      summary: Получение списка временных слотов
+      description: Возвращает список временных слотов с возможностью фильтрации
+      parameters:
+        - name: status
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - "active"
+              - "archived"
+        - name: startDate
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TimeSlot"
+                maxItems: 100
+        "401":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Not access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    post:
+      summary: Создание нового временного слота
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTimeSlotRequest"
+        required: true
+      responses:
+        "201":
+          description: Временной слот успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TimeSlot"
+        "400":
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Нет доступа
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /timeSlots/{id}:
+    get:
+      summary: Получение временного слота по идентификатору
+      parameters:
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Временной слот
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TimeSlot"
+        "400":
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Временной слот не найден
+    put:
+      summary: Обновление временного слота
+      parameters:
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TimeSlot"
+        required: true
+      responses:
+        "200":
+          description: Временной слот успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TimeSlot"
+        "400":
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Временной слот не найден
+
+    delete:
+      summary: Удаление временного слота
+      parameters:
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Временной слот успешно удален
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        "404":
+          description: Временной слот не найден
+
+  /timeSlots/{id}/activate:
+    patch:
+      summary: Активация временного слота
+      parameters:
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Временной слот успешно активирован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TimeSlot"
+        "404":
+          description: Временной слот не найден
+
+  /timeSlots/{id}/archive:
+    patch:
+      summary: Архивация временного слота
+      parameters:
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Временной слот успешно архивирован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TimeSlot"
+        "404":
+          description: Временной слот не найден
+security:
+  - BearerAuth: []
+
+components:
+  schemas:
+    CreateLocationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+      required:
+        - name
+        - address
+    CreateTimeSlotRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+            - "single"
+            - "recurring"
+        locationId:
+          type: integer
+        capacity:
+          type: integer
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        services:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimeSlotService"
+        recurrence:
+          $ref: "#/components/schemas/Recurrence"
+      required:
+        - title
+        - type
+        - locationId
+        - capacity
+        - startDate
+        - endDate
+        - services
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: string
+      required:
+        - code
+        - message
+    Location:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        address:
+          type: string
+      required:
+        - id
+        - name
+    Recurrence:
+      type: object
+      properties:
+        frequency:
+          type: string
+          enum:
+            - "daily"
+            - "weekly"
+            - "monthly"
+        interval:
+          type: integer
+          minimum: 1
+        endType:
+          type: string
+          enum:
+            - "never"
+            - "date"
+        endValue:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - frequency
+        - interval
+        - endType
+    ServiceType:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    TimeSlot:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+            - "single"
+            - "recurring"
+        locationId:
+          type: integer
+        capacity:
+          type: integer
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+            - "active"
+            - "archived"
+        services:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimeSlotService"
+        recurrence:
+          $ref: "#/components/schemas/Recurrence"
+      required:
+        - id
+        - title
+        - type
+        - locationId
+        - capacity
+        - startDate
+        - endDate
+        - status
+        - services
+    TimeSlotService:
+      type: object
+      properties:
+        serviceTypeId:
+          type: integer
+        capacity:
+          type: integer
+        bookingWindow:
+          type: integer
+        time:
+          type: string
+          format: date-time
+      required:
+        - serviceTypeId
+        - capacity
+        - bookingWindow
+        - time
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
