@@ -1,0 +1,145 @@
+syntax = "proto3";
+
+package events;
+
+option go_package = "github.com/Slava02/SaintDiego/backend/events/pkg/pb";
+
+import "google/protobuf/timestamp.proto";
+
+
+// Service definition
+service EventService {
+  // Time slots
+  rpc GetTimeSlot(GetTimeSlotRequest) returns (TimeSlot) {}
+  rpc GetTimeSlots(GetTimeSlotsRequest) returns (GetTimeSlotsResponse) {}
+  rpc CreateTimeSlot(CreateTimeSlotRequest) returns (TimeSlot) {}
+  rpc UpdateTimeSlot(UpdateTimeSlotRequest) returns (TimeSlot) {}
+  rpc DeleteTimeSlot(DeleteTimeSlotRequest) returns (DeleteTimeSlotResponse) {}
+  rpc ArchiveTimeSlot(ArchiveTimeSlotRequest) returns (TimeSlot) {}
+  rpc ActivateTimeSlot(ActivateTimeSlotRequest) returns (TimeSlot) {}
+
+  // Locations
+  rpc GetLocations(GetLocationsRequest) returns (GetLocationsResponse) {}
+  rpc CreateLocation(CreateLocationRequest) returns (Location) {}
+
+  // Services
+  rpc GetServices(GetServicesRequest) returns (GetServicesResponse) {}
+  rpc GetServiceById(GetServiceByIdRequest) returns (ServiceType) {}
+}
+
+// Request messages
+message GetTimeSlotRequest {
+  int64 id = 1;
+}
+
+message GetTimeSlotsRequest {
+  string status = 1;
+  google.protobuf.Timestamp startDate = 2;
+  google.protobuf.Timestamp endDate = 3;
+}
+
+message CreateTimeSlotRequest {
+  string title = 1;
+  string type = 2;
+  int64 locationId = 3;  
+  int32 capacity = 4;
+  google.protobuf.Timestamp startDate = 5;
+  google.protobuf.Timestamp endDate = 6;
+  repeated TimeSlotService services = 7;
+  Recurrence recurrence = 8;
+}
+
+message UpdateTimeSlotRequest {
+  int64 id = 1;  
+  TimeSlot timeSlot = 2;
+}
+
+message DeleteTimeSlotRequest {
+  int64 id = 1;  
+}
+
+message ArchiveTimeSlotRequest {
+  int64 id = 1;  
+}
+
+message ActivateTimeSlotRequest {
+  int64 id = 1;  
+}
+
+message CreateLocationRequest {
+  string name = 1;
+  string address = 2;
+  string description = 3;
+}
+
+message GetServicesRequest {}
+
+message GetServiceByIdRequest {
+  int64 id = 1;
+}
+
+// Response messages
+message GetTimeSlotsResponse {
+  repeated TimeSlot timeSlots = 1;
+}
+
+message DeleteTimeSlotResponse {
+  bool success = 1;
+}
+
+message GetLocationsRequest {}
+
+message GetLocationsResponse {
+  repeated Location locations = 1;
+}
+
+message GetServicesResponse {
+  repeated ServiceType services = 1;
+}
+
+// Common messages
+message TimeSlot {
+  int64 id = 1;  
+  string title = 2;
+  string type = 3;
+  int64 locationId = 4;  
+  int32 capacity = 5;
+  google.protobuf.Timestamp startDate = 6;
+  google.protobuf.Timestamp endDate = 7;
+  string status = 8;
+  repeated TimeSlotService services = 9;
+  Recurrence recurrence = 10;
+}
+
+message TimeSlotService {
+  int64 serviceTypeId = 1;  
+  int32 capacity = 2;
+  int32 bookingWindow = 3;
+  google.protobuf.Timestamp time = 4;
+}
+
+message Recurrence {
+  string frequency = 1;
+  int32 interval = 2;
+  string endType = 3;
+  google.protobuf.Timestamp endValue = 4;
+}
+
+message Location {
+  int64 id = 1;  
+  string name = 2;
+  string address = 3;
+  string description = 4;
+}
+
+message ServiceType {
+  int64 id = 1;  
+  string name = 2;
+  string description = 3;
+}
+
+message Error {
+  string code = 1;
+  string message = 2;
+  map<string, string> details = 3;
+}
