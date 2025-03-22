@@ -21,15 +21,18 @@ func NewLogging(lg *zap.Logger) echo.MiddlewareFunc {
 		LogUserAgent: true,
 		LogStatus:    true,
 		LogError:     true,
-		LogValuesFunc: func(_ echo.Context, v middleware.RequestLoggerValues) error {
+		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
 			lg := lg.With(
 				zap.Duration("latency", v.Latency),
 				zap.String("remote_ip", v.RemoteIP),
 				zap.String("host", v.Host),
 				zap.String("method", v.Method),
+				zap.String("uri", v.URI),
 				zap.String("path", v.URIPath),
 				zap.String("request_id", v.RequestID),
 				zap.String("user_agent", v.UserAgent),
+				zap.String("raw_path", c.Request().URL.Path),
+				zap.String("raw_query", c.Request().URL.RawQuery),
 			)
 
 			status := v.Status
@@ -48,7 +51,7 @@ func NewLogging(lg *zap.Logger) echo.MiddlewareFunc {
 			case status >= 400:
 				lg.Error("client error")
 			default:
-				lg.Info("success")
+				lg.Info("request handled")
 			}
 
 			return nil

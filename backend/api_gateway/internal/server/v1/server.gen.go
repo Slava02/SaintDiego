@@ -68,9 +68,9 @@ type CreateLocationRequest struct {
 
 // CreateTimeSlotRequest defines model for CreateTimeSlotRequest.
 type CreateTimeSlotRequest struct {
-	Capacity   int                       `json:"capacity"`
+	Capacity   int32                     `json:"capacity"`
 	EndDate    time.Time                 `json:"endDate"`
-	LocationId int                       `json:"locationId"`
+	LocationId int64                     `json:"locationId"`
 	Recurrence *Recurrence               `json:"recurrence,omitempty"`
 	Services   []TimeSlotService         `json:"services"`
 	StartDate  time.Time                 `json:"startDate"`
@@ -91,7 +91,7 @@ type Error struct {
 // Location defines model for Location.
 type Location struct {
 	Address *string `json:"address,omitempty"`
-	Id      int     `json:"id"`
+	Id      int64   `json:"id"`
 	Name    string  `json:"name"`
 }
 
@@ -100,7 +100,7 @@ type Recurrence struct {
 	EndType   RecurrenceEndType   `json:"endType"`
 	EndValue  *time.Time          `json:"endValue"`
 	Frequency RecurrenceFrequency `json:"frequency"`
-	Interval  int                 `json:"interval"`
+	Interval  int32               `json:"interval"`
 }
 
 // RecurrenceEndType defines model for Recurrence.EndType.
@@ -111,16 +111,16 @@ type RecurrenceFrequency string
 
 // ServiceType defines model for ServiceType.
 type ServiceType struct {
-	Id   int    `json:"id"`
+	Id   int64  `json:"id"`
 	Name string `json:"name"`
 }
 
 // TimeSlot defines model for TimeSlot.
 type TimeSlot struct {
-	Capacity   int               `json:"capacity"`
+	Capacity   int32             `json:"capacity"`
 	EndDate    time.Time         `json:"endDate"`
-	Id         int               `json:"id"`
-	LocationId int               `json:"locationId"`
+	Id         int64             `json:"id"`
+	LocationId int64             `json:"locationId"`
 	Recurrence *Recurrence       `json:"recurrence,omitempty"`
 	Services   []TimeSlotService `json:"services"`
 	StartDate  time.Time         `json:"startDate"`
@@ -137,9 +137,9 @@ type TimeSlotType string
 
 // TimeSlotService defines model for TimeSlotService.
 type TimeSlotService struct {
-	BookingWindow int       `json:"bookingWindow"`
-	Capacity      int       `json:"capacity"`
-	ServiceTypeId int       `json:"serviceTypeId"`
+	BookingWindow int32     `json:"bookingWindow"`
+	Capacity      int32     `json:"capacity"`
+	ServiceTypeId int64     `json:"serviceTypeId"`
 	Time          time.Time `json:"time"`
 }
 
@@ -175,7 +175,7 @@ type ServerInterface interface {
 	GetServices(ctx echo.Context) error
 	// Получение информации об услуге по идентификатору
 	// (GET /services/{id})
-	GetServicesId(ctx echo.Context, id int) error
+	GetServicesId(ctx echo.Context, id int64) error
 	// Получение списка временных слотов
 	// (GET /timeSlots)
 	GetTimeSlots(ctx echo.Context, params GetTimeSlotsParams) error
@@ -184,19 +184,19 @@ type ServerInterface interface {
 	PostTimeSlots(ctx echo.Context) error
 	// Удаление временного слота
 	// (DELETE /timeSlots/{id})
-	DeleteTimeSlotsId(ctx echo.Context, id int) error
+	DeleteTimeSlotsId(ctx echo.Context, id int64) error
 	// Получение временного слота по идентификатору
 	// (GET /timeSlots/{id})
-	GetTimeSlotsId(ctx echo.Context, id int) error
+	GetTimeSlotsId(ctx echo.Context, id int64) error
 	// Обновление временного слота
 	// (PUT /timeSlots/{id})
-	PutTimeSlotsId(ctx echo.Context, id int) error
+	PutTimeSlotsId(ctx echo.Context, id int64) error
 	// Активация временного слота
 	// (PATCH /timeSlots/{id}/activate)
-	PatchTimeSlotsIdActivate(ctx echo.Context, id int) error
+	PatchTimeSlotsIdActivate(ctx echo.Context, id int64) error
 	// Архивация временного слота
 	// (PATCH /timeSlots/{id}/archive)
-	PatchTimeSlotsIdArchive(ctx echo.Context, id int) error
+	PatchTimeSlotsIdArchive(ctx echo.Context, id int64) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -241,7 +241,7 @@ func (w *ServerInterfaceWrapper) GetServices(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) GetServicesId(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id int
+	var id int64
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -304,7 +304,7 @@ func (w *ServerInterfaceWrapper) PostTimeSlots(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) DeleteTimeSlotsId(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id int
+	var id int64
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -322,7 +322,7 @@ func (w *ServerInterfaceWrapper) DeleteTimeSlotsId(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) GetTimeSlotsId(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id int
+	var id int64
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -340,7 +340,7 @@ func (w *ServerInterfaceWrapper) GetTimeSlotsId(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) PutTimeSlotsId(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id int
+	var id int64
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -358,7 +358,7 @@ func (w *ServerInterfaceWrapper) PutTimeSlotsId(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) PatchTimeSlotsIdActivate(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id int
+	var id int64
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -376,7 +376,7 @@ func (w *ServerInterfaceWrapper) PatchTimeSlotsIdActivate(ctx echo.Context) erro
 func (w *ServerInterfaceWrapper) PatchTimeSlotsIdArchive(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id int
+	var id int64
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -435,35 +435,35 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"ZeN6/Xq91loinfXO7wEAAP//XVeNhjEmAAA=",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

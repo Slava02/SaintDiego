@@ -3,7 +3,7 @@ name = "api-gateway"
 env = "dev"
 
 [log]
-level = "info"
+level = "debug"
 
 [servers.apiGW]
 addr = ":8080"

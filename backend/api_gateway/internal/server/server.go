@@ -59,17 +59,21 @@ func New(opts Options) (*Server, error) {
 		}),
 	)
 
-	v1Api := e.Group("v1", oapimdlwr.OapiRequestValidatorWithOptions(opts.v1Swagger, &oapimdlwr.Options{
+	validatorMiddleware := oapimdlwr.OapiRequestValidatorWithOptions(opts.v1Swagger, &oapimdlwr.Options{
 		Options: openapi3filter.Options{
 			ExcludeRequestBody:  false,
 			ExcludeResponseBody: true,
 			AuthenticationFunc:  openapi3filter.NoopAuthenticationFunc,
 		},
-	}))
-	v1.RegisterHandlers(v1Api, opts.v1Handlers)
+		SilenceServersWarning: true,
+	})
+
+	v1.RegisterHandlersWithBaseURL(e, opts.v1Handlers, "/v1")
+
+	e.Group("/v1").Use(validatorMiddleware)
 
 	return &Server{
-		lg: zap.L().Named("server-apiGW"),
+		lg: zap.L().Named(nameServer),
 		srv: &http.Server{
 			Addr:              opts.serverAddr,
 			Handler:           e,

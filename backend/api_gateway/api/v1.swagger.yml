@@ -4,7 +4,7 @@ info:
   description: API для управления временными слотами, локациями и услугами в административной панели Saint Egidio
   version: 1.0.0
 servers:
-  - url: https://localhost:8080/v1
+  - url: http://localhost:8080/v1
     description: Development server
 paths:
   /locations:
@@ -95,6 +95,7 @@ paths:
           explode: false
           schema:
             type: integer
+            format: int64
       responses:
         "200":
           description: Успешный ответ
@@ -205,6 +206,7 @@ paths:
           explode: false
           schema:
             type: integer
+            format: int64
       responses:
         "200":
           description: Временной слот
@@ -230,6 +232,7 @@ paths:
           explode: false
           schema:
             type: integer
+            format: int64
       requestBody:
         content:
           application/json:
@@ -262,6 +265,7 @@ paths:
           explode: false
           schema:
             type: integer
+            format: int64
       responses:
         "200":
           description: Временной слот успешно удален
@@ -286,6 +290,7 @@ paths:
           explode: false
           schema:
             type: integer
+            format: int64
       responses:
         "200":
           description: Временной слот успешно активирован
@@ -307,6 +312,7 @@ paths:
           explode: false
           schema:
             type: integer
+            format: int64
       responses:
         "200":
           description: Временной слот успешно архивирован
@@ -343,8 +349,10 @@ components:
             - "recurring"
         locationId:
           type: integer
+          format: int64
         capacity:
           type: integer
+          format: int32
         startDate:
           type: string
           format: date-time
@@ -382,6 +390,7 @@ components:
       properties:
         id:
           type: integer
+          format: int64
         name:
           type: string
         address:
@@ -400,6 +409,7 @@ components:
             - "monthly"
         interval:
           type: integer
+          format: int32
           minimum: 1
         endType:
           type: string
@@ -419,6 +429,7 @@ components:
       properties:
         id:
           type: integer
+          format: int64
         name:
           type: string
       required:
@@ -429,6 +440,7 @@ components:
       properties:
         id:
           type: integer
+          format: int64
         title:
           type: string
         type:
@@ -438,8 +450,10 @@ components:
             - "recurring"
         locationId:
           type: integer
+          format: int64
         capacity:
           type: integer
+          format: int32
         startDate:
           type: string
           format: date-time
@@ -472,10 +486,13 @@ components:
       properties:
         serviceTypeId:
           type: integer
+          format: int64
         capacity:
           type: integer
+          format: int32
         bookingWindow:
           type: integer
+          format: int32
         time:
           type: string
           format: date-time

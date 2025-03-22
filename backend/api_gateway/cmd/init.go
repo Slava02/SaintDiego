@@ -33,8 +33,19 @@ func initServer(
 	closer.Add(manager.Close)
 
 	timeSlotsUC, err := timeSlots.New(timeSlots.NewOptions(manager.Events()))
+	if err != nil {
+		return nil, fmt.Errorf("create timeSlots usecase: %v", err)
+	}
+
 	servicesUC, err := services.New(services.NewOptions(manager.Events()))
+	if err != nil {
+		return nil, fmt.Errorf("create services usecase: %v", err)
+	}
+
 	locationsUC, err := locations.New(locations.NewOptions(manager.Events()))
+	if err != nil {
+		return nil, fmt.Errorf("create locations usecase: %v", err)
+	}
 
 	v1Handlers, err := v1.NewHandlers(v1.NewOptions(timeSlotsUC, locationsUC, servicesUC))
 	if err != nil {

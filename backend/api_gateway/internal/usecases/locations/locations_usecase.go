@@ -35,11 +35,34 @@ type IEventsClient interface {
 }
 
 func (u UseCase) GetLocations(ctx context.Context) ([]*models.Location, error) {
-	// TODO implement me
-	panic("implement me")
+	resp, err := u.eventsClient.GetLocations(ctx, &pb.GetLocationsRequest{})
+	if err != nil {
+		return nil, err
+	}
+
+	locations := make([]*models.Location, len(resp.Locations))
+	for i, location := range resp.Locations {
+		locations[i] = &models.Location{
+			ID:      location.Id,
+			Name:    location.Name,
+			Address: location.Address,
+		}
+	}
+	return locations, nil
 }
 
 func (u UseCase) CreateLocation(ctx context.Context, req *CreateLocationRequest) (*models.Location, error) {
-	// TODO implement me
-	panic("implement me")
+	resp, err := u.eventsClient.CreateLocation(ctx, &pb.CreateLocationRequest{
+		Name:    req.Name,
+		Address: req.Address,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.Location{
+		ID:      resp.Id,
+		Name:    resp.Name,
+		Address: resp.Address,
+	}, nil
 }

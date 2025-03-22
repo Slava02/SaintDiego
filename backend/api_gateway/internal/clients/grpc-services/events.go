@@ -29,9 +29,10 @@ func NewEventsClient(opts EventsClientOptions) (*EventsClient, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), connectionTimeout)
 	defer cancel()
 
-	// Create gRPC connection with tracing interceptor
+	// Create gRPC connection with tracing interceptor and blocking mode
 	conn, err := grpc.DialContext(ctx, opts.ServerAddr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		//grpc.WithBlock(), // Wait for connection to be established
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to events service: %w", err)

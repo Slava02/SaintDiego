@@ -42,11 +42,6 @@ tasks:
   tidy:
     - echo "- Tidy"
     - go mod tidy
-    - task: vendor
-
-  vendor:
-    - echo "- Vendor"
-    - go mod vendor
 
   fmt:
     - echo "- Format"
