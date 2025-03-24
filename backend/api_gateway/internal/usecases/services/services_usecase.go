@@ -1,4 +1,4 @@
-package timeSlot
+package services
 
 import (
 	"context"

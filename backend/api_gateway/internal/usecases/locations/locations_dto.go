@@ -1,4 +1,4 @@
-package timeSlots
+package locations
 
 type CreateLocationRequest struct {
 	Name    string `json:"name" validate:"required"`

@@ -1,0 +1,21 @@
+[global]
+name = "api-gateway"
+env = "dev"
+
+[log]
+level = "info"
+
+[server]
+addr = ":50051"
+max_connection_idle = 10
+timeout = 10
+max_connection_age = 10
+time = 10
+
+
+[database]
+host = "33"
+db_name = "33"
+password = "33"
+user = "33"
+port = "33"

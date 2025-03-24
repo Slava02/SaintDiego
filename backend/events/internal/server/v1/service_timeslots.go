@@ -1,0 +1,177 @@
+package v1
+
+import (
+	"context"
+
+	"github.com/Slava02/SaintDiego/backend/events/internal/models"
+	"github.com/Slava02/SaintDiego/backend/events/internal/usecases/timeSlots"
+	"github.com/Slava02/SaintDiego/backend/events/pkg/pb"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
+)
+
+type ITimeSlotsUC interface {
+	CreateTimeSlot(ctx context.Context, req *timeSlots.CreateTimeSlotReq) (*models.TimeSlot, error)
+	GetTimeSlots(ctx context.Context, req *timeSlots.GetTimeSlotsReq) ([]*models.TimeSlot, error)
+	GetTimeSlot(ctx context.Context, id int64) (*models.TimeSlot, error)
+	DeleteTimeSlot(ctx context.Context, id int64) error
+	ActivateTimeSlot(ctx context.Context, id int64) error
+	ArchiveTimeSlot(ctx context.Context, id int64) error
+	UpdateTimeSlot(ctx context.Context, req *timeSlots.UpdateTimeSlotReq) (*models.TimeSlot, error)
+}
+
+func (i *Implementation) GetTimeSlot(ctx context.Context, req *pb.GetTimeSlotRequest) (*pb.TimeSlot, error) {
+	timeSlot, err := i.timeSlotUC.GetTimeSlot(ctx, req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get time slot: %v", err)
+	}
+
+	return convertModelTimeSlotToPB(timeSlot), nil
+}
+
+func (i *Implementation) GetTimeSlots(ctx context.Context, req *pb.GetTimeSlotsRequest) (*pb.GetTimeSlotsResponse, error) {
+	timeSlots, err := i.timeSlotUC.GetTimeSlots(ctx, &timeSlots.GetTimeSlotsReq{
+		Status:    req.Status,
+		StartDate: req.StartDate.AsTime(),
+		EndDate:   req.EndDate.AsTime(),
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get time slots: %v", err)
+	}
+
+	pbTimeSlots := make([]*pb.TimeSlot, len(timeSlots))
+	for i, timeSlot := range timeSlots {
+		pbTimeSlots[i] = convertModelTimeSlotToPB(timeSlot)
+	}
+
+	return &pb.GetTimeSlotsResponse{
+		TimeSlots: pbTimeSlots,
+	}, nil
+}
+
+func (i *Implementation) CreateTimeSlot(ctx context.Context, req *pb.CreateTimeSlotRequest) (*pb.TimeSlot, error) {
+	timeSlot, err := i.timeSlotUC.CreateTimeSlot(ctx, &timeSlots.CreateTimeSlotReq{
+		Title:      req.Title,
+		Type:       req.Type,
+		LocationID: req.LocationId,
+		Capacity:   req.Capacity,
+		StartDate:  req.StartDate.AsTime(),
+		EndDate:    req.EndDate.AsTime(),
+		Services:   convertPBServicesToModel(req.Services),
+		Recurrence: convertPBRecurrenceToModel(req.Recurrence),
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to create time slot: %v", err)
+	}
+
+	return convertModelTimeSlotToPB(timeSlot), nil
+}
+
+func (i *Implementation) UpdateTimeSlot(ctx context.Context, req *pb.UpdateTimeSlotRequest) (*pb.TimeSlot, error) {
+	timeSlot, err := i.timeSlotUC.UpdateTimeSlot(ctx, &timeSlots.UpdateTimeSlotReq{
+		TimeSlot: models.TimeSlot{
+			ID:         req.Id,
+			Title:      req.TimeSlot.Title,
+			Type:       req.TimeSlot.Type,
+			LocationID: req.TimeSlot.LocationId,
+			Capacity:   req.TimeSlot.Capacity,
+			StartDate:  req.TimeSlot.StartDate.AsTime(),
+			EndDate:    req.TimeSlot.EndDate.AsTime(),
+			Status:     req.TimeSlot.Status,
+		},
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to update time slot: %v", err)
+	}
+
+	return convertModelTimeSlotToPB(timeSlot), nil
+}
+
+func (i *Implementation) DeleteTimeSlot(ctx context.Context, req *pb.DeleteTimeSlotRequest) (*pb.DeleteTimeSlotResponse, error) {
+	err := i.timeSlotUC.DeleteTimeSlot(ctx, req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to delete time slot: %v", err)
+	}
+
+	return &pb.DeleteTimeSlotResponse{
+		Success: true,
+	}, nil
+}
+
+func (i *Implementation) ArchiveTimeSlot(ctx context.Context, req *pb.ArchiveTimeSlotRequest) (*pb.TimeSlot, error) {
+	err := i.timeSlotUC.ArchiveTimeSlot(ctx, req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to archive time slot: %v", err)
+	}
+
+	timeSlot, err := i.timeSlotUC.GetTimeSlot(ctx, req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get archived time slot: %v", err)
+	}
+
+	return convertModelTimeSlotToPB(timeSlot), nil
+}
+
+func (i *Implementation) ActivateTimeSlot(ctx context.Context, req *pb.ActivateTimeSlotRequest) (*pb.TimeSlot, error) {
+	err := i.timeSlotUC.ActivateTimeSlot(ctx, req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to activate time slot: %v", err)
+	}
+
+	timeSlot, err := i.timeSlotUC.GetTimeSlot(ctx, req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get activated time slot: %v", err)
+	}
+
+	return convertModelTimeSlotToPB(timeSlot), nil
+}
+
+// Helper functions for converting between models and protobuf messages
+
+func convertModelTimeSlotToPB(timeSlot *models.TimeSlot) *pb.TimeSlot {
+	if timeSlot == nil {
+		return nil
+	}
+
+	return &pb.TimeSlot{
+		Id:         timeSlot.ID,
+		Title:      timeSlot.Title,
+		Type:       timeSlot.Type,
+		LocationId: timeSlot.LocationID,
+		Capacity:   timeSlot.Capacity,
+		StartDate:  timestamppb.New(timeSlot.StartDate),
+		EndDate:    timestamppb.New(timeSlot.EndDate),
+		Status:     timeSlot.Status,
+	}
+}
+
+func convertPBServicesToModel(services []*pb.TimeSlotService) []models.TimeSlotService {
+	if services == nil {
+		return nil
+	}
+
+	modelServices := make([]models.TimeSlotService, len(services))
+	for i, service := range services {
+		modelServices[i] = models.TimeSlotService{
+			ServiceTypeID: service.ServiceTypeId,
+			Capacity:      service.Capacity,
+			BookingWindow: service.BookingWindow,
+			Time:          service.Time.AsTime().Format("15:04-15:04"),
+		}
+	}
+	return modelServices
+}
+
+func convertPBRecurrenceToModel(recurrence *pb.Recurrence) *models.TimeSlotRecurrence {
+	if recurrence == nil {
+		return nil
+	}
+
+	return &models.TimeSlotRecurrence{
+		Frequency: recurrence.Frequency,
+		Interval:  recurrence.Interval,
+		EndType:   recurrence.EndType,
+		EndValue:  recurrence.EndValue.AsTime(),
+	}
+}

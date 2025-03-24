@@ -59,7 +59,7 @@ CREATE TABLE `time_slot` (
     `id` int(11) NOT NULL,
     `title` varchar(255) NOT NULL,
     `type` enum('single', 'recurring') NOT NULL,
-    `location_id` int(11) NOT NULL,
+    `location_id` varchar(36) NOT NULL,
     `capacity` int NOT NULL,
     `start_date` datetime NOT NULL,
     `end_date` datetime NOT NULL,

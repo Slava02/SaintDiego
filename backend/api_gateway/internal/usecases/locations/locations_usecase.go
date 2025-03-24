@@ -1,4 +1,4 @@
-package timeSlots
+package locations
 
 import (
 	"context"

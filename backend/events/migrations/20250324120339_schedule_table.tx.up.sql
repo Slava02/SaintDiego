@@ -1,5 +1,4 @@
--- Существующая таблица типов услуг (не изменяется)
-CREATE TABLE `service_type` (
+CREATE TABLE IF NOT EXISTS `service_type` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `created_by_id` int(11) DEFAULT NULL,
     `updated_by_id` int(11) DEFAULT NULL,
@@ -15,9 +14,9 @@ CREATE TABLE `service_type` (
     KEY `IDX_429DE3C5896DBBDE` (`updated_by_id`),
     CONSTRAINT `FK_429DE3C5896DBBDE` FOREIGN KEY (`updated_by_id`) REFERENCES `fos_user_user` (`id`),
     CONSTRAINT `FK_429DE3C5B03A8386` FOREIGN KEY (`created_by_id`) REFERENCES `fos_user_user` (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;
--- Существующая таблица услуг (не изменяется)
-CREATE TABLE `service` (
+);
+--bun:split
+CREATE TABLE IF NOT EXISTS `service` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `client_id` int(11) DEFAULT NULL,
     `type_id` int(11) DEFAULT NULL,
@@ -38,9 +37,9 @@ CREATE TABLE `service` (
     CONSTRAINT `FK_E19D9AD2896DBBDE` FOREIGN KEY (`updated_by_id`) REFERENCES `fos_user_user` (`id`),
     CONSTRAINT `FK_E19D9AD2B03A8386` FOREIGN KEY (`created_by_id`) REFERENCES `fos_user_user` (`id`),
     CONSTRAINT `FK_E19D9AD2C54C8C93` FOREIGN KEY (`type_id`) REFERENCES `service_type` (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;
--- Таблица локаций
-CREATE TABLE `location` (
+);
+--bun:split
+CREATE TABLE IF NOT EXISTS `location` (
     `id` int(11) NOT NULL,
     `name` varchar(255) NOT NULL,
     `address` varchar(255),
@@ -53,9 +52,9 @@ CREATE TABLE `location` (
     KEY `IDX_location_updated_by` (`updated_by_id`),
     CONSTRAINT `FK_location_created_by` FOREIGN KEY (`created_by_id`) REFERENCES `fos_user_user` (`id`),
     CONSTRAINT `FK_location_updated_by` FOREIGN KEY (`updated_by_id`) REFERENCES `fos_user_user` (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
--- Таблица временных слотов
-CREATE TABLE `time_slot` (
+);
+--bun:split
+CREATE TABLE IF NOT EXISTS `time_slot` (
     `id` int(11) NOT NULL,
     `title` varchar(255) NOT NULL,
     `type` enum('single', 'recurring') NOT NULL,
@@ -76,9 +75,9 @@ CREATE TABLE `time_slot` (
     CONSTRAINT `FK_time_slot_location` FOREIGN KEY (`location_id`) REFERENCES `location` (`id`),
     CONSTRAINT `FK_time_slot_created_by` FOREIGN KEY (`created_by_id`) REFERENCES `fos_user_user` (`id`),
     CONSTRAINT `FK_time_slot_updated_by` FOREIGN KEY (`updated_by_id`) REFERENCES `fos_user_user` (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
--- Таблица для повторяющихся слотов
-CREATE TABLE `time_slot_recurrence` (
+);
+--bun:split
+CREATE TABLE IF NOT EXISTS `time_slot_recurrence` (
     `time_slot_id` int(11) NOT NULL,
     `frequency` enum('daily', 'weekly', 'monthly') NOT NULL,
     `interval` int NOT NULL DEFAULT 1,
@@ -86,16 +85,15 @@ CREATE TABLE `time_slot_recurrence` (
     `end_value` datetime DEFAULT NULL,
     PRIMARY KEY (`time_slot_id`),
     CONSTRAINT `FK_time_slot_recurrence` FOREIGN KEY (`time_slot_id`) REFERENCES `time_slot` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
--- Таблица связи временных слотов и типов услуг
-CREATE TABLE `time_slot_service` (
+);
+--bun:split
+CREATE TABLE IF NOT EXISTS `time_slot_service` (
     `time_slot_id` int(11) NOT NULL,
     `service_type_id` int(11) NOT NULL,
     `capacity` int NOT NULL,
     `booking_window` int NOT NULL,
     `time` varchar(11) NOT NULL,
-    -- Формат: "10:00-12:00"
     PRIMARY KEY (`time_slot_id`, `service_type_id`),
     CONSTRAINT `FK_time_slot_service_slot` FOREIGN KEY (`time_slot_id`) REFERENCES `time_slot` (`id`) ON DELETE CASCADE,
     CONSTRAINT `FK_time_slot_service_type` FOREIGN KEY (`service_type_id`) REFERENCES `service_type` (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+);
