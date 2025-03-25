@@ -40,22 +40,18 @@ CREATE TABLE IF NOT EXISTS `service` (
 );
 --bun:split
 CREATE TABLE IF NOT EXISTS `location` (
-    `id` int(11) NOT NULL,
+    `id` int(11) NOT NULL AUTO_INCREMENT,
     `name` varchar(255) NOT NULL,
     `address` varchar(255),
     `created_by_id` int(11) DEFAULT NULL,
     `updated_by_id` int(11) DEFAULT NULL,
     `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    KEY `IDX_location_created_by` (`created_by_id`),
-    KEY `IDX_location_updated_by` (`updated_by_id`),
-    CONSTRAINT `FK_location_created_by` FOREIGN KEY (`created_by_id`) REFERENCES `fos_user_user` (`id`),
-    CONSTRAINT `FK_location_updated_by` FOREIGN KEY (`updated_by_id`) REFERENCES `fos_user_user` (`id`)
+    PRIMARY KEY (`id`)
 );
 --bun:split
 CREATE TABLE IF NOT EXISTS `time_slot` (
-    `id` int(11) NOT NULL,
+    `id` int(11) NOT NULL AUTO_INCREMENT,
     `title` varchar(255) NOT NULL,
     `type` enum('single', 'recurring') NOT NULL,
     `location_id` int(11) NOT NULL,
@@ -92,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `time_slot_service` (
     `service_type_id` int(11) NOT NULL,
     `capacity` int NOT NULL,
     `booking_window` int NOT NULL,
-    `time` varchar(11) NOT NULL,
+    `time` datetime NOT NULL,
     PRIMARY KEY (`time_slot_id`, `service_type_id`),
     CONSTRAINT `FK_time_slot_service_slot` FOREIGN KEY (`time_slot_id`) REFERENCES `time_slot` (`id`) ON DELETE CASCADE,
     CONSTRAINT `FK_time_slot_service_type` FOREIGN KEY (`service_type_id`) REFERENCES `service_type` (`id`)

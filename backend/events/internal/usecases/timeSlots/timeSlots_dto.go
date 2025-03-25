@@ -14,7 +14,7 @@ type CreateTimeSlotReq struct {
 	Capacity   int32                      `json:"capacity" validate:"required,min=1"`
 	StartDate  time.Time                  `json:"startDate" validate:"required"`
 	EndDate    time.Time                  `json:"endDate" validate:"required,gtfield=StartDate"`
-	Services   []models.TimeSlotService   `json:"services" validate:"required,dive,min=1"`
+	Services   []*models.TimeSlotService  `json:"services" validate:"required,dive,min=1"`
 	Recurrence *models.TimeSlotRecurrence `json:"recurrence,omitempty" validate:"omitempty,required_if=Type recurring"`
 }
 

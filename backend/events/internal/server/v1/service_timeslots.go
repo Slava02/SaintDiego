@@ -143,24 +143,44 @@ func convertModelTimeSlotToPB(timeSlot *models.TimeSlot) *pb.TimeSlot {
 		StartDate:  timestamppb.New(timeSlot.StartDate),
 		EndDate:    timestamppb.New(timeSlot.EndDate),
 		Status:     timeSlot.Status,
+		Services:   convertModelServicesToPBServices(timeSlot.Services),
+		Recurrence: convertModelRecurrenceToPBRecurrence(timeSlot.Recurrence),
 	}
 }
 
-func convertPBServicesToModel(services []*pb.TimeSlotService) []models.TimeSlotService {
+func convertPBServicesToModel(services []*pb.TimeSlotService) []*models.TimeSlotService {
 	if services == nil {
 		return nil
 	}
 
-	modelServices := make([]models.TimeSlotService, len(services))
+	modelServices := make([]*models.TimeSlotService, len(services))
 	for i, service := range services {
-		modelServices[i] = models.TimeSlotService{
+		modelServices[i] = &models.TimeSlotService{
 			ServiceTypeID: service.ServiceTypeId,
 			Capacity:      service.Capacity,
 			BookingWindow: service.BookingWindow,
-			Time:          service.Time.AsTime().Format("15:04-15:04"),
+			Time:          service.Time.AsTime(),
 		}
 	}
 	return modelServices
+}
+
+func convertModelServicesToPBServices(services []*models.TimeSlotService) []*pb.TimeSlotService {
+	if services == nil {
+		return nil
+	}
+
+	pbServices := make([]*pb.TimeSlotService, len(services))
+	for i, service := range services {
+		pbServices[i] = &pb.TimeSlotService{
+			ServiceTypeId: service.ServiceTypeID,
+			Capacity:      service.Capacity,
+			BookingWindow: service.BookingWindow,
+			Time:          timestamppb.New(service.Time),
+		}
+	}
+
+	return pbServices
 }
 
 func convertPBRecurrenceToModel(recurrence *pb.Recurrence) *models.TimeSlotRecurrence {
@@ -173,5 +193,18 @@ func convertPBRecurrenceToModel(recurrence *pb.Recurrence) *models.TimeSlotRecur
 		Interval:  recurrence.Interval,
 		EndType:   recurrence.EndType,
 		EndValue:  recurrence.EndValue.AsTime(),
+	}
+}
+
+func convertModelRecurrenceToPBRecurrence(recurrence *models.TimeSlotRecurrence) *pb.Recurrence {
+	if recurrence == nil {
+		return nil
+	}
+
+	return &pb.Recurrence{
+		Frequency: recurrence.Frequency,
+		Interval:  recurrence.Interval,
+		EndType:   recurrence.EndType,
+		EndValue:  timestamppb.New(recurrence.EndValue),
 	}
 }

@@ -17,6 +17,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
 import { ServiceConfig } from "./service-config"
+import { api } from "@/lib/api"
 
 interface TimeSlotFormProps {
     timeSlot?: TimeSlot | null
@@ -86,7 +87,7 @@ function LocationModal({ onSave, onClose }: LocationModalProps) {
 export function TimeSlotForm({ timeSlot, locations, availableServices, onSave, onCancel, onAddLocation }: TimeSlotFormProps) {
     // Основные состояния формы
     const [title, setTitle] = useState(timeSlot?.title || "")
-    const [location, setLocation] = useState<string>(timeSlot?.locationId || locations[0]?.id || "")
+    const [locationId, setLocationId] = useState<string>(timeSlot?.locationId || locations[0]?.id || "")
     const [capacity, setCapacity] = useState(timeSlot?.capacity.toString() || "20")
     const [startDate, setStartDate] = useState<Date | undefined>(timeSlot ? new Date(timeSlot.startDate) : new Date())
     const [endDate, setEndDate] = useState<Date | undefined>(timeSlot ? new Date(timeSlot.endDate) : new Date())
@@ -99,53 +100,51 @@ export function TimeSlotForm({ timeSlot, locations, availableServices, onSave, o
     const [recurrenceFrequency, setRecurrenceFrequency] = useState<"daily" | "weekly" | "monthly">(
         timeSlot?.recurrence?.frequency || "weekly"
     )
-    const [recurrenceInterval, setRecurrenceInterval] = useState(timeSlot?.recurrence?.interval.toString() || "1")
-    const [isInfiniteRecurrence, setIsInfiniteRecurrence] = useState(timeSlot?.recurrence?.endType === "never")
+    const [recurrenceInterval, setRecurrenceInterval] = useState(
+        timeSlot?.recurrence?.interval.toString() || "1"
+    )
+    const [recurrenceEndType, setRecurrenceEndType] = useState<"never" | "date">(
+        timeSlot?.recurrence?.endType || "never"
+    )
     const [recurrenceEndDate, setRecurrenceEndDate] = useState<Date | undefined>(
         timeSlot?.recurrence?.endValue ? new Date(timeSlot.recurrence.endValue) : undefined
     )
 
-    // Состояние для модального окна добавления места
+    // Состояния для модального окна добавления места
     const [showLocationModal, setShowLocationModal] = useState(false)
     const [newLocation, setNewLocation] = useState<Omit<Location, "id">>({
         name: "",
         address: "",
     })
 
-    // Состояния для валидации
-    const [errors, setErrors] = useState<{
-        title?: string
-        location?: string
-        date?: string
-        capacity?: string
-        services?: string
-        newLocationName?: string
-    }>({})
+    // Состояния для ошибок
+    const [errors, setErrors] = useState<Record<string, string>>({})
 
-    // Валидация формы
     const validateForm = () => {
-        const newErrors: {
-            title?: string
-            location?: string
-            date?: string
-            capacity?: string
-            services?: string
-        } = {}
+        const newErrors: Record<string, string> = {}
 
-        if (!title.trim()) {
-            newErrors.title = "Название временного слота обязательно"
+        if (!title) {
+            newErrors.title = "Название обязательно"
         }
 
-        if (!location) {
-            newErrors.location = "Выберите место проведения"
+        if (!locationId) {
+            newErrors.location = "Место обязательно"
         }
 
-        if (!startDate || !endDate) {
-            newErrors.date = "Выберите дату начала и окончания"
-        }
-
-        if (parseInt(capacity) <= 0) {
+        if (!capacity || parseInt(capacity) <= 0) {
             newErrors.capacity = "Вместимость должна быть больше 0"
+        }
+
+        if (!startDate) {
+            newErrors.startDate = "Дата начала обязательна"
+        }
+
+        if (!endDate) {
+            newErrors.endDate = "Дата окончания обязательна"
+        }
+
+        if (startDate && endDate && endDate <= startDate) {
+            newErrors.endDate = "Дата окончания должна быть позже даты начала"
         }
 
         if (selectedServices.length === 0) {
@@ -156,20 +155,7 @@ export function TimeSlotForm({ timeSlot, locations, availableServices, onSave, o
         return Object.keys(newErrors).length === 0
     }
 
-    // Валидация нового места
-    const validateNewLocation = () => {
-        const newErrors: { newLocationName?: string } = {}
-
-        if (!newLocation.name.trim()) {
-            newErrors.newLocationName = "Название места обязательно"
-        }
-
-        setErrors((prev) => ({ ...prev, ...newErrors }))
-        return !newErrors.newLocationName
-    }
-
-    // Обработчик сохранения временного слота
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!validateForm()) return
 
         const startDateTime = new Date(startDate!)
@@ -180,15 +166,7 @@ export function TimeSlotForm({ timeSlot, locations, availableServices, onSave, o
         const [endHours, endMinutes] = endTime.split(":").map(Number)
         endDateTime.setHours(endHours, endMinutes)
 
-        if (endDateTime <= startDateTime) {
-            setErrors((prev) => ({
-                ...prev,
-                date: "Время окончания должно быть позже времени начала"
-            }))
-            return
-        }
-
-        const selectedLocation = locations.find(loc => loc.id === location)
+        const selectedLocation = locations.find(loc => loc.id === locationId)
         if (!selectedLocation) {
             setErrors((prev) => ({
                 ...prev,
@@ -197,36 +175,44 @@ export function TimeSlotForm({ timeSlot, locations, availableServices, onSave, o
             return
         }
 
-        let recurrence: Recurrence | undefined
-        if (type === "recurring") {
-            recurrence = {
-                frequency: recurrenceFrequency,
-                interval: parseInt(recurrenceInterval),
-                endType: isInfiniteRecurrence ? "never" : "date",
-                endValue: isInfiniteRecurrence ? undefined : recurrenceEndDate?.toISOString()
-            }
-        }
-
         const newTimeSlot: TimeSlot = {
             id: timeSlot?.id || `ts_${Date.now()}`,
             title,
             type,
-            locationId: location,
+            locationId,
             location: selectedLocation.name,
             capacity: parseInt(capacity),
             startDate: startDateTime.toISOString(),
             endDate: endDateTime.toISOString(),
             status: timeSlot?.status || "active",
             services: selectedServices,
-            ...(type === "recurring" && { recurrence })
+            ...(type === "recurring" && {
+                recurrence: {
+                    frequency: recurrenceFrequency,
+                    interval: parseInt(recurrenceInterval),
+                    endType: recurrenceEndType,
+                    endValue: recurrenceEndType === "date" ? recurrenceEndDate?.toISOString() : undefined
+                }
+            })
         }
 
-        onSave(newTimeSlot)
+        try {
+            if (timeSlot) {
+                // TODO: Implement update endpoint
+                onSave(newTimeSlot)
+            } else {
+                const createdTimeSlot = await api.createTimeSlot(newTimeSlot)
+                onSave(createdTimeSlot)
+            }
+        } catch (error) {
+            console.error('Failed to save time slot:', error)
+            // TODO: Add proper error handling and user notification
+        }
     }
 
     // Обработчик добавления нового места
     const handleAddLocation = () => {
-        if (!validateNewLocation()) return
+        if (!validateForm()) return
 
         const location = {
             ...newLocation,
@@ -234,7 +220,7 @@ export function TimeSlotForm({ timeSlot, locations, availableServices, onSave, o
         }
 
         onAddLocation!(location)
-        setLocation(location.id)
+        setLocationId(location.id)
         setShowLocationModal(false)
         setNewLocation({
             name: "",
@@ -243,267 +229,265 @@ export function TimeSlotForm({ timeSlot, locations, availableServices, onSave, o
     }
 
     return (
-        <div className="space-y-6">
-            <div className="space-y-2">
-                <Label htmlFor="title">
-                    Название <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                    id="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Введите название временного слота"
-                    className={errors.title ? "border-red-500" : ""}
-                />
-                {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
-            </div>
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+            <div className="space-y-4">
+                <div>
+                    <Label htmlFor="title">Название</Label>
+                    <Input
+                        id="title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="Введите название временного слота"
+                        className={cn(errors.title && "border-red-500")}
+                    />
+                    {errors.title && (
+                        <p className="text-sm text-red-500 mt-1">{errors.title}</p>
+                    )}
+                </div>
 
-            <div className="space-y-2">
-                <Label>Тип временного слота</Label>
-                <RadioGroup value={type} onValueChange={(value) => setType(value as "single" | "recurring")}>
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="single" id="single" />
-                        <Label htmlFor="single">Разовый</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="recurring" id="recurring" />
-                        <Label htmlFor="recurring">Повторяющийся</Label>
-                    </div>
-                </RadioGroup>
-            </div>
+                <div>
+                    <Label htmlFor="location">Место</Label>
+                    <Select
+                        value={locationId}
+                        onValueChange={setLocationId}
+                    >
+                        <SelectTrigger className={cn(errors.location && "border-red-500")}>
+                            <SelectValue placeholder="Выберите место" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {locations.map((location) => (
+                                <SelectItem key={location.id} value={location.id}>
+                                    {location.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    {errors.location && (
+                        <p className="text-sm text-red-500 mt-1">{errors.location}</p>
+                    )}
+                </div>
 
-            {type === "recurring" && (
-                <div className="space-y-4 border p-4 rounded-md bg-gray-50">
-                    <div className="space-y-2">
-                        <Label htmlFor="recurrenceFrequency">Частота повторения</Label>
-                        <Select
-                            value={recurrenceFrequency}
-                            onValueChange={(value) => setRecurrenceFrequency(value as "daily" | "weekly" | "monthly")}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Выберите частоту" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="daily">Ежедневно</SelectItem>
-                                <SelectItem value="weekly">Еженедельно</SelectItem>
-                                <SelectItem value="monthly">Ежемесячно</SelectItem>
-                            </SelectContent>
-                        </Select>
+                <div>
+                    <Label htmlFor="capacity">Вместимость</Label>
+                    <Input
+                        id="capacity"
+                        type="number"
+                        value={capacity}
+                        onChange={(e) => setCapacity(e.target.value)}
+                        min="1"
+                        className={cn(errors.capacity && "border-red-500")}
+                    />
+                    {errors.capacity && (
+                        <p className="text-sm text-red-500 mt-1">{errors.capacity}</p>
+                    )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <Label>Дата начала</Label>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    className={cn(
+                                        "w-full justify-start text-left font-normal",
+                                        !startDate && "text-muted-foreground",
+                                        errors.startDate && "border-red-500"
+                                    )}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {startDate ? format(startDate, "PPP", { locale: ru }) : "Выберите дату"}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                    mode="single"
+                                    selected={startDate}
+                                    onSelect={setStartDate}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                        {errors.startDate && (
+                            <p className="text-sm text-red-500 mt-1">{errors.startDate}</p>
+                        )}
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="recurrenceInterval">Интервал повторения</Label>
+                    <div>
+                        <Label>Дата окончания</Label>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    className={cn(
+                                        "w-full justify-start text-left font-normal",
+                                        !endDate && "text-muted-foreground",
+                                        errors.endDate && "border-red-500"
+                                    )}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {endDate ? format(endDate, "PPP", { locale: ru }) : "Выберите дату"}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                    mode="single"
+                                    selected={endDate}
+                                    onSelect={setEndDate}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                        {errors.endDate && (
+                            <p className="text-sm text-red-500 mt-1">{errors.endDate}</p>
+                        )}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <Label>Время начала</Label>
                         <Input
-                            id="recurrenceInterval"
-                            type="number"
-                            min="1"
-                            value={recurrenceInterval}
-                            onChange={(e) => setRecurrenceInterval(e.target.value)}
-                            required
+                            type="time"
+                            value={startTime}
+                            onChange={(e) => setStartTime(e.target.value)}
                         />
                     </div>
 
-                    <div className="flex items-center space-x-2">
-                        <Switch
-                            id="isInfiniteRecurrence"
-                            checked={isInfiniteRecurrence}
-                            onCheckedChange={setIsInfiniteRecurrence}
+                    <div>
+                        <Label>Время окончания</Label>
+                        <Input
+                            type="time"
+                            value={endTime}
+                            onChange={(e) => setEndTime(e.target.value)}
                         />
-                        <Label htmlFor="isInfiniteRecurrence">Повторять бесконечно</Label>
                     </div>
+                </div>
 
-                    {!isInfiniteRecurrence && (
-                        <div className="space-y-2">
-                            <Label>Дата окончания повторения</Label>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        className={cn(
-                                            "w-full justify-start text-left font-normal",
-                                            !recurrenceEndDate && "text-muted-foreground"
-                                        )}
-                                    >
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {recurrenceEndDate ? format(recurrenceEndDate, "PPP", { locale: ru }) : "Выберите дату"}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0">
-                                    <Calendar
-                                        mode="single"
-                                        selected={recurrenceEndDate}
-                                        onSelect={setRecurrenceEndDate}
-                                        initialFocus
-                                        disabled={(date) => date < new Date()}
-                                    />
-                                </PopoverContent>
-                            </Popover>
+                <div>
+                    <Label>Тип</Label>
+                    <RadioGroup
+                        value={type}
+                        onValueChange={(value: "single" | "recurring") => setType(value)}
+                        className="flex space-x-4"
+                    >
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="single" id="single" />
+                            <Label htmlFor="single">Одиночный</Label>
                         </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="recurring" id="recurring" />
+                            <Label htmlFor="recurring">Повторяющийся</Label>
+                        </div>
+                    </RadioGroup>
+                </div>
+
+                {type === "recurring" && (
+                    <Card>
+                        <CardContent className="pt-6">
+                            <div className="space-y-4">
+                                <div>
+                                    <Label>Частота повторения</Label>
+                                    <Select
+                                        value={recurrenceFrequency}
+                                        onValueChange={(value: "daily" | "weekly" | "monthly") =>
+                                            setRecurrenceFrequency(value)
+                                        }
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="daily">Ежедневно</SelectItem>
+                                            <SelectItem value="weekly">Еженедельно</SelectItem>
+                                            <SelectItem value="monthly">Ежемесячно</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div>
+                                    <Label>Интервал</Label>
+                                    <Input
+                                        type="number"
+                                        value={recurrenceInterval}
+                                        onChange={(e) => setRecurrenceInterval(e.target.value)}
+                                        min="1"
+                                    />
+                                </div>
+
+                                <div>
+                                    <Label>Окончание повторения</Label>
+                                    <RadioGroup
+                                        value={recurrenceEndType}
+                                        onValueChange={(value: "never" | "date") =>
+                                            setRecurrenceEndType(value)
+                                        }
+                                        className="flex space-x-4"
+                                    >
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="never" id="never" />
+                                            <Label htmlFor="never">Бесконечно</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="date" id="date" />
+                                            <Label htmlFor="date">До даты</Label>
+                                        </div>
+                                    </RadioGroup>
+
+                                    {recurrenceEndType === "date" && (
+                                        <div className="mt-2">
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        className={cn(
+                                                            "w-full justify-start text-left font-normal",
+                                                            !recurrenceEndDate && "text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                                        {recurrenceEndDate
+                                                            ? format(recurrenceEndDate, "PPP", { locale: ru })
+                                                            : "Выберите дату"}
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-auto p-0">
+                                                    <Calendar
+                                                        mode="single"
+                                                        selected={recurrenceEndDate}
+                                                        onSelect={setRecurrenceEndDate}
+                                                        initialFocus
+                                                    />
+                                                </PopoverContent>
+                                            </Popover>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                <div>
+                    <Label>Услуги</Label>
+                    <ServiceConfig
+                        availableServices={availableServices}
+                        selectedServices={selectedServices}
+                        maxCapacity={parseInt(capacity) || 0}
+                        onServicesChange={setSelectedServices}
+                    />
+                    {errors.services && (
+                        <p className="text-sm text-red-500 mt-1">{errors.services}</p>
                     )}
                 </div>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <Label>
-                        Дата начала <span className="text-red-500">*</span>
-                    </Label>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className={cn(
-                                    "w-full justify-start text-left font-normal",
-                                    !startDate && "text-muted-foreground",
-                                    errors.date ? "border-red-500" : ""
-                                )}
-                            >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {startDate ? format(startDate, "PPP", { locale: ru }) : "Выберите дату"}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                            <Calendar
-                                mode="single"
-                                selected={startDate}
-                                onSelect={setStartDate}
-                                initialFocus
-                                disabled={(date) => date < new Date()}
-                            />
-                        </PopoverContent>
-                    </Popover>
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="startTime">
-                        Время начала <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                        id="startTime"
-                        type="time"
-                        value={startTime}
-                        onChange={(e) => setStartTime(e.target.value)}
-                        required
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <Label>
-                        Дата окончания <span className="text-red-500">*</span>
-                    </Label>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className={cn(
-                                    "w-full justify-start text-left font-normal",
-                                    !endDate && "text-muted-foreground",
-                                    errors.date ? "border-red-500" : ""
-                                )}
-                            >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {endDate ? format(endDate, "PPP", { locale: ru }) : "Выберите дату"}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                            <Calendar
-                                mode="single"
-                                selected={endDate}
-                                onSelect={setEndDate}
-                                initialFocus
-                                disabled={(date) => date < new Date()}
-                            />
-                        </PopoverContent>
-                    </Popover>
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="endTime">
-                        Время окончания <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                        id="endTime"
-                        type="time"
-                        value={endTime}
-                        onChange={(e) => setEndTime(e.target.value)}
-                        required
-                    />
-                </div>
-            </div>
-
-            <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                    <Label htmlFor="location">
-                        Место проведения <span className="text-red-500">*</span>
-                    </Label>
-                    {onAddLocation && (
-                        <Button variant="outline" size="sm" onClick={() => setShowLocationModal(true)}>
-                            <Plus className="h-4 w-4 mr-1" />
-                            Добавить место
-                        </Button>
-                    )}
-                </div>
-                <Select value={location} onValueChange={setLocation}>
-                    <SelectTrigger className={errors.location ? "border-red-500" : ""}>
-                        <SelectValue placeholder="Выберите место проведения" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {locations.map((loc) => (
-                            <SelectItem key={loc.id} value={loc.id}>
-                                {loc.name} {loc.address ? `- ${loc.address}` : ""}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                {errors.location && <p className="text-sm text-red-500">{errors.location}</p>}
-            </div>
-
-            <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                    <Label htmlFor="capacity">
-                        Общая вместимость <span className="text-red-500">*</span>
-                    </Label>
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Info className="h-4 w-4 text-muted-foreground" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>Максимальное количество участников для всех услуг</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                </div>
-                <Input
-                    id="capacity"
-                    type="number"
-                    min="1"
-                    value={capacity}
-                    onChange={(e) => setCapacity(e.target.value)}
-                    className={errors.capacity ? "border-red-500" : ""}
-                />
-                {errors.capacity && <p className="text-sm text-red-500">{errors.capacity}</p>}
-            </div>
-
-            <div className="space-y-2">
-                <Label>
-                    Услуги <span className="text-red-500">*</span>
-                </Label>
-                <ServiceConfig
-                    availableServices={availableServices}
-                    selectedServices={selectedServices}
-                    maxCapacity={parseInt(capacity) || 0}
-                    onServicesChange={setSelectedServices}
-                />
-                {errors.services && <p className="text-sm text-red-500">{errors.services}</p>}
             </div>
 
             <div className="flex justify-end space-x-4">
                 <Button type="button" variant="outline" onClick={onCancel}>
                     Отмена
                 </Button>
-                <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
-                    {timeSlot ? "Сохранить изменения" : "Создать временной слот"}
+                <Button type="submit" onClick={handleSave}>
+                    Сохранить
                 </Button>
             </div>
 
@@ -547,6 +531,6 @@ export function TimeSlotForm({ timeSlot, locations, availableServices, onSave, o
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </div>
+        </form>
     )
 } 

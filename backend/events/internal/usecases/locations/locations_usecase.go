@@ -3,7 +3,6 @@ package locations
 import (
 	"context"
 	"fmt"
-	"math/rand"
 
 	"github.com/Slava02/SaintDiego/backend/events/internal/models"
 )
@@ -37,10 +36,7 @@ func (u UseCase) GetLocations(ctx context.Context) ([]*models.Location, error) {
 }
 
 func (u UseCase) CreateLocation(ctx context.Context, req *CreateLocationRequest) (*models.Location, error) {
-	id := rand.Int63() // Generate a random number for location ID
-
 	return u.locationRepository.CreateLocation(ctx, &models.Location{
-		ID:      id,
 		Name:    req.Name,
 		Address: req.Address,
 	})

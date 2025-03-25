@@ -35,10 +35,6 @@ type ITimeSlotsRepository interface {
 	ActivateTimeSlot(ctx context.Context, id int64) error
 	ArchiveTimeSlot(ctx context.Context, id int64) error
 	UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*models.TimeSlot, error)
-	CreateTimeSlotService(ctx context.Context, service *models.TimeSlotService) error
-	DeleteTimeSlotServices(ctx context.Context, timeSlotID int64) error
-	CreateTimeSlotRecurrence(ctx context.Context, recurrence *models.TimeSlotRecurrence) error
-	DeleteTimeSlotRecurrence(ctx context.Context, timeSlotID int64) error
 }
 
 func (u UseCase) CreateTimeSlot(ctx context.Context, req *CreateTimeSlotReq) (*models.TimeSlot, error) {
@@ -50,27 +46,13 @@ func (u UseCase) CreateTimeSlot(ctx context.Context, req *CreateTimeSlotReq) (*m
 		StartDate:  req.StartDate,
 		EndDate:    req.EndDate,
 		Status:     "active",
+		Services:   req.Services,
+		Recurrence: req.Recurrence,
 	}
 
 	timeSlot, err := u.timeSlotsRepository.CreateTimeSlot(ctx, timeSlot)
 	if err != nil {
 		return nil, fmt.Errorf("create time slot: %v", err)
-	}
-
-	if len(req.Services) > 0 {
-		for _, service := range req.Services {
-			service.TimeSlotID = timeSlot.ID
-			if err := u.timeSlotsRepository.CreateTimeSlotService(ctx, &service); err != nil {
-				return nil, fmt.Errorf("create time slot service: %v", err)
-			}
-		}
-	}
-
-	if req.Recurrence != nil {
-		req.Recurrence.TimeSlotID = timeSlot.ID
-		if err := u.timeSlotsRepository.CreateTimeSlotRecurrence(ctx, req.Recurrence); err != nil {
-			return nil, fmt.Errorf("create time slot recurrence: %v", err)
-		}
 	}
 
 	return timeSlot, nil
@@ -85,14 +67,6 @@ func (u UseCase) GetTimeSlot(ctx context.Context, id int64) (*models.TimeSlot, e
 }
 
 func (u UseCase) DeleteTimeSlot(ctx context.Context, id int64) error {
-	if err := u.timeSlotsRepository.DeleteTimeSlotServices(ctx, id); err != nil {
-		return fmt.Errorf("delete time slot services: %v", err)
-	}
-
-	if err := u.timeSlotsRepository.DeleteTimeSlotRecurrence(ctx, id); err != nil {
-		return fmt.Errorf("delete time slot recurrence: %v", err)
-	}
-
 	if err := u.timeSlotsRepository.DeleteTimeSlot(ctx, id); err != nil {
 		return fmt.Errorf("delete time slot: %v", err)
 	}

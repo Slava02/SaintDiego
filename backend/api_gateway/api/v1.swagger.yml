@@ -20,10 +20,33 @@ paths:
                 items:
                   $ref: "#/components/schemas/Location"
                 maxItems: 100
+              example:
+                - id: 1
+                  name: "Главный храм"
+                  address: "ул. Примерная, 123"
+                - id: 2
+                  name: "Филиал на севере"
+                  address: "пр. Северный, 45"
         "401":
           description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                code: "UNAUTHORIZED"
+                message: "Необходима авторизация"
+                details: "Требуется валидный JWT токен"
         "403":
           description: Нет доступа
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                code: "FORBIDDEN"
+                message: "Нет доступа к ресурсу"
+                details: "У пользователя недостаточно прав"
 
     post:
       summary: Создание новой локации
@@ -32,6 +55,9 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateLocationRequest"
+            example:
+              name: "Новый храм"
+              address: "ул. Новая, 67"
         required: true
       responses:
         "201":
@@ -40,24 +66,40 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Location"
+              example:
+                id: 3
+                name: "Новый храм"
+                address: "ул. Новая, 67"
         "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "VALIDATION_ERROR"
+                message: "Ошибка валидации"
+                details: "Поле 'name' обязательно для заполнения"
         "401":
           description: Не авторизован
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "UNAUTHORIZED"
+                message: "Необходима авторизация"
+                details: "Требуется валидный JWT токен"
         "403":
           description: Нет доступа
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "FORBIDDEN"
+                message: "Нет доступа к ресурсу"
+                details: "У пользователя недостаточно прав"
 
   /services:
     get:
@@ -72,18 +114,34 @@ paths:
                 items:
                   $ref: "#/components/schemas/ServiceType"
                 maxItems: 100
+              example:
+                - id: 1
+                  name: "Исповедь"
+                - id: 2
+                  name: "Причастие"
+                - id: 3
+                  name: "Соборование"
         "401":
           description: Не авторизован
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "UNAUTHORIZED"
+                message: "Необходима авторизация"
+                details: "Требуется валидный JWT токен"
         "403":
           description: Нет доступа
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "FORBIDDEN"
+                message: "Нет доступа к ресурсу"
+                details: "У пользователя недостаточно прав"
+
   /services/{id}:
     get:
       summary: Получение информации об услуге по идентификатору
@@ -96,6 +154,7 @@ paths:
           schema:
             type: integer
             format: int64
+          example: 1
       responses:
         "200":
           description: Успешный ответ
@@ -103,6 +162,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServiceType"
+              example:
+                id: 1
+                name: "Исповедь"
 
   /timeSlots:
     get:
@@ -118,6 +180,7 @@ paths:
             enum:
               - "active"
               - "archived"
+          example: "active"
         - name: startDate
           in: query
           style: form
@@ -125,6 +188,7 @@ paths:
           schema:
             type: string
             format: date-time
+          example: "2024-03-20T00:00:00Z"
         - name: endDate
           in: query
           style: form
@@ -132,6 +196,7 @@ paths:
           schema:
             type: string
             format: date-time
+          example: "2024-03-27T23:59:59Z"
       responses:
         "200":
           description: OK
@@ -142,24 +207,54 @@ paths:
                 items:
                   $ref: "#/components/schemas/TimeSlot"
                 maxItems: 100
+              example:
+                - id: 1
+                  title: "Утренняя служба"
+                  type: "single"
+                  locationId: 1
+                  capacity: 50
+                  startDate: "2024-03-20T09:00:00Z"
+                  endDate: "2024-03-20T10:00:00Z"
+                  status: "active"
+                  services:
+                    - serviceTypeId: 1
+                      capacity: 20
+                      bookingWindow: 30
+                      time: "2024-03-20T09:00:00Z"
+                    - serviceTypeId: 2
+                      capacity: 30
+                      bookingWindow: 30
+                      time: "2024-03-20T09:30:00Z"
         "401":
           description: Not authorized
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "UNAUTHORIZED"
+                message: "Необходима авторизация"
+                details: "Требуется валидный JWT токен"
         "403":
           description: Not access
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "FORBIDDEN"
+                message: "Нет доступа к ресурсу"
+                details: "У пользователя недостаточно прав"
         "500":
           description: Internal server error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "INTERNAL_ERROR"
+                message: "Внутренняя ошибка сервера"
+                details: "Произошла ошибка при обработке запроса"
 
     post:
       summary: Создание нового временного слота
@@ -168,6 +263,27 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateTimeSlotRequest"
+            example:
+              title: "Вечерняя служба"
+              type: "recurring"
+              locationId: 1
+              capacity: 100
+              startDate: "2024-03-20T18:00:00Z"
+              endDate: "2024-03-20T19:00:00Z"
+              services:
+                - serviceTypeId: 1
+                  capacity: 40
+                  bookingWindow: 30
+                  time: "2024-03-20T18:00:00Z"
+                - serviceTypeId: 2
+                  capacity: 60
+                  bookingWindow: 30
+                  time: "2024-03-20T18:30:00Z"
+              recurrence:
+                frequency: "weekly"
+                interval: 1
+                endType: "date"
+                endValue: "2024-04-20T19:00:00Z"
         required: true
       responses:
         "201":
@@ -176,24 +292,59 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TimeSlot"
+              example:
+                id: 2
+                title: "Вечерняя служба"
+                type: "recurring"
+                locationId: 1
+                capacity: 100
+                startDate: "2024-03-20T18:00:00Z"
+                endDate: "2024-03-20T19:00:00Z"
+                status: "active"
+                services:
+                  - serviceTypeId: 1
+                    capacity: 40
+                    bookingWindow: 30
+                    time: "2024-03-20T18:00:00Z"
+                  - serviceTypeId: 2
+                    capacity: 60
+                    bookingWindow: 30
+                    time: "2024-03-20T18:30:00Z"
+                recurrence:
+                  frequency: "weekly"
+                  interval: 1
+                  endType: "date"
+                  endValue: "2024-04-20T19:00:00Z"
         "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "VALIDATION_ERROR"
+                message: "Ошибка валидации"
+                details: "Поле 'title' обязательно для заполнения"
         "401":
           description: Не авторизован
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "UNAUTHORIZED"
+                message: "Необходима авторизация"
+                details: "Требуется валидный JWT токен"
         "403":
           description: Нет доступа
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "FORBIDDEN"
+                message: "Нет доступа к ресурсу"
+                details: "У пользователя недостаточно прав"
 
   /timeSlots/{id}:
     get:
@@ -207,6 +358,7 @@ paths:
           schema:
             type: integer
             format: int64
+          example: 1
       responses:
         "200":
           description: Временной слот
@@ -214,14 +366,45 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TimeSlot"
+              example:
+                id: 1
+                title: "Утренняя служба"
+                type: "single"
+                locationId: 1
+                capacity: 50
+                startDate: "2024-03-20T09:00:00Z"
+                endDate: "2024-03-20T10:00:00Z"
+                status: "active"
+                services:
+                  - serviceTypeId: 1
+                    capacity: 20
+                    bookingWindow: 30
+                    time: "2024-03-20T09:00:00Z"
+                  - serviceTypeId: 2
+                    capacity: 30
+                    bookingWindow: 30
+                    time: "2024-03-20T09:30:00Z"
         "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "VALIDATION_ERROR"
+                message: "Ошибка валидации"
+                details: "Неверный формат идентификатора"
         "404":
           description: Временной слот не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                code: "NOT_FOUND"
+                message: "Временной слот не найден"
+                details: "Слот с ID 999 не существует"
+
     put:
       summary: Обновление временного слота
       parameters:
@@ -233,11 +416,29 @@ paths:
           schema:
             type: integer
             format: int64
+          example: 1
       requestBody:
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/TimeSlot"
+            example:
+              title: "Обновленная утренняя служба"
+              type: "single"
+              locationId: 1
+              capacity: 60
+              startDate: "2024-03-20T09:00:00Z"
+              endDate: "2024-03-20T10:00:00Z"
+              status: "active"
+              services:
+                - serviceTypeId: 1
+                  capacity: 25
+                  bookingWindow: 30
+                  time: "2024-03-20T09:00:00Z"
+                - serviceTypeId: 2
+                  capacity: 35
+                  bookingWindow: 30
+                  time: "2024-03-20T09:30:00Z"
         required: true
       responses:
         "200":
@@ -246,14 +447,44 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TimeSlot"
+              example:
+                id: 1
+                title: "Обновленная утренняя служба"
+                type: "single"
+                locationId: 1
+                capacity: 60
+                startDate: "2024-03-20T09:00:00Z"
+                endDate: "2024-03-20T10:00:00Z"
+                status: "active"
+                services:
+                  - serviceTypeId: 1
+                    capacity: 25
+                    bookingWindow: 30
+                    time: "2024-03-20T09:00:00Z"
+                  - serviceTypeId: 2
+                    capacity: 35
+                    bookingWindow: 30
+                    time: "2024-03-20T09:30:00Z"
         "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "VALIDATION_ERROR"
+                message: "Ошибка валидации"
+                details: "Поле 'title' обязательно для заполнения"
         "404":
           description: Временной слот не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                code: "NOT_FOUND"
+                message: "Временной слот не найден"
+                details: "Слот с ID 999 не существует"
 
     delete:
       summary: Удаление временного слота
@@ -266,6 +497,7 @@ paths:
           schema:
             type: integer
             format: int64
+          example: 1
       responses:
         "200":
           description: Временной слот успешно удален
@@ -276,8 +508,18 @@ paths:
                 properties:
                   success:
                     type: boolean
+              example:
+                success: true
         "404":
           description: Временной слот не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                code: "NOT_FOUND"
+                message: "Временной слот не найден"
+                details: "Слот с ID 999 не существует"
 
   /timeSlots/{id}/activate:
     patch:
@@ -291,6 +533,7 @@ paths:
           schema:
             type: integer
             format: int64
+          example: 1
       responses:
         "200":
           description: Временной слот успешно активирован
@@ -298,8 +541,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TimeSlot"
+              example:
+                id: 1
+                title: "Утренняя служба"
+                type: "single"
+                locationId: 1
+                capacity: 50
+                startDate: "2024-03-20T09:00:00Z"
+                endDate: "2024-03-20T10:00:00Z"
+                status: "active"
+                services:
+                  - serviceTypeId: 1
+                    capacity: 20
+                    bookingWindow: 30
+                    time: "2024-03-20T09:00:00Z"
+                  - serviceTypeId: 2
+                    capacity: 30
+                    bookingWindow: 30
+                    time: "2024-03-20T09:30:00Z"
         "404":
           description: Временной слот не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                code: "NOT_FOUND"
+                message: "Временной слот не найден"
+                details: "Слот с ID 999 не существует"
 
   /timeSlots/{id}/archive:
     patch:
@@ -313,6 +582,7 @@ paths:
           schema:
             type: integer
             format: int64
+          example: 1
       responses:
         "200":
           description: Временной слот успешно архивирован
@@ -320,8 +590,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TimeSlot"
+              example:
+                id: 1
+                title: "Утренняя служба"
+                type: "single"
+                locationId: 1
+                capacity: 50
+                startDate: "2024-03-20T09:00:00Z"
+                endDate: "2024-03-20T10:00:00Z"
+                status: "archived"
+                services:
+                  - serviceTypeId: 1
+                    capacity: 20
+                    bookingWindow: 30
+                    time: "2024-03-20T09:00:00Z"
+                  - serviceTypeId: 2
+                    capacity: 30
+                    bookingWindow: 30
+                    time: "2024-03-20T09:30:00Z"
         "404":
           description: Временной слот не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                code: "NOT_FOUND"
+                message: "Временной слот не найден"
+                details: "Слот с ID 999 не существует"
+
 security:
   - BearerAuth: []
 
@@ -337,6 +634,9 @@ components:
       required:
         - name
         - address
+      example:
+        name: "Новый храм"
+        address: "ул. Новая, 67"
     CreateTimeSlotRequest:
       type: object
       properties:
@@ -373,6 +673,27 @@ components:
         - startDate
         - endDate
         - services
+      example:
+        title: "Вечерняя служба"
+        type: "recurring"
+        locationId: 1
+        capacity: 100
+        startDate: "2024-03-20T18:00:00Z"
+        endDate: "2024-03-20T19:00:00Z"
+        services:
+          - serviceTypeId: 1
+            capacity: 40
+            bookingWindow: 30
+            time: "2024-03-20T18:00:00Z"
+          - serviceTypeId: 2
+            capacity: 60
+            bookingWindow: 30
+            time: "2024-03-20T18:30:00Z"
+        recurrence:
+          frequency: "weekly"
+          interval: 1
+          endType: "date"
+          endValue: "2024-04-20T19:00:00Z"
     Error:
       type: object
       properties:
@@ -385,6 +706,10 @@ components:
       required:
         - code
         - message
+      example:
+        code: "VALIDATION_ERROR"
+        message: "Ошибка валидации"
+        details: "Поле 'name' обязательно для заполнения"
     Location:
       type: object
       properties:
@@ -398,6 +723,10 @@ components:
       required:
         - id
         - name
+      example:
+        id: 1
+        name: "Главный храм"
+        address: "ул. Примерная, 123"
     Recurrence:
       type: object
       properties:
@@ -424,6 +753,11 @@ components:
         - frequency
         - interval
         - endType
+      example:
+        frequency: "weekly"
+        interval: 1
+        endType: "date"
+        endValue: "2024-04-20T19:00:00Z"
     ServiceType:
       type: object
       properties:
@@ -435,6 +769,9 @@ components:
       required:
         - id
         - name
+      example:
+        id: 1
+        name: "Исповедь"
     TimeSlot:
       type: object
       properties:
@@ -481,6 +818,24 @@ components:
         - endDate
         - status
         - services
+      example:
+        id: 1
+        title: "Утренняя служба"
+        type: "single"
+        locationId: 1
+        capacity: 50
+        startDate: "2024-03-20T09:00:00Z"
+        endDate: "2024-03-20T10:00:00Z"
+        status: "active"
+        services:
+          - serviceTypeId: 1
+            capacity: 20
+            bookingWindow: 30
+            time: "2024-03-20T09:00:00Z"
+          - serviceTypeId: 2
+            capacity: 30
+            bookingWindow: 30
+            time: "2024-03-20T09:30:00Z"
     TimeSlotService:
       type: object
       properties:
@@ -501,6 +856,11 @@ components:
         - capacity
         - bookingWindow
         - time
+      example:
+        serviceTypeId: 1
+        capacity: 20
+        bookingWindow: 30
+        time: "2024-03-20T09:00:00Z"
   securitySchemes:
     BearerAuth:
       type: http
