@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	connectionTimeout = 5 * time.Second
+	connectionTimeout = 10 * time.Second
 )
 
 //go:generate options-gen -out-filename=events_options.gen.go -from-struct=EventsClientOptions
@@ -26,6 +26,37 @@ type EventsClient struct {
 }
 
 func NewEventsClient(opts EventsClientOptions) (*EventsClient, error) {
+	// conn, err := grpc.NewClient(
+	// 	opts.ServerAddr,
+	// 	grpc.WithTransportCredentials(insecure.NewCredentials()),
+	// )
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed to create gRPC client: %w", err)
+	// }
+
+	// // Wait for connection to be established
+	// timeout := time.After(connectionTimeout)
+	// for {
+	// 	state := conn.GetState()
+	// 	if state == connectivity.Ready {
+	// 		break
+	// 	}
+	// 	if state == connectivity.TransientFailure {
+	// 		return nil, fmt.Errorf("connection failed")
+	// 	}
+	// 	select {
+	// 	case <-timeout:
+	// 		return nil, fmt.Errorf("connection timeout")
+	// 	case <-time.After(100 * time.Millisecond):
+	// 		continue
+	// 	}
+	// }
+
+	// return &EventsClient{
+	// 	conn,
+	// 	api.NewEventServiceClient(conn),
+	// }, nil
+
 	ctx, cancel := context.WithTimeout(context.Background(), connectionTimeout)
 	defer cancel()
 

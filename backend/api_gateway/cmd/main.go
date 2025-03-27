@@ -15,9 +15,11 @@ import (
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/config"
 	v1 "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1"
 	logger "github.com/Slava02/SaintDiego/backend/api_gateway/pkg/logger"
+	"github.com/Slava02/SaintDiego/backend/api_gateway/pkg/tracing"
 )
 
 const nameMain = "main"
+const nameService = "api-gw"
 
 var configPath = flag.String("config", "configs/config.toml", "Path to config file")
 
@@ -45,6 +47,8 @@ func run() (errReturned error) {
 	defer logger.Sync()
 
 	lg := zap.L().Named(nameMain)
+
+	tracing.Init(lg, nameService)
 
 	v1Swagger, err := v1.GetSwagger()
 	if err != nil {

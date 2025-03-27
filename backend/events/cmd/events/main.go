@@ -21,6 +21,7 @@ import (
 	server "github.com/Slava02/SaintDiego/backend/events/internal/server"
 	"github.com/Slava02/SaintDiego/backend/events/pkg/closer"
 	"github.com/Slava02/SaintDiego/backend/events/pkg/logger"
+	"github.com/Slava02/SaintDiego/backend/events/pkg/tracing"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/mysqldialect"
@@ -32,6 +33,7 @@ import (
 )
 
 const nameMain = "main"
+const serviceName = "events"
 
 var configPath = flag.String("config", "configs/config.toml", "Path to config file")
 
@@ -63,6 +65,8 @@ func run() error {
 
 	lg := zap.L().Named(nameMain)
 
+	tracing.Init(lg, serviceName)
+
 	// Storage
 
 	sqldb, err := sql.Open("mysql", cfg.Database.Conn())
@@ -73,10 +77,11 @@ func run() error {
 
 	db := bun.NewDB(sqldb, mysqldialect.New())
 
-	// TODO: check if debug mode
-	db.AddQueryHook(bundebug.NewQueryHook(
-		bundebug.WithVerbose(true),
-	))
+	if !cfg.Global.IsProduction() {
+		db.AddQueryHook(bundebug.NewQueryHook(
+			bundebug.WithVerbose(true),
+		))
+	}
 
 	// Repositories
 

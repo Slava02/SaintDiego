@@ -20,6 +20,8 @@ import (
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/middlewares"
 	v1 "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1"
+
+	apmecho "github.com/opentracing-contrib/echo"
 )
 
 const (
@@ -56,6 +58,7 @@ func New(opts Options) (*Server, error) {
 		middleware.CORSWithConfig(middleware.CORSConfig{
 			AllowOrigins: opts.allowOrigins,
 		}),
+		apmecho.Middleware(nameServer),
 	)
 
 	validatorMiddleware := oapimdlwr.OapiRequestValidatorWithOptions(opts.v1Swagger, &oapimdlwr.Options{

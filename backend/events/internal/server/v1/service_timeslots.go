@@ -6,6 +6,7 @@ import (
 	"github.com/Slava02/SaintDiego/backend/events/internal/models"
 	"github.com/Slava02/SaintDiego/backend/events/internal/usecases/timeSlots"
 	"github.com/Slava02/SaintDiego/backend/events/pkg/pb"
+	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -22,6 +23,11 @@ type ITimeSlotsUC interface {
 }
 
 func (i *Implementation) GetTimeSlot(ctx context.Context, req *pb.GetTimeSlotRequest) (*pb.TimeSlot, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "GetTimeSlot")
+	defer span.Finish()
+
+	span.SetTag("id", req.GetId())
+
 	timeSlot, err := i.timeSlotUC.GetTimeSlot(ctx, req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get time slot: %v", err)
@@ -31,6 +37,9 @@ func (i *Implementation) GetTimeSlot(ctx context.Context, req *pb.GetTimeSlotReq
 }
 
 func (i *Implementation) GetTimeSlots(ctx context.Context, req *pb.GetTimeSlotsRequest) (*pb.GetTimeSlotsResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "GetTimeSlots")
+	defer span.Finish()
+
 	timeSlots, err := i.timeSlotUC.GetTimeSlots(ctx, &timeSlots.GetTimeSlotsReq{
 		Status:    req.Status,
 		StartDate: req.StartDate.AsTime(),
@@ -51,6 +60,9 @@ func (i *Implementation) GetTimeSlots(ctx context.Context, req *pb.GetTimeSlotsR
 }
 
 func (i *Implementation) CreateTimeSlot(ctx context.Context, req *pb.CreateTimeSlotRequest) (*pb.TimeSlot, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "CreateTimeSlot")
+	defer span.Finish()
+
 	timeSlot, err := i.timeSlotUC.CreateTimeSlot(ctx, &timeSlots.CreateTimeSlotReq{
 		Title:      req.Title,
 		Type:       req.Type,
@@ -69,6 +81,11 @@ func (i *Implementation) CreateTimeSlot(ctx context.Context, req *pb.CreateTimeS
 }
 
 func (i *Implementation) UpdateTimeSlot(ctx context.Context, req *pb.TimeSlot) (*pb.TimeSlot, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UpdateTimeSlot")
+	defer span.Finish()
+
+	span.SetTag("id", req.Id)
+
 	timeSlot, err := i.timeSlotUC.UpdateTimeSlot(ctx, &models.TimeSlot{
 		ID:         req.Id,
 		Title:      req.Title,
@@ -89,6 +106,11 @@ func (i *Implementation) UpdateTimeSlot(ctx context.Context, req *pb.TimeSlot) (
 }
 
 func (i *Implementation) DeleteTimeSlot(ctx context.Context, req *pb.DeleteTimeSlotRequest) (*pb.DeleteTimeSlotResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "DeleteTimeSlot")
+	defer span.Finish()
+
+	span.SetTag("id", req.Id)
+
 	err := i.timeSlotUC.DeleteTimeSlot(ctx, req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to delete time slot: %v", err)
@@ -100,6 +122,11 @@ func (i *Implementation) DeleteTimeSlot(ctx context.Context, req *pb.DeleteTimeS
 }
 
 func (i *Implementation) ArchiveTimeSlot(ctx context.Context, req *pb.ArchiveTimeSlotRequest) (*pb.TimeSlot, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "ArchiveTimeSlot")
+	defer span.Finish()
+
+	span.SetTag("id", req.Id)
+
 	err := i.timeSlotUC.ArchiveTimeSlot(ctx, req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to archive time slot: %v", err)
@@ -114,6 +141,11 @@ func (i *Implementation) ArchiveTimeSlot(ctx context.Context, req *pb.ArchiveTim
 }
 
 func (i *Implementation) ActivateTimeSlot(ctx context.Context, req *pb.ActivateTimeSlotRequest) (*pb.TimeSlot, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "ActivateTimeSlot")
+	defer span.Finish()
+
+	span.SetTag("id", req.Id)
+
 	err := i.timeSlotUC.ActivateTimeSlot(ctx, req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to activate time slot: %v", err)

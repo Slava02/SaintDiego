@@ -83,5 +83,11 @@ func (u UseCase) ArchiveTimeSlot(ctx context.Context, id int64) error {
 }
 
 func (u UseCase) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*models.TimeSlot, error) {
+
+	_, err := u.timeSlotsRepository.GetTimeSlot(ctx, req.ID)
+	if err != nil {
+		return nil, fmt.Errorf("get time slot: %v", err)
+	}
+
 	return u.timeSlotsRepository.UpdateTimeSlot(ctx, req)
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/Slava02/SaintDiego/backend/events/internal/models"
 	"github.com/Slava02/SaintDiego/backend/events/pkg/pb"
+	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -15,6 +16,9 @@ type IServicesUC interface {
 }
 
 func (i *Implementation) GetServices(ctx context.Context, _ *pb.GetServicesRequest) (*pb.GetServicesResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "GetServices")
+	defer span.Finish()
+
 	services, err := i.servicesUC.GetServices(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get services: %v", err)
@@ -35,6 +39,11 @@ func (i *Implementation) GetServices(ctx context.Context, _ *pb.GetServicesReque
 }
 
 func (i *Implementation) GetServiceById(ctx context.Context, req *pb.GetServiceByIdRequest) (*pb.ServiceType, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "GetServiceById")
+	defer span.Finish()
+
+	span.SetTag("id", req.Id)
+
 	service, err := i.servicesUC.GetServicesId(ctx, req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get service: %v", err)

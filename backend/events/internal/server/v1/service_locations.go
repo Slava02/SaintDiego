@@ -6,6 +6,7 @@ import (
 	"github.com/Slava02/SaintDiego/backend/events/internal/models"
 	"github.com/Slava02/SaintDiego/backend/events/internal/usecases/locations"
 	"github.com/Slava02/SaintDiego/backend/events/pkg/pb"
+	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -16,6 +17,9 @@ type ILocationsUC interface {
 }
 
 func (i *Implementation) GetLocations(ctx context.Context, _ *pb.GetLocationsRequest) (*pb.GetLocationsResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "GetLocations")
+	defer span.Finish()
+
 	locations, err := i.locationsUC.GetLocations(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get locations: %v", err)
@@ -37,6 +41,9 @@ func (i *Implementation) GetLocations(ctx context.Context, _ *pb.GetLocationsReq
 }
 
 func (i *Implementation) CreateLocation(ctx context.Context, req *pb.CreateLocationRequest) (*pb.Location, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "CreateLocation")
+	defer span.Finish()
+
 	location, err := i.locationsUC.CreateLocation(ctx, &locations.CreateLocationRequest{
 		Name:    req.Name,
 		Address: req.Address,

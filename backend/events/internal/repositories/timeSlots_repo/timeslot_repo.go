@@ -276,6 +276,7 @@ func (r *TimeSlotRepository) UpdateTimeSlot(ctx context.Context, req *models.Tim
 
 	_, err = tx.NewUpdate().
 		Model(req).
+		Column("title", "type", "location_id", "capacity", "start_date", "end_date", "status", "created_by_id", "updated_by_id").
 		Where("id = ?", req.ID).
 		Exec(ctx)
 	if err != nil {

@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/Slava02/SaintDiego/backend/events/internal/config"
+	"github.com/Slava02/SaintDiego/backend/events/internal/interceptors"
 	"github.com/Slava02/SaintDiego/backend/events/pkg/closer"
 	"github.com/Slava02/SaintDiego/backend/events/pkg/pb"
 	"github.com/pkg/errors"
@@ -16,6 +17,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
+
+	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 )
 
 //go:generate options-gen -out-filename=server_options.gen.go -from-struct=Options
@@ -45,6 +48,13 @@ func New(opts Options) (*Server, error) {
 		MaxConnectionAge:  opts.ServerConfig.MaxConnectionAge,
 		Time:              opts.ServerConfig.Time,
 	}),
+
+		grpc.UnaryInterceptor(
+			grpcMiddleware.ChainUnaryServer(
+				interceptors.LogInterceptor,
+				interceptors.ServerTracingInterceptor,
+			),
+		),
 	)
 
 	return &Server{
