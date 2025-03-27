@@ -13,7 +13,7 @@ service EventService {
   rpc GetTimeSlot(GetTimeSlotRequest) returns (TimeSlot) {}
   rpc GetTimeSlots(GetTimeSlotsRequest) returns (GetTimeSlotsResponse) {}
   rpc CreateTimeSlot(CreateTimeSlotRequest) returns (TimeSlot) {}
-  rpc UpdateTimeSlot(UpdateTimeSlotRequest) returns (TimeSlot) {}
+  rpc UpdateTimeSlot(TimeSlot) returns (TimeSlot) {}
   rpc DeleteTimeSlot(DeleteTimeSlotRequest) returns (DeleteTimeSlotResponse) {}
   rpc ArchiveTimeSlot(ArchiveTimeSlotRequest) returns (TimeSlot) {}
   rpc ActivateTimeSlot(ActivateTimeSlotRequest) returns (TimeSlot) {}
@@ -47,10 +47,6 @@ message CreateTimeSlotRequest {
   google.protobuf.Timestamp endDate = 6;
   repeated TimeSlotService services = 7;
   Recurrence recurrence = 8;
-}
-
-message UpdateTimeSlotRequest {
-  TimeSlot timeSlot = 1;
 }
 
 message DeleteTimeSlotRequest {

@@ -36,7 +36,7 @@ type IEventsClient interface {
 	DeleteTimeSlot(ctx context.Context, req *pb.DeleteTimeSlotRequest, opts ...grpc.CallOption) (*pb.DeleteTimeSlotResponse, error)
 	ActivateTimeSlot(ctx context.Context, req *pb.ActivateTimeSlotRequest, opts ...grpc.CallOption) (*pb.TimeSlot, error)
 	ArchiveTimeSlot(ctx context.Context, req *pb.ArchiveTimeSlotRequest, opts ...grpc.CallOption) (*pb.TimeSlot, error)
-	UpdateTimeSlot(ctx context.Context, req *pb.UpdateTimeSlotRequest, opts ...grpc.CallOption) (*pb.TimeSlot, error)
+	UpdateTimeSlot(ctx context.Context, req *pb.TimeSlot, opts ...grpc.CallOption) (*pb.TimeSlot, error)
 }
 
 func (u UseCase) CreateTimeSlot(ctx context.Context, req *CreateTimeSlotReq) (*models.TimeSlot, error) {
@@ -183,11 +183,7 @@ func (u UseCase) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*mod
 		}
 	}
 
-	pbReq := &pb.UpdateTimeSlotRequest{
-		TimeSlot: pbTimeSlot,
-	}
-
-	pbTimeSlot, err := u.eventsClient.UpdateTimeSlot(ctx, pbReq)
+	pbTimeSlot, err := u.eventsClient.UpdateTimeSlot(ctx, pbTimeSlot)
 	if err != nil {
 		return nil, fmt.Errorf("update time slot: %w", err)
 	}

@@ -68,18 +68,18 @@ func (i *Implementation) CreateTimeSlot(ctx context.Context, req *pb.CreateTimeS
 	return convertModelTimeSlotToPB(timeSlot), nil
 }
 
-func (i *Implementation) UpdateTimeSlot(ctx context.Context, req *pb.UpdateTimeSlotRequest) (*pb.TimeSlot, error) {
+func (i *Implementation) UpdateTimeSlot(ctx context.Context, req *pb.TimeSlot) (*pb.TimeSlot, error) {
 	timeSlot, err := i.timeSlotUC.UpdateTimeSlot(ctx, &models.TimeSlot{
-		ID:         req.TimeSlot.Id,
-		Title:      req.TimeSlot.Title,
-		Type:       req.TimeSlot.Type,
-		LocationID: req.TimeSlot.LocationId,
-		Capacity:   req.TimeSlot.Capacity,
-		StartDate:  req.TimeSlot.StartDate.AsTime(),
-		EndDate:    req.TimeSlot.EndDate.AsTime(),
-		Status:     req.TimeSlot.Status,
-		Services:   convertPBServicesToModel(req.TimeSlot.Services),
-		Recurrence: convertPBRecurrenceToModel(req.TimeSlot.Recurrence),
+		ID:         req.Id,
+		Title:      req.Title,
+		Type:       req.Type,
+		LocationID: req.LocationId,
+		Capacity:   req.Capacity,
+		StartDate:  req.StartDate.AsTime(),
+		EndDate:    req.EndDate.AsTime(),
+		Status:     req.Status,
+		Services:   convertPBServicesToModel(req.Services),
+		Recurrence: convertPBRecurrenceToModel(req.Recurrence),
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to update time slot: %v", err)

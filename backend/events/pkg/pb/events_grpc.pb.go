@@ -42,7 +42,7 @@ type EventServiceClient interface {
 	GetTimeSlot(ctx context.Context, in *GetTimeSlotRequest, opts ...grpc.CallOption) (*TimeSlot, error)
 	GetTimeSlots(ctx context.Context, in *GetTimeSlotsRequest, opts ...grpc.CallOption) (*GetTimeSlotsResponse, error)
 	CreateTimeSlot(ctx context.Context, in *CreateTimeSlotRequest, opts ...grpc.CallOption) (*TimeSlot, error)
-	UpdateTimeSlot(ctx context.Context, in *UpdateTimeSlotRequest, opts ...grpc.CallOption) (*TimeSlot, error)
+	UpdateTimeSlot(ctx context.Context, in *TimeSlot, opts ...grpc.CallOption) (*TimeSlot, error)
 	DeleteTimeSlot(ctx context.Context, in *DeleteTimeSlotRequest, opts ...grpc.CallOption) (*DeleteTimeSlotResponse, error)
 	ArchiveTimeSlot(ctx context.Context, in *ArchiveTimeSlotRequest, opts ...grpc.CallOption) (*TimeSlot, error)
 	ActivateTimeSlot(ctx context.Context, in *ActivateTimeSlotRequest, opts ...grpc.CallOption) (*TimeSlot, error)
@@ -92,7 +92,7 @@ func (c *eventServiceClient) CreateTimeSlot(ctx context.Context, in *CreateTimeS
 	return out, nil
 }
 
-func (c *eventServiceClient) UpdateTimeSlot(ctx context.Context, in *UpdateTimeSlotRequest, opts ...grpc.CallOption) (*TimeSlot, error) {
+func (c *eventServiceClient) UpdateTimeSlot(ctx context.Context, in *TimeSlot, opts ...grpc.CallOption) (*TimeSlot, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TimeSlot)
 	err := c.cc.Invoke(ctx, EventService_UpdateTimeSlot_FullMethodName, in, out, cOpts...)
@@ -182,7 +182,7 @@ type EventServiceServer interface {
 	GetTimeSlot(context.Context, *GetTimeSlotRequest) (*TimeSlot, error)
 	GetTimeSlots(context.Context, *GetTimeSlotsRequest) (*GetTimeSlotsResponse, error)
 	CreateTimeSlot(context.Context, *CreateTimeSlotRequest) (*TimeSlot, error)
-	UpdateTimeSlot(context.Context, *UpdateTimeSlotRequest) (*TimeSlot, error)
+	UpdateTimeSlot(context.Context, *TimeSlot) (*TimeSlot, error)
 	DeleteTimeSlot(context.Context, *DeleteTimeSlotRequest) (*DeleteTimeSlotResponse, error)
 	ArchiveTimeSlot(context.Context, *ArchiveTimeSlotRequest) (*TimeSlot, error)
 	ActivateTimeSlot(context.Context, *ActivateTimeSlotRequest) (*TimeSlot, error)
@@ -211,7 +211,7 @@ func (UnimplementedEventServiceServer) GetTimeSlots(context.Context, *GetTimeSlo
 func (UnimplementedEventServiceServer) CreateTimeSlot(context.Context, *CreateTimeSlotRequest) (*TimeSlot, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTimeSlot not implemented")
 }
-func (UnimplementedEventServiceServer) UpdateTimeSlot(context.Context, *UpdateTimeSlotRequest) (*TimeSlot, error) {
+func (UnimplementedEventServiceServer) UpdateTimeSlot(context.Context, *TimeSlot) (*TimeSlot, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTimeSlot not implemented")
 }
 func (UnimplementedEventServiceServer) DeleteTimeSlot(context.Context, *DeleteTimeSlotRequest) (*DeleteTimeSlotResponse, error) {
@@ -311,7 +311,7 @@ func _EventService_CreateTimeSlot_Handler(srv interface{}, ctx context.Context, 
 }
 
 func _EventService_UpdateTimeSlot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateTimeSlotRequest)
+	in := new(TimeSlot)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -323,7 +323,7 @@ func _EventService_UpdateTimeSlot_Handler(srv interface{}, ctx context.Context, 
 		FullMethod: EventService_UpdateTimeSlot_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EventServiceServer).UpdateTimeSlot(ctx, req.(*UpdateTimeSlotRequest))
+		return srv.(EventServiceServer).UpdateTimeSlot(ctx, req.(*TimeSlot))
 	}
 	return interceptor(ctx, in, info, handler)
 }
