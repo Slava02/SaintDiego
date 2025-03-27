@@ -50,8 +50,7 @@ message CreateTimeSlotRequest {
 }
 
 message UpdateTimeSlotRequest {
-  int64 id = 1;  
-  TimeSlot timeSlot = 2;
+  TimeSlot timeSlot = 1;
 }
 
 message DeleteTimeSlotRequest {

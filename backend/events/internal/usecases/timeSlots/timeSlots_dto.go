@@ -23,7 +23,3 @@ type GetTimeSlotsReq struct {
 	StartDate time.Time `json:"startDate" validate:"required"`
 	EndDate   time.Time `json:"endDate" validate:"required,gtfield=StartDate"`
 }
-
-type UpdateTimeSlotReq struct {
-	TimeSlot models.TimeSlot `json:"timeSlot" validate:"required"`
-}

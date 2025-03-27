@@ -150,31 +150,31 @@ func (u UseCase) ArchiveTimeSlot(ctx context.Context, id int64) error {
 	return nil
 }
 
-func (u UseCase) UpdateTimeSlot(ctx context.Context, req *UpdateTimeSlotReq) (*models.TimeSlot, error) {
+func (u UseCase) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*models.TimeSlot, error) {
 	pbTimeSlot := &pb.TimeSlot{
-		Id:         req.TimeSlot.ID,
-		Title:      req.TimeSlot.Title,
-		Type:       req.TimeSlot.Type,
-		LocationId: req.TimeSlot.LocationID,
-		Capacity:   req.TimeSlot.Capacity,
-		StartDate:  timestamppb.New(req.TimeSlot.StartDate),
-		EndDate:    timestamppb.New(req.TimeSlot.EndDate),
-		Status:     req.TimeSlot.Status,
-		Services:   make([]*pb.TimeSlotService, len(req.TimeSlot.Services)),
+		Id:         req.ID,
+		Title:      req.Title,
+		Type:       req.Type,
+		LocationId: req.LocationID,
+		Capacity:   req.Capacity,
+		StartDate:  timestamppb.New(req.StartDate),
+		EndDate:    timestamppb.New(req.EndDate),
+		Status:     req.Status,
+		Services:   make([]*pb.TimeSlotService, len(req.Services)),
 	}
 
-	if req.TimeSlot.Recurrence != nil {
+	if req.Recurrence != nil {
 		pbTimeSlot.Recurrence = &pb.Recurrence{
-			Frequency: req.TimeSlot.Recurrence.Frequency,
-			Interval:  req.TimeSlot.Recurrence.Interval,
-			EndType:   req.TimeSlot.Recurrence.EndType,
+			Frequency: req.Recurrence.Frequency,
+			Interval:  req.Recurrence.Interval,
+			EndType:   req.Recurrence.EndType,
 		}
-		if req.TimeSlot.Recurrence.EndValue != nil {
-			pbTimeSlot.Recurrence.EndValue = timestamppb.New(*req.TimeSlot.Recurrence.EndValue)
+		if req.Recurrence.EndValue != nil {
+			pbTimeSlot.Recurrence.EndValue = timestamppb.New(*req.Recurrence.EndValue)
 		}
 	}
 
-	for i, service := range req.TimeSlot.Services {
+	for i, service := range req.Services {
 		pbTimeSlot.Services[i] = &pb.TimeSlotService{
 			ServiceTypeId: service.ServiceTypeID,
 			Capacity:      service.Capacity,
@@ -184,7 +184,6 @@ func (u UseCase) UpdateTimeSlot(ctx context.Context, req *UpdateTimeSlotReq) (*m
 	}
 
 	pbReq := &pb.UpdateTimeSlotRequest{
-		Id:       req.TimeSlot.ID,
 		TimeSlot: pbTimeSlot,
 	}
 

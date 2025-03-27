@@ -82,6 +82,6 @@ func (u UseCase) ArchiveTimeSlot(ctx context.Context, id int64) error {
 	return u.timeSlotsRepository.ArchiveTimeSlot(ctx, id)
 }
 
-func (u UseCase) UpdateTimeSlot(ctx context.Context, req *UpdateTimeSlotReq) (*models.TimeSlot, error) {
-	return u.timeSlotsRepository.UpdateTimeSlot(ctx, &req.TimeSlot)
+func (u UseCase) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*models.TimeSlot, error) {
+	return u.timeSlotsRepository.UpdateTimeSlot(ctx, req)
 }

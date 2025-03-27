@@ -18,7 +18,7 @@ type ITimeSlotsUC interface {
 	DeleteTimeSlot(ctx context.Context, id int64) error
 	ActivateTimeSlot(ctx context.Context, id int64) error
 	ArchiveTimeSlot(ctx context.Context, id int64) error
-	UpdateTimeSlot(ctx context.Context, req *timeSlots.UpdateTimeSlotReq) (*models.TimeSlot, error)
+	UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*models.TimeSlot, error)
 }
 
 func (i *Implementation) GetTimeSlot(ctx context.Context, req *pb.GetTimeSlotRequest) (*pb.TimeSlot, error) {
@@ -69,17 +69,17 @@ func (i *Implementation) CreateTimeSlot(ctx context.Context, req *pb.CreateTimeS
 }
 
 func (i *Implementation) UpdateTimeSlot(ctx context.Context, req *pb.UpdateTimeSlotRequest) (*pb.TimeSlot, error) {
-	timeSlot, err := i.timeSlotUC.UpdateTimeSlot(ctx, &timeSlots.UpdateTimeSlotReq{
-		TimeSlot: models.TimeSlot{
-			ID:         req.Id,
-			Title:      req.TimeSlot.Title,
-			Type:       req.TimeSlot.Type,
-			LocationID: req.TimeSlot.LocationId,
-			Capacity:   req.TimeSlot.Capacity,
-			StartDate:  req.TimeSlot.StartDate.AsTime(),
-			EndDate:    req.TimeSlot.EndDate.AsTime(),
-			Status:     req.TimeSlot.Status,
-		},
+	timeSlot, err := i.timeSlotUC.UpdateTimeSlot(ctx, &models.TimeSlot{
+		ID:         req.TimeSlot.Id,
+		Title:      req.TimeSlot.Title,
+		Type:       req.TimeSlot.Type,
+		LocationID: req.TimeSlot.LocationId,
+		Capacity:   req.TimeSlot.Capacity,
+		StartDate:  req.TimeSlot.StartDate.AsTime(),
+		EndDate:    req.TimeSlot.EndDate.AsTime(),
+		Status:     req.TimeSlot.Status,
+		Services:   convertPBServicesToModel(req.TimeSlot.Services),
+		Recurrence: convertPBRecurrenceToModel(req.TimeSlot.Recurrence),
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to update time slot: %v", err)

@@ -84,7 +84,7 @@ func (r *TimeSlotRepository) GetTimeSlots(ctx context.Context, status string, st
 	var timeSlots []*models.TimeSlot
 
 	// Get base time slots
-	query := r.db.NewSelect().Model(&timeSlots)
+	query := tx.NewSelect().Model(&timeSlots)
 
 	if status != "" {
 		query = query.Where("status = ?", status)
@@ -109,7 +109,7 @@ func (r *TimeSlotRepository) GetTimeSlots(ctx context.Context, status string, st
 			timeSlotIDs[i] = ts.ID
 		}
 
-		err = r.db.NewSelect().
+		err = tx.NewSelect().
 			Model(&services).
 			Where("time_slot_id IN (?)", bun.In(timeSlotIDs)).
 			Scan(ctx)
@@ -136,7 +136,7 @@ func (r *TimeSlotRepository) GetTimeSlots(ctx context.Context, status string, st
 			timeSlotIDs[i] = ts.ID
 		}
 
-		err = r.db.NewSelect().
+		err = tx.NewSelect().
 			Model(&recurrences).
 			Where("time_slot_id IN (?)", bun.In(timeSlotIDs)).
 			Scan(ctx)
@@ -163,16 +163,44 @@ func (r *TimeSlotRepository) GetTimeSlots(ctx context.Context, status string, st
 }
 
 func (r *TimeSlotRepository) GetTimeSlot(ctx context.Context, id int64) (*models.TimeSlot, error) {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, fmt.Errorf("begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
 	timeSlot := &models.TimeSlot{}
 
-	err := r.db.NewSelect().
+	err = tx.NewSelect().
 		Model(timeSlot).
-		Relation("Services").
-		Relation("Recurrence").
 		Where("id = ?", id).
 		Scan(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("select time slot: %w", err)
+	}
+
+	var services []*models.TimeSlotService
+	err = tx.NewSelect().
+		Model(&services).
+		Where("time_slot_id = ?", id).
+		Scan(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("select time slot services: %w", err)
+	}
+	timeSlot.Services = services
+
+	recurrence := &models.TimeSlotRecurrence{}
+	err = tx.NewSelect().
+		Model(recurrence).
+		Where("time_slot_id = ?", id).
+		Scan(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("select time slot recurrence: %w", err)
+	}
+	timeSlot.Recurrence = recurrence
+
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("commit transaction: %w", err)
 	}
 
 	return timeSlot, nil
@@ -185,13 +213,11 @@ func (r *TimeSlotRepository) DeleteTimeSlot(ctx context.Context, id int64) error
 	}
 	defer tx.Rollback()
 
-	// Delete time slot
 	_, err = tx.NewDelete().Model((*models.TimeSlot)(nil)).Where("id = ?", id).Exec(ctx)
 	if err != nil {
 		return fmt.Errorf("delete time slot: %w", err)
 	}
 
-	// Delete recurrence
 	_, err = tx.NewDelete().
 		Model((*models.TimeSlotRecurrence)(nil)).
 		Where("time_slot_id = ?", id).
@@ -200,7 +226,6 @@ func (r *TimeSlotRepository) DeleteTimeSlot(ctx context.Context, id int64) error
 		return fmt.Errorf("delete time slot recurrence: %w", err)
 	}
 
-	// Delete services
 	_, err = tx.NewDelete().
 		Model((*models.TimeSlotService)(nil)).
 		Where("time_slot_id = ?", id).
@@ -243,9 +268,53 @@ func (r *TimeSlotRepository) ArchiveTimeSlot(ctx context.Context, id int64) erro
 }
 
 func (r *TimeSlotRepository) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*models.TimeSlot, error) {
-	_, err := r.db.NewUpdate().Model(req).Where("id = ?", req.ID).Exec(ctx)
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, fmt.Errorf("begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	_, err = tx.NewUpdate().
+		Model(req).
+		Where("id = ?", req.ID).
+		Exec(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("update time slot: %w", err)
+	}
+
+	if len(req.Services) > 0 {
+		for i := range req.Services {
+			req.Services[i].TimeSlotID = req.ID
+		}
+		_, err = tx.NewInsert().
+			Model(&req.Services).
+			On("DUPLICATE KEY UPDATE").
+			Set("capacity = VALUES(capacity)").
+			Set("booking_window = VALUES(booking_window)").
+			Set("time = VALUES(time)").
+			Exec(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("upsert time slot services: %w", err)
+		}
+	}
+
+	if req.Recurrence != nil {
+		req.Recurrence.TimeSlotID = req.ID
+		_, err = tx.NewInsert().
+			Model(req.Recurrence).
+			On("DUPLICATE KEY UPDATE").
+			Set("frequency = VALUES(frequency)").
+			Set("interval = VALUES(interval)").
+			Set("end_type = VALUES(end_type)").
+			Set("end_value = VALUES(end_value)").
+			Exec(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("upsert time slot recurrence: %w", err)
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("commit transaction: %w", err)
 	}
 
 	return req, nil
