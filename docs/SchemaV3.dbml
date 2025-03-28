@@ -1,0 +1,116 @@
+Table service_type {
+  id int [pk, increment]
+  created_by_id int
+  updated_by_id int
+  name varchar(255)
+  pay boolean
+  document boolean
+  sync_id int
+  sort int
+  created_at datetime
+  updated_at datetime
+  
+  indexes {
+    created_by_id [name: 'IDX_429DE3C5B03A8386']
+    updated_by_id [name: 'IDX_429DE3C5896DBBDE']
+  }
+}
+
+Table service {
+  id int [pk, increment]
+  client_id int
+  type_id int
+  created_by_id int
+  updated_by_id int
+  comment longtext
+  amount int
+  sync_id int
+  sort int
+  created_at datetime
+  updated_at datetime
+
+  indexes {
+    client_id [name: 'IDX_E19D9AD219EB6921']
+    type_id [name: 'IDX_E19D9AD2C54C8C93']
+    created_by_id [name: 'IDX_E19D9AD2B03A8386']
+    updated_by_id [name: 'IDX_E19D9AD2896DBBDE']
+  }
+}
+
+Table location {
+  id int [pk, increment]
+  name varchar(255) [not null]
+  address varchar(255)
+  created_by_id int
+  updated_by_id int
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at datetime [not null, default: `CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`]
+}
+
+Table time_slot {
+  id int [pk, increment]
+  title varchar(255) [not null]
+  type enum('single', 'recurring') [not null]
+  location_id int [not null]
+  capacity int [not null]
+  start_date datetime [not null]
+  end_date datetime [not null]
+  status enum('active', 'archived') [not null, default: 'active']
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at datetime [not null, default: `CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`]
+
+  indexes {
+    status [name: 'IDX_time_slot_status']
+    (start_date, end_date) [name: 'IDX_time_slot_dates']
+  }
+}
+
+Table time_slot_recurrence {
+  time_slot_id int [pk]
+  frequency enum('daily', 'weekly', 'monthly') [not null]
+  interval int [not null, default: 1]
+  end_type enum('never', 'date') [not null]
+  end_value datetime
+}
+
+Table time_slot_service {
+  id int [pk, increment]
+  time_slot_id int [pk]
+  service_type_id int [pk]
+  default_capacity int [not null]
+  booking_window int [not null]
+  default_time time [not null]
+}
+
+
+Table event {
+  id int [pk, increment]
+  time_slot_service_id int [not null]
+  capacity int [not null]
+  datetime datetime [not null]
+}
+
+Table event_client {
+  event_id int pk [not null]
+  client_id int pk [not null]
+  volounteer_id int pk [not null]
+  status enum('attend', 'absent') [not null, default: 'absent']
+}
+
+Table client {
+  id int pk [not null]
+}
+
+Table volounteer {
+  id int pk [not null]
+}
+// References
+Ref: service.type_id > service_type.id
+Ref: time_slot.location_id > location.id
+Ref: time_slot_recurrence.time_slot_id > time_slot.id [delete: cascade]
+Ref: time_slot_service.time_slot_id > time_slot.id [delete: cascade]
+Ref: time_slot_service.service_type_id > service_type.id
+Ref: event.id > time_slot_service.id
+Ref: client.id > event_client.client_id 
+Ref: event.id > event_client.event_id
+Ref: volounteer.id > event_client.volounteer_id 

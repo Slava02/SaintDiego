@@ -46,8 +46,9 @@ type TimeSlotRecurrence struct {
 type TimeSlotService struct {
 	bun.BaseModel `bun:"table:time_slot_service,alias:tss"`
 
-	TimeSlotID    int64     `bun:"time_slot_id,pk" json:"time_slot_id" validate:"required"`
-	ServiceTypeID int64     `bun:"service_type_id,pk" json:"service_type_id" validate:"required"`
+	ID            int64     `bun:"id,pk,autoincrement" json:"id"`
+	TimeSlotID    int64     `bun:"time_slot_id,notnull" json:"time_slot_id" validate:"required"`
+	ServiceTypeID int64     `bun:"service_type_id,notnull" json:"service_type_id" validate:"required"`
 	Capacity      int32     `bun:"capacity,notnull" json:"capacity" validate:"required,min=1"`
 	BookingWindow int32     `bun:"booking_window,notnull" json:"booking_window" validate:"required,min=1"`
 	Time          time.Time `bun:"time,notnull" json:"time" validate:"required"`
@@ -55,4 +56,16 @@ type TimeSlotService struct {
 	// Relations
 	TimeSlot    *TimeSlot    `bun:"rel:belongs-to,join:time_slot_id=id" json:"time_slot,omitempty"`
 	ServiceType *ServiceType `bun:"rel:belongs-to,join:service_type_id=id" json:"service_type,omitempty"`
+}
+
+type Event struct {
+	bun.BaseModel `bun:"table:event,alias:e"`
+
+	ID                int64     `bun:"id,pk,autoincrement" json:"id"`
+	TimeSlotServiceID int64     `bun:"time_slot_service_id,notnull" json:"time_slot_service_id" validate:"required"`
+	Capacity          int32     `bun:"capacity,notnull" json:"capacity" validate:"required,min=1"`
+	DateTime          time.Time `bun:"datetime,notnull" json:"datetime" validate:"required"`
+
+	// Relations
+	TimeSlotService *TimeSlotService `bun:"rel:belongs-to,join:time_slot_service_id=id" json:"time_slot_service,omitempty"`
 }

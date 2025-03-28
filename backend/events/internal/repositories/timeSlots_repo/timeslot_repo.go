@@ -6,85 +6,65 @@ import (
 	"time"
 
 	"github.com/Slava02/SaintDiego/backend/events/internal/models"
+	"github.com/Slava02/SaintDiego/backend/events/internal/storage"
 	"github.com/uptrace/bun"
 )
 
 //go:generate options-gen -out-filename=timeslot_repo_options.gen.go -from-struct=Options
 type Options struct {
-	DB *bun.DB `option:"mandatory" validate:"required"`
+	DB *storage.Database `option:"mandatory" validate:"required"`
 }
 
 type TimeSlotRepository struct {
-	db *bun.DB
+	db *storage.Database
 }
 
 func NewTimeSlotRepository(opts Options) *TimeSlotRepository {
 	return &TimeSlotRepository{db: opts.DB}
 }
 
-func (r *TimeSlotRepository) CreateTimeSlot(ctx context.Context, req *models.TimeSlot) (*models.TimeSlot, error) {
-	tx, err := r.db.BeginTx(ctx, nil)
+func (r *TimeSlotRepository) CreateTimeSlot(ctx context.Context, timeSlot *models.TimeSlot) (*models.TimeSlot, error) {
+	// Create time slot
+	_, err := r.db.Insert(ctx, timeSlot).Exec(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("begin transaction: %w", err)
-	}
-	defer tx.Rollback()
-
-	// Create base time slot without relations
-	timeSlot := &models.TimeSlot{
-		Title:      req.Title,
-		Type:       req.Type,
-		LocationID: req.LocationID,
-		Capacity:   req.Capacity,
-		StartDate:  req.StartDate,
-		EndDate:    req.EndDate,
-		Status:     req.Status,
+		return nil, fmt.Errorf("create time slot: %w", err)
 	}
 
-	_, err = tx.NewInsert().Model(timeSlot).Exec(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("insert time slot: %w", err)
-	}
-
-	// Set TimeSlotID for each service and insert them
-	if len(req.Services) > 0 {
-		for i := range req.Services {
-			req.Services[i].TimeSlotID = timeSlot.ID
-		}
-		timeSlot.Services = req.Services
-		_, err = tx.NewInsert().Model(&timeSlot.Services).Exec(ctx)
+	// Create services and get their IDs
+	for _, service := range timeSlot.Services {
+		service.TimeSlotID = timeSlot.ID
+		_, err = r.db.Insert(ctx, service).Exec(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("insert time slot service: %w", err)
+			return nil, fmt.Errorf("create service: %w", err)
 		}
+
 	}
 
-	// Set TimeSlotID for recurrence and insert it
-	if req.Recurrence != nil {
-		req.Recurrence.TimeSlotID = timeSlot.ID
-		_, err = tx.NewInsert().Model(req.Recurrence).Exec(ctx)
+	// Create recurrence if it's a recurring time slot
+	if timeSlot.Type == "recurring" && timeSlot.Recurrence != nil {
+		timeSlot.Recurrence.TimeSlotID = timeSlot.ID
+		_, err = r.db.Insert(ctx, timeSlot.Recurrence).Exec(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("insert time slot recurrence: %w", err)
+			return nil, fmt.Errorf("create recurrence: %w", err)
 		}
-		timeSlot.Recurrence = req.Recurrence
-	}
-
-	if err := tx.Commit(); err != nil {
-		return nil, fmt.Errorf("commit transaction: %w", err)
 	}
 
 	return timeSlot, nil
 }
 
-func (r *TimeSlotRepository) GetTimeSlots(ctx context.Context, status string, startDate, endDate time.Time) ([]*models.TimeSlot, error) {
-	tx, err := r.db.BeginTx(ctx, nil)
+func (r *TimeSlotRepository) CreateEvents(ctx context.Context, events []*models.Event) error {
+	_, err := r.db.Insert(ctx, &events).Exec(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("begin transaction: %w", err)
+		return fmt.Errorf("create events: %w", err)
 	}
-	defer tx.Rollback()
+	return nil
+}
 
+func (r *TimeSlotRepository) GetTimeSlots(ctx context.Context, status string, startDate, endDate time.Time) ([]*models.TimeSlot, error) {
 	var timeSlots []*models.TimeSlot
 
 	// Get base time slots
-	query := tx.NewSelect().Model(&timeSlots)
+	query := r.db.Select(ctx, &timeSlots)
 
 	if status != "" {
 		query = query.Where("status = ?", status)
@@ -96,7 +76,7 @@ func (r *TimeSlotRepository) GetTimeSlots(ctx context.Context, status string, st
 		query = query.Where("end_date <= ?", endDate)
 	}
 
-	err = query.Scan(ctx)
+	err := query.Scan(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("select time slots: %w", err)
 	}
@@ -109,8 +89,7 @@ func (r *TimeSlotRepository) GetTimeSlots(ctx context.Context, status string, st
 			timeSlotIDs[i] = ts.ID
 		}
 
-		err = tx.NewSelect().
-			Model(&services).
+		err = r.db.Select(ctx, &services).
 			Where("time_slot_id IN (?)", bun.In(timeSlotIDs)).
 			Scan(ctx)
 		if err != nil {
@@ -136,8 +115,7 @@ func (r *TimeSlotRepository) GetTimeSlots(ctx context.Context, status string, st
 			timeSlotIDs[i] = ts.ID
 		}
 
-		err = tx.NewSelect().
-			Model(&recurrences).
+		err = r.db.Select(ctx, &recurrences).
 			Where("time_slot_id IN (?)", bun.In(timeSlotIDs)).
 			Scan(ctx)
 		if err != nil {
@@ -155,24 +133,14 @@ func (r *TimeSlotRepository) GetTimeSlots(ctx context.Context, status string, st
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
-		return nil, fmt.Errorf("commit transaction: %w", err)
-	}
-
 	return timeSlots, nil
 }
 
 func (r *TimeSlotRepository) GetTimeSlot(ctx context.Context, id int64) (*models.TimeSlot, error) {
-	tx, err := r.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, fmt.Errorf("begin transaction: %w", err)
-	}
-	defer tx.Rollback()
 
 	timeSlot := &models.TimeSlot{}
 
-	err = tx.NewSelect().
-		Model(timeSlot).
+	err := r.db.Select(ctx, timeSlot).
 		Where("id = ?", id).
 		Scan(ctx)
 	if err != nil {
@@ -180,8 +148,7 @@ func (r *TimeSlotRepository) GetTimeSlot(ctx context.Context, id int64) (*models
 	}
 
 	var services []*models.TimeSlotService
-	err = tx.NewSelect().
-		Model(&services).
+	err = r.db.Select(ctx, &services).
 		Where("time_slot_id = ?", id).
 		Scan(ctx)
 	if err != nil {
@@ -190,8 +157,7 @@ func (r *TimeSlotRepository) GetTimeSlot(ctx context.Context, id int64) (*models
 	timeSlot.Services = services
 
 	recurrence := &models.TimeSlotRecurrence{}
-	err = tx.NewSelect().
-		Model(recurrence).
+	err = r.db.Select(ctx, recurrence).
 		Where("time_slot_id = ?", id).
 		Scan(ctx)
 	if err != nil {
@@ -199,51 +165,35 @@ func (r *TimeSlotRepository) GetTimeSlot(ctx context.Context, id int64) (*models
 	}
 	timeSlot.Recurrence = recurrence
 
-	if err := tx.Commit(); err != nil {
-		return nil, fmt.Errorf("commit transaction: %w", err)
-	}
-
 	return timeSlot, nil
 }
 
 func (r *TimeSlotRepository) DeleteTimeSlot(ctx context.Context, id int64) error {
-	tx, err := r.db.BeginTx(ctx, nil)
-	if err != nil {
-		return fmt.Errorf("begin transaction: %w", err)
-	}
-	defer tx.Rollback()
 
-	_, err = tx.NewDelete().Model((*models.TimeSlot)(nil)).Where("id = ?", id).Exec(ctx)
+	_, err := r.db.Delete(ctx, (*models.TimeSlot)(nil)).Where("id = ?", id).Exec(ctx)
 	if err != nil {
 		return fmt.Errorf("delete time slot: %w", err)
 	}
 
-	_, err = tx.NewDelete().
-		Model((*models.TimeSlotRecurrence)(nil)).
+	_, err = r.db.Delete(ctx, (*models.TimeSlotRecurrence)(nil)).
 		Where("time_slot_id = ?", id).
 		Exec(ctx)
 	if err != nil {
 		return fmt.Errorf("delete time slot recurrence: %w", err)
 	}
 
-	_, err = tx.NewDelete().
-		Model((*models.TimeSlotService)(nil)).
+	_, err = r.db.Delete(ctx, (*models.TimeSlotService)(nil)).
 		Where("time_slot_id = ?", id).
 		Exec(ctx)
 	if err != nil {
 		return fmt.Errorf("delete time slot services: %w", err)
 	}
 
-	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("commit transaction: %w", err)
-	}
-
 	return nil
 }
 
 func (r *TimeSlotRepository) ActivateTimeSlot(ctx context.Context, id int64) error {
-	_, err := r.db.NewUpdate().
-		Model((*models.TimeSlot)(nil)).
+	_, err := r.db.Update(ctx, (*models.TimeSlot)(nil)).
 		Set("status = ?", "active").
 		Where("id = ?", id).
 		Exec(ctx)
@@ -255,8 +205,7 @@ func (r *TimeSlotRepository) ActivateTimeSlot(ctx context.Context, id int64) err
 }
 
 func (r *TimeSlotRepository) ArchiveTimeSlot(ctx context.Context, id int64) error {
-	_, err := r.db.NewUpdate().
-		Model((*models.TimeSlot)(nil)).
+	_, err := r.db.Update(ctx, (*models.TimeSlot)(nil)).
 		Set("status = ?", "archived").
 		Where("id = ?", id).
 		Exec(ctx)
@@ -268,14 +217,8 @@ func (r *TimeSlotRepository) ArchiveTimeSlot(ctx context.Context, id int64) erro
 }
 
 func (r *TimeSlotRepository) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*models.TimeSlot, error) {
-	tx, err := r.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, fmt.Errorf("begin transaction: %w", err)
-	}
-	defer tx.Rollback()
 
-	_, err = tx.NewUpdate().
-		Model(req).
+	_, err := r.db.Update(ctx, req).
 		Column("title", "type", "location_id", "capacity", "start_date", "end_date", "status", "created_by_id", "updated_by_id").
 		Where("id = ?", req.ID).
 		Exec(ctx)
@@ -287,8 +230,7 @@ func (r *TimeSlotRepository) UpdateTimeSlot(ctx context.Context, req *models.Tim
 		for i := range req.Services {
 			req.Services[i].TimeSlotID = req.ID
 		}
-		_, err = tx.NewInsert().
-			Model(&req.Services).
+		_, err = r.db.Insert(ctx, req.Services).
 			On("DUPLICATE KEY UPDATE").
 			Set("capacity = VALUES(capacity)").
 			Set("booking_window = VALUES(booking_window)").
@@ -301,8 +243,7 @@ func (r *TimeSlotRepository) UpdateTimeSlot(ctx context.Context, req *models.Tim
 
 	if req.Recurrence != nil {
 		req.Recurrence.TimeSlotID = req.ID
-		_, err = tx.NewInsert().
-			Model(req.Recurrence).
+		_, err = r.db.Insert(ctx, req.Recurrence).
 			On("DUPLICATE KEY UPDATE").
 			Set("frequency = VALUES(frequency)").
 			Set("interval = VALUES(interval)").
@@ -312,10 +253,6 @@ func (r *TimeSlotRepository) UpdateTimeSlot(ctx context.Context, req *models.Tim
 		if err != nil {
 			return nil, fmt.Errorf("upsert time slot recurrence: %w", err)
 		}
-	}
-
-	if err := tx.Commit(); err != nil {
-		return nil, fmt.Errorf("commit transaction: %w", err)
 	}
 
 	return req, nil

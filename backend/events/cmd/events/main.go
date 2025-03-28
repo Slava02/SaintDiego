@@ -13,6 +13,7 @@ import (
 	"github.com/Slava02/SaintDiego/backend/events/internal/repositories/locations_repo"
 	"github.com/Slava02/SaintDiego/backend/events/internal/repositories/services_repo"
 	timeslots_repo "github.com/Slava02/SaintDiego/backend/events/internal/repositories/timeSlots_repo"
+	"github.com/Slava02/SaintDiego/backend/events/internal/storage"
 	"github.com/Slava02/SaintDiego/backend/events/internal/usecases/locations"
 	"github.com/Slava02/SaintDiego/backend/events/internal/usecases/services"
 	"github.com/Slava02/SaintDiego/backend/events/internal/usecases/timeSlots"
@@ -23,9 +24,6 @@ import (
 	"github.com/Slava02/SaintDiego/backend/events/pkg/logger"
 	"github.com/Slava02/SaintDiego/backend/events/pkg/tracing"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/mysqldialect"
-	"github.com/uptrace/bun/extra/bundebug"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
@@ -75,23 +73,20 @@ func run() error {
 	}
 	closer.Add(sqldb.Close)
 
-	db := bun.NewDB(sqldb, mysqldialect.New())
-
-	if !cfg.Global.IsProduction() {
-		db.AddQueryHook(bundebug.NewQueryHook(
-			bundebug.WithVerbose(true),
-		))
+	db, err := storage.New(storage.NewOptions(sqldb, storage.WithProd(cfg.Global.IsProduction())))
+	if err != nil {
+		return fmt.Errorf("init storage: %v", err)
 	}
 
 	// Repositories
 
 	timeSlotsRepo := timeslots_repo.NewTimeSlotRepository(timeslots_repo.NewOptions(db))
-	locationsRepo := locations_repo.NewLocationRepository(locations_repo.NewOptions(db))
-	servicesRepo := services_repo.NewServiceRepository(services_repo.NewOptions(db))
+	locationsRepo := locations_repo.NewLocationRepository(locations_repo.NewOptions(db.GetDBtmp()))
+	servicesRepo := services_repo.NewServiceRepository(services_repo.NewOptions(db.GetDBtmp()))
 
 	// Usecases
 
-	timeSlotsUsecase, err := timeSlots.New(timeSlots.NewOptions(timeSlotsRepo))
+	timeSlotsUsecase, err := timeSlots.New(timeSlots.NewOptions(timeSlotsRepo, db))
 	if err != nil {
 		lg.Error("init timeSlots usecase", zap.Error(err))
 		return fmt.Errorf("init timeSlots usecase: %v", err)

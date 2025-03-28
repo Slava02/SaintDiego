@@ -12,6 +12,7 @@ type OptOptionsSetter func(o *Options)
 
 func NewOptions(
 	TimeSlotsRepository ITimeSlotsRepository,
+	Transactor Transactor,
 	options ...OptOptionsSetter,
 ) Options {
 	o := Options{}
@@ -19,6 +20,8 @@ func NewOptions(
 	// Setting defaults from field tag (if present)
 
 	o.TimeSlotsRepository = TimeSlotsRepository
+
+	o.Transactor = Transactor
 
 	for _, opt := range options {
 		opt(&o)
@@ -29,12 +32,20 @@ func NewOptions(
 func (o *Options) Validate() error {
 	errs := new(errors461e464ebed9.ValidationErrors)
 	errs.Add(errors461e464ebed9.NewValidationError("TimeSlotsRepository", _validate_Options_TimeSlotsRepository(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("Transactor", _validate_Options_Transactor(o)))
 	return errs.AsError()
 }
 
 func _validate_Options_TimeSlotsRepository(o *Options) error {
 	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.TimeSlotsRepository, "required"); err != nil {
 		return fmt461e464ebed9.Errorf("field `TimeSlotsRepository` did not pass the test: %w", err)
+	}
+	return nil
+}
+
+func _validate_Options_Transactor(o *Options) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.Transactor, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `Transactor` did not pass the test: %w", err)
 	}
 	return nil
 }
