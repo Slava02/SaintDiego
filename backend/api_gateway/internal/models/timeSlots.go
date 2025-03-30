@@ -33,9 +33,9 @@ type TimeSlot struct {
 	Recurrence *Recurrence       `json:"recurrence,omitempty" validate:"omitempty,required_if=Type recurring"`
 }
 
-// TODO: add ID
 // TimeSlotService represents a service available in a time slot.
 type TimeSlotService struct {
+	ID            int64     `json:"id" validate:"omitempty"`
 	ServiceTypeID int64     `json:"serviceTypeId" validate:"required"`
 	Capacity      int32     `json:"capacity" validate:"required,min=1"`
 	BookingWindow int32     `json:"bookingWindow" validate:"required,min=1"`

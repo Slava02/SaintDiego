@@ -28,10 +28,6 @@ type Database struct {
 	db *bun.DB
 }
 
-func (db *Database) GetDBtmp() *bun.DB {
-	return db.db
-}
-
 // NewDatabase creates a new Database instance
 func New(opts Options) (*Database, error) {
 	if err := opts.Validate(); err != nil {

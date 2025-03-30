@@ -4,15 +4,15 @@ package locations_repo
 import (
 	fmt461e464ebed9 "fmt"
 
+	"github.com/Slava02/SaintDiego/backend/events/internal/storage"
 	errors461e464ebed9 "github.com/kazhuravlev/options-gen/pkg/errors"
 	validator461e464ebed9 "github.com/kazhuravlev/options-gen/pkg/validator"
-	"github.com/uptrace/bun"
 )
 
 type OptOptionsSetter func(o *Options)
 
 func NewOptions(
-	DB *bun.DB,
+	DB *storage.Database,
 	options ...OptOptionsSetter,
 ) Options {
 	o := Options{}

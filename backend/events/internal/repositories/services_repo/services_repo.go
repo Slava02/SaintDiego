@@ -5,16 +5,16 @@ import (
 	"fmt"
 
 	"github.com/Slava02/SaintDiego/backend/events/internal/models"
-	"github.com/uptrace/bun"
+	"github.com/Slava02/SaintDiego/backend/events/internal/storage"
 )
 
 //go:generate options-gen -out-filename=services_repo_options.gen.go -from-struct=Options
 type Options struct {
-	DB *bun.DB `option:"mandatory" validate:"required"`
+	DB *storage.Database `option:"mandatory" validate:"required"`
 }
 
 type ServiceRepository struct {
-	db *bun.DB
+	db *storage.Database
 }
 
 func NewServiceRepository(opts Options) *ServiceRepository {
@@ -24,7 +24,7 @@ func NewServiceRepository(opts Options) *ServiceRepository {
 func (r *ServiceRepository) GetServices(ctx context.Context) ([]*models.ServiceType, error) {
 	var services []*models.ServiceType
 
-	err := r.db.NewSelect().Model(&services).Scan(ctx)
+	err := r.db.Select(ctx, &services)
 	if err != nil {
 		return nil, fmt.Errorf("select services: %w", err)
 	}
@@ -35,7 +35,9 @@ func (r *ServiceRepository) GetServices(ctx context.Context) ([]*models.ServiceT
 func (r *ServiceRepository) GetServiceById(ctx context.Context, id int64) (*models.ServiceType, error) {
 	service := &models.ServiceType{}
 
-	err := r.db.NewSelect().Model(service).Where("id = ?", id).Scan(ctx)
+	err := r.db.Select(ctx, service).
+		Where("id = ?", id).
+		Scan(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("select service by id: %w", err)
 	}

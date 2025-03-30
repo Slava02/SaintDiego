@@ -2,6 +2,8 @@ package timeslots_repo
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -23,9 +25,14 @@ func NewTimeSlotRepository(opts Options) *TimeSlotRepository {
 	return &TimeSlotRepository{db: opts.DB}
 }
 
-func (r *TimeSlotRepository) CreateTimeSlot(ctx context.Context, timeSlot *models.TimeSlot) (*models.TimeSlot, error) {
+func (r *TimeSlotRepository) InsertUpdateTimeSlot(ctx context.Context, timeSlot *models.TimeSlot) (*models.TimeSlot, error) {
 	// Create time slot
-	_, err := r.db.Insert(ctx, timeSlot).Exec(ctx)
+	_, err := r.db.Insert(ctx, timeSlot).
+		On("DUPLICATE KEY UPDATE").
+		Set("start_date = ?", timeSlot.StartDate).
+		Set("end_date = ?", timeSlot.EndDate).
+		Set("status = ?", timeSlot.Status).
+		Exec(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("create time slot: %w", err)
 	}
@@ -33,7 +40,12 @@ func (r *TimeSlotRepository) CreateTimeSlot(ctx context.Context, timeSlot *model
 	// Create services and get their IDs
 	for _, service := range timeSlot.Services {
 		service.TimeSlotID = timeSlot.ID
-		_, err = r.db.Insert(ctx, service).Exec(ctx)
+		_, err = r.db.Insert(ctx, service).
+			On("DUPLICATE KEY UPDATE").
+			Set("capacity = ?", service.Capacity).
+			Set("booking_window = ?", service.BookingWindow).
+			Set("time = ?", service.Time).
+			Exec(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("create service: %w", err)
 		}
@@ -43,21 +55,19 @@ func (r *TimeSlotRepository) CreateTimeSlot(ctx context.Context, timeSlot *model
 	// Create recurrence if it's a recurring time slot
 	if timeSlot.Type == "recurring" && timeSlot.Recurrence != nil {
 		timeSlot.Recurrence.TimeSlotID = timeSlot.ID
-		_, err = r.db.Insert(ctx, timeSlot.Recurrence).Exec(ctx)
+		_, err = r.db.Insert(ctx, timeSlot.Recurrence).
+			On("DUPLICATE KEY UPDATE").
+			Set("frequency = ?", timeSlot.Recurrence.Frequency).
+			Set("`interval` = ?", timeSlot.Recurrence.Interval).
+			Set("end_type = ?", timeSlot.Recurrence.EndType).
+			Set("end_value = ?", timeSlot.Recurrence.EndValue).
+			Exec(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("create recurrence: %w", err)
 		}
 	}
 
 	return timeSlot, nil
-}
-
-func (r *TimeSlotRepository) CreateEvents(ctx context.Context, events []*models.Event) error {
-	_, err := r.db.Insert(ctx, &events).Exec(ctx)
-	if err != nil {
-		return fmt.Errorf("create events: %w", err)
-	}
-	return nil
 }
 
 func (r *TimeSlotRepository) GetTimeSlots(ctx context.Context, status string, startDate, endDate time.Time) ([]*models.TimeSlot, error) {
@@ -161,35 +171,71 @@ func (r *TimeSlotRepository) GetTimeSlot(ctx context.Context, id int64) (*models
 		Where("time_slot_id = ?", id).
 		Scan(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("select time slot recurrence: %w", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return timeSlot, nil
+		} else {
+			return nil, fmt.Errorf("select time slot recurrence: %w", err)
+		}
 	}
+
 	timeSlot.Recurrence = recurrence
 
 	return timeSlot, nil
 }
 
 func (r *TimeSlotRepository) DeleteTimeSlot(ctx context.Context, id int64) error {
+	return r.db.WithinTransaction(ctx, func(txCtx context.Context) error {
+		// First, get all services for this time slot
+		var services []*models.TimeSlotService
+		err := r.db.Select(txCtx, &services).
+			Where("time_slot_id = ?", id).
+			Scan(txCtx)
+		if err != nil {
+			return fmt.Errorf("get time slot services: %w", err)
+		}
 
-	_, err := r.db.Delete(ctx, (*models.TimeSlot)(nil)).Where("id = ?", id).Exec(ctx)
-	if err != nil {
-		return fmt.Errorf("delete time slot: %w", err)
-	}
+		// Get all service IDs
+		serviceIDs := make([]int64, len(services))
+		for i, service := range services {
+			serviceIDs[i] = service.ID
+		}
 
-	_, err = r.db.Delete(ctx, (*models.TimeSlotRecurrence)(nil)).
-		Where("time_slot_id = ?", id).
-		Exec(ctx)
-	if err != nil {
-		return fmt.Errorf("delete time slot recurrence: %w", err)
-	}
+		// Delete all events related to these services
+		if len(serviceIDs) > 0 {
+			_, err = r.db.Delete(txCtx, (*models.Event)(nil)).
+				Where("time_slot_service_id IN (?)", bun.In(serviceIDs)).
+				Exec(txCtx)
+			if err != nil {
+				return fmt.Errorf("delete events: %w", err)
+			}
+		}
 
-	_, err = r.db.Delete(ctx, (*models.TimeSlotService)(nil)).
-		Where("time_slot_id = ?", id).
-		Exec(ctx)
-	if err != nil {
-		return fmt.Errorf("delete time slot services: %w", err)
-	}
+		// Delete time slot services
+		_, err = r.db.Delete(txCtx, (*models.TimeSlotService)(nil)).
+			Where("time_slot_id = ?", id).
+			Exec(txCtx)
+		if err != nil {
+			return fmt.Errorf("delete time slot services: %w", err)
+		}
 
-	return nil
+		// Delete time slot recurrence
+		_, err = r.db.Delete(txCtx, (*models.TimeSlotRecurrence)(nil)).
+			Where("time_slot_id = ?", id).
+			Exec(txCtx)
+		if err != nil {
+			return fmt.Errorf("delete time slot recurrence: %w", err)
+		}
+
+		// Finally, delete the time slot itself
+		_, err = r.db.Delete(txCtx, (*models.TimeSlot)(nil)).
+			Where("id = ?", id).
+			Exec(txCtx)
+		if err != nil {
+			return fmt.Errorf("delete time slot: %w", err)
+		}
+
+		return nil
+	})
 }
 
 func (r *TimeSlotRepository) ActivateTimeSlot(ctx context.Context, id int64) error {
@@ -216,44 +262,66 @@ func (r *TimeSlotRepository) ArchiveTimeSlot(ctx context.Context, id int64) erro
 	return nil
 }
 
-func (r *TimeSlotRepository) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*models.TimeSlot, error) {
+func (r *TimeSlotRepository) CreateTimeSlotServices(ctx context.Context, id int64, req []*models.TimeSlotService) ([]*models.TimeSlotService, error) {
+	_, err := r.db.Insert(ctx, &req).Exec(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("create time slot services: %w", err)
+	}
+	return req, nil
+}
 
-	_, err := r.db.Update(ctx, req).
-		Column("title", "type", "location_id", "capacity", "start_date", "end_date", "status", "created_by_id", "updated_by_id").
-		Where("id = ?", req.ID).
+func (r *TimeSlotRepository) DeleteTimeSlotRecurrence(ctx context.Context, timeSlotID int64) error {
+	_, err := r.db.Delete(ctx, (*models.TimeSlotRecurrence)(nil)).
+		Where("time_slot_id = ?", timeSlotID).
 		Exec(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("update time slot: %w", err)
+		return fmt.Errorf("delete time slot recurrence: %w", err)
 	}
+	return nil
+}
 
-	if len(req.Services) > 0 {
-		for i := range req.Services {
-			req.Services[i].TimeSlotID = req.ID
-		}
-		_, err = r.db.Insert(ctx, req.Services).
+func (r *TimeSlotRepository) DeleteTimeSlotServicesByIds(ctx context.Context, serviceIds []int64) error {
+	_, err := r.db.Delete(ctx, (*models.TimeSlotService)(nil)).
+		Where("id IN (?)", bun.In(serviceIds)).
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("delete time slot service: %w", err)
+	}
+	return nil
+}
+
+func (r *TimeSlotRepository) DeleteEventsByServiceIds(ctx context.Context, serviceIds []int64) error {
+	_, err := r.db.Delete(ctx, (*models.Event)(nil)).
+		Where("time_slot_service_id IN (?)", bun.In(serviceIds)).
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("delete events: %w", err)
+	}
+	return nil
+}
+
+func (r *TimeSlotRepository) GetEventsByServiceIds(ctx context.Context, serviceIds []int64) ([]*models.Event, error) {
+	var events []*models.Event
+	err := r.db.Select(ctx, &events).
+		Where("time_slot_service_id IN (?)", bun.In(serviceIds)).
+		Scan(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("select events: %w", err)
+	}
+	return events, nil
+}
+
+func (r *TimeSlotRepository) InsertUpdateEvents(ctx context.Context, events []*models.Event) error {
+	for _, event := range events {
+		_, err := r.db.Insert(ctx, event).
 			On("DUPLICATE KEY UPDATE").
-			Set("capacity = VALUES(capacity)").
-			Set("booking_window = VALUES(booking_window)").
-			Set("time = VALUES(time)").
+			Set("capacity = ?", event.Capacity).
+			Set("datetime = ?", event.DateTime).
+			Set("time_slot_service_id = ?", event.TimeSlotServiceID).
 			Exec(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("upsert time slot services: %w", err)
+			return fmt.Errorf("create events: %w", err)
 		}
 	}
-
-	if req.Recurrence != nil {
-		req.Recurrence.TimeSlotID = req.ID
-		_, err = r.db.Insert(ctx, req.Recurrence).
-			On("DUPLICATE KEY UPDATE").
-			Set("frequency = VALUES(frequency)").
-			Set("interval = VALUES(interval)").
-			Set("end_type = VALUES(end_type)").
-			Set("end_value = VALUES(end_value)").
-			Exec(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("upsert time slot recurrence: %w", err)
-		}
-	}
-
-	return req, nil
+	return nil
 }

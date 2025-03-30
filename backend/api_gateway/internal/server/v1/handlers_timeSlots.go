@@ -18,6 +18,7 @@ type ITimeSlotsUC interface {
 	ActivateTimeSlot(ctx context.Context, id int64) error
 	ArchiveTimeSlot(ctx context.Context, id int64) error
 	UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*models.TimeSlot, error)
+	AddServiceToTimeSlot(ctx context.Context, id int64, req *timeSlots.CreateTimeSlotServiceReq) (*models.TimeSlotService, error)
 }
 
 func (h Handlers) GetTimeSlotsId(ctx echo.Context, id int64) error {
@@ -101,4 +102,18 @@ func (h Handlers) PatchTimeSlotsIdArchive(ctx echo.Context, id int64) error {
 	}
 
 	return ctx.NoContent(http.StatusNoContent)
+}
+
+func (h Handlers) PostTimeSlotsIdService(ctx echo.Context, id int64) error {
+	var req timeSlots.CreateTimeSlotServiceReq
+	if err := ctx.Bind(&req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	timeSlotService, err := h.timeSlotUC.AddServiceToTimeSlot(ctx.Request().Context(), id, &req)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusCreated, timeSlotService)
 }

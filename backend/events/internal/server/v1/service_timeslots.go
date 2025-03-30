@@ -12,6 +12,10 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+const (
+	newTimeSlotID = 0
+)
+
 type ITimeSlotsUC interface {
 	CreateTimeSlot(ctx context.Context, req *timeSlots.CreateTimeSlotReq) (*models.TimeSlot, error)
 	GetTimeSlots(ctx context.Context, req *timeSlots.GetTimeSlotsReq) ([]*models.TimeSlot, error)
@@ -20,6 +24,7 @@ type ITimeSlotsUC interface {
 	ActivateTimeSlot(ctx context.Context, id int64) error
 	ArchiveTimeSlot(ctx context.Context, id int64) error
 	UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*models.TimeSlot, error)
+	AddServiceToTimeSlot(ctx context.Context, id int64, req *models.TimeSlotService) (*models.TimeSlotService, error)
 }
 
 func (i *Implementation) GetTimeSlot(ctx context.Context, req *pb.GetTimeSlotRequest) (*pb.TimeSlot, error) {
@@ -70,7 +75,7 @@ func (i *Implementation) CreateTimeSlot(ctx context.Context, req *pb.CreateTimeS
 		Capacity:   req.Capacity,
 		StartDate:  req.StartDate.AsTime(),
 		EndDate:    req.EndDate.AsTime(),
-		Services:   convertPBServicesToModel(req.Services),
+		Services:   convertPBServicesToModel(req.Services, newTimeSlotID),
 		Recurrence: convertPBRecurrenceToModel(req.Recurrence),
 	})
 	if err != nil {
@@ -95,7 +100,7 @@ func (i *Implementation) UpdateTimeSlot(ctx context.Context, req *pb.TimeSlot) (
 		StartDate:  req.StartDate.AsTime(),
 		EndDate:    req.EndDate.AsTime(),
 		Status:     req.Status,
-		Services:   convertPBServicesToModel(req.Services),
+		Services:   convertPBServicesToModel(req.Services, req.Id),
 		Recurrence: convertPBRecurrenceToModel(req.Recurrence),
 	})
 	if err != nil {
@@ -159,7 +164,35 @@ func (i *Implementation) ActivateTimeSlot(ctx context.Context, req *pb.ActivateT
 	return convertModelTimeSlotToPB(timeSlot), nil
 }
 
+func (i *Implementation) AddServiceToTimeSlot(ctx context.Context, req *pb.AddServiceToTimeSlotRequest) (*pb.TimeSlotService, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "AddServiceToTimeSlot")
+	defer span.Finish()
+
+	timeSlotService, err := i.timeSlotUC.AddServiceToTimeSlot(ctx, req.TimeSlotId, &models.TimeSlotService{
+		TimeSlotID:    req.TimeSlotId,
+		ServiceTypeID: req.ServiceTypeId,
+		Capacity:      req.Capacity,
+		BookingWindow: req.BookingWindow,
+		Time:          req.Time.AsTime(),
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to add service to time slot: %v", err)
+	}
+
+	return convertModelTimeSlotServiceToPB(timeSlotService), nil
+}
+
 // Helper functions for converting between models and protobuf messages
+
+func convertModelTimeSlotServiceToPB(timeSlotService *models.TimeSlotService) *pb.TimeSlotService {
+	return &pb.TimeSlotService{
+		Id:            timeSlotService.ID,
+		ServiceTypeId: timeSlotService.ServiceTypeID,
+		Capacity:      timeSlotService.Capacity,
+		BookingWindow: timeSlotService.BookingWindow,
+		Time:          timestamppb.New(timeSlotService.Time),
+	}
+}
 
 func convertModelTimeSlotToPB(timeSlot *models.TimeSlot) *pb.TimeSlot {
 	if timeSlot == nil {
@@ -180,7 +213,7 @@ func convertModelTimeSlotToPB(timeSlot *models.TimeSlot) *pb.TimeSlot {
 	}
 }
 
-func convertPBServicesToModel(services []*pb.TimeSlotService) []*models.TimeSlotService {
+func convertPBServicesToModel(services []*pb.TimeSlotService, timeSlotID int64) []*models.TimeSlotService {
 	if services == nil {
 		return nil
 	}
@@ -188,6 +221,8 @@ func convertPBServicesToModel(services []*pb.TimeSlotService) []*models.TimeSlot
 	modelServices := make([]*models.TimeSlotService, len(services))
 	for i, service := range services {
 		modelServices[i] = &models.TimeSlotService{
+			TimeSlotID:    timeSlotID,
+			ID:            service.Id,
 			ServiceTypeID: service.ServiceTypeId,
 			Capacity:      service.Capacity,
 			BookingWindow: service.BookingWindow,
@@ -205,6 +240,7 @@ func convertModelServicesToPBServices(services []*models.TimeSlotService) []*pb.
 	pbServices := make([]*pb.TimeSlotService, len(services))
 	for i, service := range services {
 		pbServices[i] = &pb.TimeSlotService{
+			Id:            service.ID,
 			ServiceTypeId: service.ServiceTypeID,
 			Capacity:      service.Capacity,
 			BookingWindow: service.BookingWindow,

@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  api_gateway:
+    build:
+      context: ./api_gateway
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - config=docker
+      - DB_HOST=events_db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=events
+      - JAEGER_AGENT_HOST=jaeger
+      - JAEGER_AGENT_PORT=6831
+    depends_on:
+      - events_db
+      - jaeger
+    networks:
+      - saint_diego_network
+
+  events:
+    build:
+      context: ./events
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5000"
+    environment:
+      - config=docker
+      - DB_HOST=events_db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=events
+      - JAEGER_AGENT_HOST=jaeger
+      - JAEGER_AGENT_PORT=6831
+    depends_on:
+      - events_db
+      - jaeger
+    networks:
+      - saint_diego_network
+
+  events_db:
+    image: mariadb:10.6
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=events
+    volumes:
+      - events_db_data:/var/lib/mysql
+    networks:
+      - saint_diego_network
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.48
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "9411:9411"
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - saint_diego_network
+
+volumes:
+  events_db_data:
+
+networks:
+  saint_diego_network:
+    driver: bridge 

@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	connectionTimeout = 10 * time.Second
+	connectionTimeout = 3 * time.Second
 )
 
 //go:generate options-gen -out-filename=events_options.gen.go -from-struct=EventsClientOptions

@@ -20,6 +20,7 @@ func convertPBTimeSlotToModel(pbTimeSlot *pb.TimeSlot) *models.TimeSlot {
 
 	for i, pbService := range pbTimeSlot.Services {
 		timeSlot.Services[i] = models.TimeSlotService{
+			ID:            pbService.Id,
 			ServiceTypeID: pbService.ServiceTypeId,
 			Capacity:      pbService.Capacity,
 			BookingWindow: pbService.BookingWindow,
@@ -40,4 +41,14 @@ func convertPBTimeSlotToModel(pbTimeSlot *pb.TimeSlot) *models.TimeSlot {
 	}
 
 	return timeSlot
+}
+
+func convertPBTimeSlotServiceToModel(pbTimeSlotService *pb.TimeSlotService) *models.TimeSlotService {
+	return &models.TimeSlotService{
+		ID:            pbTimeSlotService.Id,
+		ServiceTypeID: pbTimeSlotService.ServiceTypeId,
+		Capacity:      pbTimeSlotService.Capacity,
+		BookingWindow: pbTimeSlotService.BookingWindow,
+		Time:          pbTimeSlotService.Time.AsTime(),
+	}
 }

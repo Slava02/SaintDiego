@@ -27,3 +27,10 @@ type GetTimeSlotsReq struct {
 type UpdateTimeSlotReq struct {
 	TimeSlot models.TimeSlot `json:"timeSlot" validate:"required"`
 }
+
+type CreateTimeSlotServiceReq struct {
+	ServiceTypeID int64     `json:"serviceTypeId" validate:"required"`
+	Capacity      int32     `json:"capacity" validate:"required,min=1"`
+	BookingWindow int32     `json:"bookingWindow" validate:"required,min=1"`
+	Time          time.Time `json:"time" validate:"required"`
+}

@@ -19,8 +19,8 @@ vars:
     github.com/daixiang0/gci@v0.13.5
     github.com/kazhuravlev/options-gen/cmd/options-gen@v0.33.1
     mvdan.cc/gofumpt@v0.7.0
-    go.uber.org/mock/mockgen@v0.5.0
-    github.com/uptrace/bun@v1.2.11
+    github.com/vektra/mockery/v2@v2.53.3
+    github.com/stretchr/testify/mock@latest
 
   DOCKER_COMPOSE_PATHS: |
     ./deploy/local/docker-compose.yml

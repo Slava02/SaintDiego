@@ -7,6 +7,11 @@ import (
 	"github.com/Slava02/SaintDiego/backend/events/internal/models"
 )
 
+type ILocationRepository interface {
+	GetLocations(ctx context.Context) ([]*models.Location, error)
+	CreateLocation(ctx context.Context, req *models.Location) (*models.Location, error)
+}
+
 //go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options
 type Options struct {
 	LocationRepository ILocationRepository `option:"mandatory" validate:"required"`
@@ -24,11 +29,6 @@ func New(opts Options) (*UseCase, error) {
 	return &UseCase{
 		locationRepository: opts.LocationRepository,
 	}, nil
-}
-
-type ILocationRepository interface {
-	GetLocations(ctx context.Context) ([]*models.Location, error)
-	CreateLocation(ctx context.Context, req *models.Location) (*models.Location, error)
 }
 
 func (u UseCase) GetLocations(ctx context.Context) ([]*models.Location, error) {

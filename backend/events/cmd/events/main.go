@@ -81,8 +81,8 @@ func run() error {
 	// Repositories
 
 	timeSlotsRepo := timeslots_repo.NewTimeSlotRepository(timeslots_repo.NewOptions(db))
-	locationsRepo := locations_repo.NewLocationRepository(locations_repo.NewOptions(db.GetDBtmp()))
-	servicesRepo := services_repo.NewServiceRepository(services_repo.NewOptions(db.GetDBtmp()))
+	locationsRepo := locations_repo.NewLocationRepository(locations_repo.NewOptions(db))
+	servicesRepo := services_repo.NewServiceRepository(services_repo.NewOptions(db))
 
 	// Usecases
 

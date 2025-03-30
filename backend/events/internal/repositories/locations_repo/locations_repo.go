@@ -5,16 +5,16 @@ import (
 	"fmt"
 
 	"github.com/Slava02/SaintDiego/backend/events/internal/models"
-	"github.com/uptrace/bun"
+	"github.com/Slava02/SaintDiego/backend/events/internal/storage"
 )
 
 //go:generate options-gen -out-filename=locations_repo_options.gen.go -from-struct=Options
 type Options struct {
-	DB *bun.DB `option:"mandatory" validate:"required"`
+	DB *storage.Database `option:"mandatory" validate:"required"`
 }
 
 type LocationRepository struct {
-	db *bun.DB
+	db *storage.Database
 }
 
 func NewLocationRepository(opts Options) *LocationRepository {
@@ -24,7 +24,7 @@ func NewLocationRepository(opts Options) *LocationRepository {
 func (r *LocationRepository) GetLocations(ctx context.Context) ([]*models.Location, error) {
 	var locations []*models.Location
 
-	err := r.db.NewSelect().Model(&locations).Scan(ctx)
+	err := r.db.Select(ctx, &locations)
 	if err != nil {
 		return nil, fmt.Errorf("select locations: %w", err)
 	}
@@ -33,7 +33,7 @@ func (r *LocationRepository) GetLocations(ctx context.Context) ([]*models.Locati
 }
 
 func (r *LocationRepository) CreateLocation(ctx context.Context, req *models.Location) (*models.Location, error) {
-	_, err := r.db.NewInsert().Model(req).Exec(ctx)
+	_, err := r.db.Insert(ctx, req).Exec(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("insert location: %w", err)
 	}

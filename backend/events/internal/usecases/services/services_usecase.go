@@ -7,6 +7,11 @@ import (
 	"github.com/Slava02/SaintDiego/backend/events/internal/models"
 )
 
+type IServiceRepository interface {
+	GetServices(ctx context.Context) ([]*models.ServiceType, error)
+	GetServiceById(ctx context.Context, id int64) (*models.ServiceType, error)
+}
+
 //go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options
 type Options struct {
 	ServiceRepository IServiceRepository `option:"mandatory" validate:"required"`
@@ -24,11 +29,6 @@ func New(opts Options) (*UseCase, error) {
 	return &UseCase{
 		serviceRepository: opts.ServiceRepository,
 	}, nil
-}
-
-type IServiceRepository interface {
-	GetServices(ctx context.Context) ([]*models.ServiceType, error)
-	GetServiceById(ctx context.Context, id int64) (*models.ServiceType, error)
 }
 
 func (u UseCase) GetServices(ctx context.Context) ([]*models.ServiceType, error) {
