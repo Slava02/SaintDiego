@@ -19,7 +19,7 @@ import { TimeSlotTable } from "@/components/admin/time-slot-table"
 import { ActivateTimeSlotModal } from "@/components/admin/activate-time-slot-modal"
 import { useTimeSlots } from "@/hooks/useTimeSlots"
 import { api } from "@/lib/api"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import { ru } from 'date-fns/locale'
 
 interface FilterState {
@@ -31,23 +31,39 @@ interface FilterState {
 
 export default function SchedulePage() {
   const [filteredTimeSlots, setFilteredTimeSlots] = useState<TimeSlot[]>([])
-  const [showTimeSlotModal, setShowTimeSlotModal] = useState(false)
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(null)
-  const [isEditing, setIsEditing] = useState(false)
+  const [modalState, setModalState] = useState<{
+    showTimeSlotModal: boolean;
+    showActivateModal: boolean;
+    selectedTimeSlot: TimeSlot | null;
+    isEditing: boolean;
+    timeSlotToActivate: TimeSlot | null;
+  }>({
+    showTimeSlotModal: false,
+    showActivateModal: false,
+    selectedTimeSlot: null,
+    isEditing: false,
+    timeSlotToActivate: null,
+  })
   const [activeTab, setActiveTab] = useState<"active" | "archived">("active")
   const [showFilters, setShowFilters] = useState(false)
-  const [showActivateModal, setShowActivateModal] = useState(false)
-  const [timeSlotToActivate, setTimeSlotToActivate] = useState<TimeSlot | null>(null)
   const [filters, setFilters] = useState<FilterState>({
     type: "all",
     status: "all",
     searchQuery: "",
     service: "all",
   })
-  const queryClient = useQueryClient()
 
   // Получаем данные с сервера
-  const { timeSlots, isLoading, error, createTimeSlot, isCreating } = useTimeSlots({
+  const {
+    timeSlots,
+    isLoading,
+    error,
+    createTimeSlot,
+    isCreating,
+    archiveTimeSlot,
+    activateTimeSlot,
+    deleteTimeSlot
+  } = useTimeSlots({
     status: activeTab,
   })
 
@@ -107,36 +123,59 @@ export default function SchedulePage() {
   }, [timeSlots, filters, services])
 
   const handleCreateTimeSlot = () => {
-    setSelectedTimeSlot(null)
-    setIsEditing(false)
-    setShowTimeSlotModal(true)
+    setModalState({
+      showTimeSlotModal: true,
+      showActivateModal: false,
+      selectedTimeSlot: null,
+      isEditing: false,
+      timeSlotToActivate: null,
+    })
   }
 
   const handleEditTimeSlot = (timeSlot: TimeSlot) => {
-    setSelectedTimeSlot(timeSlot)
-    setIsEditing(true)
-    setShowTimeSlotModal(true)
+    setModalState({
+      showTimeSlotModal: true,
+      showActivateModal: false,
+      selectedTimeSlot: timeSlot,
+      isEditing: true,
+      timeSlotToActivate: null,
+    })
   }
 
   const handleSaveTimeSlot = async (timeSlot: TimeSlot) => {
     try {
-      if (isEditing && selectedTimeSlot) {
+      if (modalState.isEditing && modalState.selectedTimeSlot) {
         // TODO: Добавить метод обновления в API
-        // await api.updateTimeSlot(selectedTimeSlot.id, timeSlot)
+        // await api.updateTimeSlot(modalState.selectedTimeSlot.id, timeSlot)
       } else {
         await createTimeSlot(timeSlot)
       }
-      setShowTimeSlotModal(false)
+      // Закрываем модальное окно и сбрасываем состояние одним обновлением
+      setModalState({
+        showTimeSlotModal: false,
+        showActivateModal: false,
+        selectedTimeSlot: null,
+        isEditing: false,
+        timeSlotToActivate: null,
+      })
     } catch (error) {
       console.error('Error saving time slot:', error)
       // TODO: Добавить обработку ошибок
     }
   }
 
+  const handleCloseTimeSlotModal = () => {
+    setModalState(prev => ({
+      ...prev,
+      showTimeSlotModal: false,
+      selectedTimeSlot: null,
+      isEditing: false,
+    }))
+  }
+
   const handleDeleteTimeSlot = async (timeSlotId: string) => {
     try {
-      // TODO: Добавить метод удаления в API
-      // await api.deleteTimeSlot(timeSlotId)
+      await deleteTimeSlot(timeSlotId)
     } catch (error) {
       console.error('Error deleting time slot:', error)
       // TODO: Добавить обработку ошибок
@@ -145,8 +184,7 @@ export default function SchedulePage() {
 
   const handleArchiveTimeSlot = async (timeSlotId: string) => {
     try {
-      // TODO: Добавить метод архивации в API
-      // await api.archiveTimeSlot(timeSlotId)
+      await archiveTimeSlot(timeSlotId)
     } catch (error) {
       console.error('Error archiving time slot:', error)
       // TODO: Добавить обработку ошибок
@@ -154,15 +192,21 @@ export default function SchedulePage() {
   }
 
   const handleActivateTimeSlot = (timeSlot: TimeSlot) => {
-    setTimeSlotToActivate(timeSlot)
-    setShowActivateModal(true)
+    setModalState(prev => ({
+      ...prev,
+      showActivateModal: true,
+      timeSlotToActivate: timeSlot,
+    }))
   }
 
   const handleConfirmActivation = async (timeSlot: TimeSlot, newStartDate: string) => {
     try {
-      // TODO: Добавить метод активации в API
-      // await api.activateTimeSlot(timeSlot.id, newStartDate)
-      setShowActivateModal(false)
+      await activateTimeSlot(timeSlot.id)
+      setModalState(prev => ({
+        ...prev,
+        showActivateModal: false,
+        timeSlotToActivate: null,
+      }))
     } catch (error) {
       console.error('Error activating time slot:', error)
       // TODO: Добавить обработку ошибок
@@ -283,28 +327,32 @@ export default function SchedulePage() {
         </CardContent>
       </Card>
 
-      <Dialog open={showTimeSlotModal} onOpenChange={setShowTimeSlotModal}>
+      <Dialog open={modalState.showTimeSlotModal} onOpenChange={handleCloseTimeSlotModal}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              {isEditing ? "Редактирование временного слота" : "Создание временного слота"}
+              {modalState.isEditing ? "Редактирование временного слота" : "Создание временного слота"}
             </DialogTitle>
           </DialogHeader>
           <TimeSlotForm
-            timeSlot={selectedTimeSlot}
+            timeSlot={modalState.selectedTimeSlot}
             locations={locations}
             availableServices={services}
             onSave={handleSaveTimeSlot}
-            onCancel={() => setShowTimeSlotModal(false)}
+            onCancel={handleCloseTimeSlotModal}
           />
         </DialogContent>
       </Dialog>
 
-      {timeSlotToActivate && (
+      {modalState.timeSlotToActivate && (
         <ActivateTimeSlotModal
-          open={showActivateModal}
-          onClose={() => setShowActivateModal(false)}
-          timeSlot={timeSlotToActivate}
+          open={modalState.showActivateModal}
+          onClose={() => setModalState(prev => ({
+            ...prev,
+            showActivateModal: false,
+            timeSlotToActivate: null,
+          }))}
+          timeSlot={modalState.timeSlotToActivate}
           onConfirm={handleConfirmActivation}
         />
       )}

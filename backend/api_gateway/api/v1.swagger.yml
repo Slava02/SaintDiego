@@ -411,34 +411,6 @@ paths:
                 message: "Временной слот не найден"
                 details: "Слот с ID 999 не существует"
 
-  /timeSlots/{id}/service:
-    post:
-      summary: Добавление услуги к временному слоту
-      deprecated: true
-      parameters:
-        - name: id
-          in: path
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateTimeSlotServiceRequest"
-      responses:
-        "201":
-          description: Услуга успешно добавлена к временному слоту
-        "500":
-          description: Внутренняя ошибка сервера
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
   /timeSlots/{id}/archive:
     patch:
       summary: Архивация временного слота
@@ -470,6 +442,56 @@ paths:
                 message: "Временной слот не найден"
                 details: "Слот с ID 999 не существует"
 
+  /events/current:
+    get:
+      summary: Получение списка событий
+      description: Возвращает список событий, которые проходят в данный момент
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Event"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /events/past:
+    get:
+      summary: Получение списка событий
+      description: Возвращает список событий, которые прошли
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Event"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 security:
   - BearerAuth: []
 
@@ -547,32 +569,6 @@ components:
           interval: 1
           endType: "date"
           endValue: "2024-04-20T19:00:00Z"
-    CreateTimeSlotServiceRequest:
-      type: object
-      properties:
-        serviceTypeId:
-          type: integer
-          format: int64
-        capacity:
-          type: integer
-          format: int32
-        bookingWindow:
-          type: integer
-          format: int32
-        time:
-          type: string
-          format: date-time
-      required:
-        - serviceTypeId
-        - capacity
-        - bookingWindow
-        - time
-      example:
-        timeSlotId: 1
-        serviceTypeId: 1
-        capacity: 10
-        bookingWindow: 30
-        time: "2024-03-20T18:00:00Z"
     Error:
       type: object
       properties:
@@ -745,6 +741,31 @@ components:
         capacity: 20
         bookingWindow: 30
         time: "2024-03-20T09:00:00Z"
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        timeSlotServiceId:
+          type: integer
+          format: int64
+        capacity:
+          type: integer
+          format: int32
+        datetime:
+          type: string
+          format: date-time
+      required:
+        - timeSlotServiceId
+        - capacity
+        - datetime
+      example:
+        id: 1
+        timeSlotServiceId: 1
+        capacity: 20
+        datetime: "2024-03-20T09:00:00Z"
+
   securitySchemes:
     BearerAuth:
       type: http

@@ -100,9 +100,7 @@ export function TimeSlotForm({ timeSlot, locations, availableServices, onSave, o
     const [recurrenceFrequency, setRecurrenceFrequency] = useState<"daily" | "weekly" | "monthly">(
         timeSlot?.recurrence?.frequency || "weekly"
     )
-    const [recurrenceInterval, setRecurrenceInterval] = useState(
-        timeSlot?.recurrence?.interval.toString() || "1"
-    )
+    const [recurrenceInterval, setRecurrenceInterval] = useState(timeSlot?.recurrence?.interval.toString() || "1")
     const [recurrenceEndType, setRecurrenceEndType] = useState<"never" | "date">(
         timeSlot?.recurrence?.endType || "never"
     )
@@ -110,8 +108,12 @@ export function TimeSlotForm({ timeSlot, locations, availableServices, onSave, o
         timeSlot?.recurrence?.endValue ? new Date(timeSlot.recurrence.endValue) : undefined
     )
 
-    // Состояния для модального окна добавления места
+    // Состояния для модальных окон
     const [showLocationModal, setShowLocationModal] = useState(false)
+    const [showServiceConfig, setShowServiceConfig] = useState(false)
+    const [showRecurrenceModal, setShowRecurrenceModal] = useState(false)
+
+    // Состояния для модального окна добавления места
     const [newLocation, setNewLocation] = useState<Omit<Location, "id">>({
         name: "",
         address: "",
@@ -197,13 +199,7 @@ export function TimeSlotForm({ timeSlot, locations, availableServices, onSave, o
         }
 
         try {
-            if (timeSlot) {
-                // TODO: Implement update endpoint
-                onSave(newTimeSlot)
-            } else {
-                const createdTimeSlot = await api.createTimeSlot(newTimeSlot)
-                onSave(createdTimeSlot)
-            }
+            await onSave(newTimeSlot)
         } catch (error) {
             console.error('Failed to save time slot:', error)
             // TODO: Add proper error handling and user notification

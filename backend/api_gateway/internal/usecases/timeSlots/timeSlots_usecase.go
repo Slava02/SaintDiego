@@ -37,7 +37,7 @@ type IEventsClient interface {
 	ActivateTimeSlot(ctx context.Context, req *pb.ActivateTimeSlotRequest, opts ...grpc.CallOption) (*pb.TimeSlot, error)
 	ArchiveTimeSlot(ctx context.Context, req *pb.ArchiveTimeSlotRequest, opts ...grpc.CallOption) (*pb.TimeSlot, error)
 	UpdateTimeSlot(ctx context.Context, req *pb.TimeSlot, opts ...grpc.CallOption) (*pb.TimeSlot, error)
-	AddServiceToTimeSlot(ctx context.Context, req *pb.AddServiceToTimeSlotRequest, opts ...grpc.CallOption) (*pb.TimeSlotService, error)
+	GetEvents(ctx context.Context, req *pb.GetEventsRequest, opts ...grpc.CallOption) (*pb.GetEventsResponse, error)
 }
 
 func (u UseCase) CreateTimeSlot(ctx context.Context, req *CreateTimeSlotReq) (*models.TimeSlot, error) {
@@ -193,19 +193,15 @@ func (u UseCase) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*mod
 	return convertPBTimeSlotToModel(pbTimeSlot), nil
 }
 
-func (u UseCase) AddServiceToTimeSlot(ctx context.Context, id int64, req *CreateTimeSlotServiceReq) (*models.TimeSlotService, error) {
-	pbReq := &pb.AddServiceToTimeSlotRequest{
-		TimeSlotId:    id,
-		ServiceTypeId: req.ServiceTypeID,
-		Capacity:      req.Capacity,
-		BookingWindow: req.BookingWindow,
-		Time:          timestamppb.New(req.Time),
+func (u UseCase) GetEvents(ctx context.Context, req *GetEventsReq) ([]*models.Event, error) {
+	pbReq := &pb.GetEventsRequest{
+		EventStatus: req.EventStatus,
 	}
 
-	pbTimeSlotService, err := u.eventsClient.AddServiceToTimeSlot(ctx, pbReq)
+	pbEvents, err := u.eventsClient.GetEvents(ctx, pbReq)
 	if err != nil {
-		return nil, fmt.Errorf("add service to time slot: %w", err)
+		return nil, fmt.Errorf("get events: %w", err)
 	}
 
-	return convertPBTimeSlotServiceToModel(pbTimeSlotService), nil
+	return convertPBEventToModel(pbEvents), nil
 }

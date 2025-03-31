@@ -23,3 +23,7 @@ type GetTimeSlotsReq struct {
 	StartDate time.Time `json:"startDate" validate:"required"`
 	EndDate   time.Time `json:"endDate" validate:"required,gtfield=StartDate"`
 }
+
+type GetEventsReq struct {
+	EventStatus string `json:"eventStatus" validate:"required,oneof=active archived"`
+}

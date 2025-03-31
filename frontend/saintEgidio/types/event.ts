@@ -91,4 +91,25 @@ export interface EventFiltersState {
     eventType: "all" | "medical" | "clothing" | "psychology" | "legal"
     place: "all" | "Цветной" | "Гиляровского" | "Ясная"
     participant: string
+}
+
+export interface CreateTimeSlotRequest {
+    title: string;
+    type: 'single' | 'recurring';
+    locationId: string;
+    capacity: number;
+    startDate: string;
+    endDate: string;
+    services: Array<{
+        serviceId: string;
+        capacity: number;
+        bookingWindow: number;
+        time: string;
+    }>;
+    recurrence?: {
+        frequency: 'daily' | 'weekly' | 'monthly';
+        interval: number;
+        endType: 'never' | 'date';
+        endValue?: string;
+    };
 } 

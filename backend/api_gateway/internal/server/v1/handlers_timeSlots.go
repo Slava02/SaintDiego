@@ -19,6 +19,7 @@ type ITimeSlotsUC interface {
 	ArchiveTimeSlot(ctx context.Context, id int64) error
 	UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*models.TimeSlot, error)
 	AddServiceToTimeSlot(ctx context.Context, id int64, req *timeSlots.CreateTimeSlotServiceReq) (*models.TimeSlotService, error)
+	GetEvents(ctx context.Context, req *timeSlots.GetEventsReq) ([]*models.Event, error)
 }
 
 func (h Handlers) GetTimeSlotsId(ctx echo.Context, id int64) error {
@@ -104,16 +105,22 @@ func (h Handlers) PatchTimeSlotsIdArchive(ctx echo.Context, id int64) error {
 	return ctx.NoContent(http.StatusNoContent)
 }
 
-func (h Handlers) PostTimeSlotsIdService(ctx echo.Context, id int64) error {
-	var req timeSlots.CreateTimeSlotServiceReq
-	if err := ctx.Bind(&req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
-
-	timeSlotService, err := h.timeSlotUC.AddServiceToTimeSlot(ctx.Request().Context(), id, &req)
+func (h Handlers) GetEventsCurrent(ctx echo.Context) error {
+	events, err := h.timeSlotUC.GetEvents(ctx.Request().Context(), &timeSlots.GetEventsReq{
+		EventStatus: "current",
+	})
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
+	return ctx.JSON(http.StatusOK, events)
+}
 
-	return ctx.JSON(http.StatusCreated, timeSlotService)
+func (h Handlers) GetEventsPast(ctx echo.Context) error {
+	events, err := h.timeSlotUC.GetEvents(ctx.Request().Context(), &timeSlots.GetEventsReq{
+		EventStatus: "past",
+	})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return ctx.JSON(http.StatusOK, events)
 }

@@ -325,3 +325,14 @@ func (r *TimeSlotRepository) InsertUpdateEvents(ctx context.Context, events []*m
 	}
 	return nil
 }
+
+func (r *TimeSlotRepository) GetEvents(ctx context.Context, status string) ([]*models.Event, error) {
+	var events []*models.Event
+	err := r.db.Select(ctx, &events).
+		Where("status = ?", status).
+		Scan(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("select events: %w", err)
+	}
+	return events, nil
+}

@@ -159,4 +159,39 @@ export const api = {
         const apiServices = await handleResponse<ApiService[]>(response);
         return apiServices.map(transformApiService);
     },
+
+    async archiveTimeSlot(id: string): Promise<TimeSlot> {
+        const response = await fetch(`${API_BASE_URL}/timeSlots/${id}/archive`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                // 'Authorization': `Bearer ${token}`
+            },
+        });
+        const apiTimeSlot = await handleResponse<ApiTimeSlot>(response);
+        return transformApiTimeSlot(apiTimeSlot);
+    },
+
+    async activateTimeSlot(id: string): Promise<TimeSlot> {
+        const response = await fetch(`${API_BASE_URL}/timeSlots/${id}/activate`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                // 'Authorization': `Bearer ${token}`
+            },
+        });
+        const apiTimeSlot = await handleResponse<ApiTimeSlot>(response);
+        return transformApiTimeSlot(apiTimeSlot);
+    },
+
+    async deleteTimeSlot(id: string): Promise<void> {
+        const response = await fetch(`${API_BASE_URL}/timeSlots/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                // 'Authorization': `Bearer ${token}`
+            },
+        });
+        await handleResponse<{ success: boolean }>(response);
+    },
 }; 

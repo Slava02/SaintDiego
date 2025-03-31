@@ -19,18 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	EventService_GetTimeSlot_FullMethodName          = "/events.EventService/GetTimeSlot"
-	EventService_GetTimeSlots_FullMethodName         = "/events.EventService/GetTimeSlots"
-	EventService_CreateTimeSlot_FullMethodName       = "/events.EventService/CreateTimeSlot"
-	EventService_UpdateTimeSlot_FullMethodName       = "/events.EventService/UpdateTimeSlot"
-	EventService_DeleteTimeSlot_FullMethodName       = "/events.EventService/DeleteTimeSlot"
-	EventService_ArchiveTimeSlot_FullMethodName      = "/events.EventService/ArchiveTimeSlot"
-	EventService_ActivateTimeSlot_FullMethodName     = "/events.EventService/ActivateTimeSlot"
-	EventService_AddServiceToTimeSlot_FullMethodName = "/events.EventService/AddServiceToTimeSlot"
-	EventService_GetLocations_FullMethodName         = "/events.EventService/GetLocations"
-	EventService_CreateLocation_FullMethodName       = "/events.EventService/CreateLocation"
-	EventService_GetServices_FullMethodName          = "/events.EventService/GetServices"
-	EventService_GetServiceById_FullMethodName       = "/events.EventService/GetServiceById"
+	EventService_GetTimeSlot_FullMethodName      = "/events.EventService/GetTimeSlot"
+	EventService_GetTimeSlots_FullMethodName     = "/events.EventService/GetTimeSlots"
+	EventService_CreateTimeSlot_FullMethodName   = "/events.EventService/CreateTimeSlot"
+	EventService_UpdateTimeSlot_FullMethodName   = "/events.EventService/UpdateTimeSlot"
+	EventService_DeleteTimeSlot_FullMethodName   = "/events.EventService/DeleteTimeSlot"
+	EventService_ArchiveTimeSlot_FullMethodName  = "/events.EventService/ArchiveTimeSlot"
+	EventService_ActivateTimeSlot_FullMethodName = "/events.EventService/ActivateTimeSlot"
+	EventService_GetLocations_FullMethodName     = "/events.EventService/GetLocations"
+	EventService_CreateLocation_FullMethodName   = "/events.EventService/CreateLocation"
+	EventService_GetServices_FullMethodName      = "/events.EventService/GetServices"
+	EventService_GetServiceById_FullMethodName   = "/events.EventService/GetServiceById"
+	EventService_GetEvents_FullMethodName        = "/events.EventService/GetEvents"
 )
 
 // EventServiceClient is the client API for EventService service.
@@ -47,13 +47,14 @@ type EventServiceClient interface {
 	DeleteTimeSlot(ctx context.Context, in *DeleteTimeSlotRequest, opts ...grpc.CallOption) (*DeleteTimeSlotResponse, error)
 	ArchiveTimeSlot(ctx context.Context, in *ArchiveTimeSlotRequest, opts ...grpc.CallOption) (*TimeSlot, error)
 	ActivateTimeSlot(ctx context.Context, in *ActivateTimeSlotRequest, opts ...grpc.CallOption) (*TimeSlot, error)
-	AddServiceToTimeSlot(ctx context.Context, in *AddServiceToTimeSlotRequest, opts ...grpc.CallOption) (*TimeSlotService, error)
 	// Locations
 	GetLocations(ctx context.Context, in *GetLocationsRequest, opts ...grpc.CallOption) (*GetLocationsResponse, error)
 	CreateLocation(ctx context.Context, in *CreateLocationRequest, opts ...grpc.CallOption) (*Location, error)
 	// Services
 	GetServices(ctx context.Context, in *GetServicesRequest, opts ...grpc.CallOption) (*GetServicesResponse, error)
 	GetServiceById(ctx context.Context, in *GetServiceByIdRequest, opts ...grpc.CallOption) (*ServiceType, error)
+	// Events
+	GetEvents(ctx context.Context, in *GetEventsRequest, opts ...grpc.CallOption) (*GetEventsResponse, error)
 }
 
 type eventServiceClient struct {
@@ -134,16 +135,6 @@ func (c *eventServiceClient) ActivateTimeSlot(ctx context.Context, in *ActivateT
 	return out, nil
 }
 
-func (c *eventServiceClient) AddServiceToTimeSlot(ctx context.Context, in *AddServiceToTimeSlotRequest, opts ...grpc.CallOption) (*TimeSlotService, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TimeSlotService)
-	err := c.cc.Invoke(ctx, EventService_AddServiceToTimeSlot_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *eventServiceClient) GetLocations(ctx context.Context, in *GetLocationsRequest, opts ...grpc.CallOption) (*GetLocationsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetLocationsResponse)
@@ -184,6 +175,16 @@ func (c *eventServiceClient) GetServiceById(ctx context.Context, in *GetServiceB
 	return out, nil
 }
 
+func (c *eventServiceClient) GetEvents(ctx context.Context, in *GetEventsRequest, opts ...grpc.CallOption) (*GetEventsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetEventsResponse)
+	err := c.cc.Invoke(ctx, EventService_GetEvents_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EventServiceServer is the server API for EventService service.
 // All implementations must embed UnimplementedEventServiceServer
 // for forward compatibility.
@@ -198,13 +199,14 @@ type EventServiceServer interface {
 	DeleteTimeSlot(context.Context, *DeleteTimeSlotRequest) (*DeleteTimeSlotResponse, error)
 	ArchiveTimeSlot(context.Context, *ArchiveTimeSlotRequest) (*TimeSlot, error)
 	ActivateTimeSlot(context.Context, *ActivateTimeSlotRequest) (*TimeSlot, error)
-	AddServiceToTimeSlot(context.Context, *AddServiceToTimeSlotRequest) (*TimeSlotService, error)
 	// Locations
 	GetLocations(context.Context, *GetLocationsRequest) (*GetLocationsResponse, error)
 	CreateLocation(context.Context, *CreateLocationRequest) (*Location, error)
 	// Services
 	GetServices(context.Context, *GetServicesRequest) (*GetServicesResponse, error)
 	GetServiceById(context.Context, *GetServiceByIdRequest) (*ServiceType, error)
+	// Events
+	GetEvents(context.Context, *GetEventsRequest) (*GetEventsResponse, error)
 	mustEmbedUnimplementedEventServiceServer()
 }
 
@@ -236,9 +238,6 @@ func (UnimplementedEventServiceServer) ArchiveTimeSlot(context.Context, *Archive
 func (UnimplementedEventServiceServer) ActivateTimeSlot(context.Context, *ActivateTimeSlotRequest) (*TimeSlot, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ActivateTimeSlot not implemented")
 }
-func (UnimplementedEventServiceServer) AddServiceToTimeSlot(context.Context, *AddServiceToTimeSlotRequest) (*TimeSlotService, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddServiceToTimeSlot not implemented")
-}
 func (UnimplementedEventServiceServer) GetLocations(context.Context, *GetLocationsRequest) (*GetLocationsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetLocations not implemented")
 }
@@ -250,6 +249,9 @@ func (UnimplementedEventServiceServer) GetServices(context.Context, *GetServices
 }
 func (UnimplementedEventServiceServer) GetServiceById(context.Context, *GetServiceByIdRequest) (*ServiceType, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetServiceById not implemented")
+}
+func (UnimplementedEventServiceServer) GetEvents(context.Context, *GetEventsRequest) (*GetEventsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEvents not implemented")
 }
 func (UnimplementedEventServiceServer) mustEmbedUnimplementedEventServiceServer() {}
 func (UnimplementedEventServiceServer) testEmbeddedByValue()                      {}
@@ -398,24 +400,6 @@ func _EventService_ActivateTimeSlot_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
-func _EventService_AddServiceToTimeSlot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddServiceToTimeSlotRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(EventServiceServer).AddServiceToTimeSlot(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: EventService_AddServiceToTimeSlot_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EventServiceServer).AddServiceToTimeSlot(ctx, req.(*AddServiceToTimeSlotRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _EventService_GetLocations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetLocationsRequest)
 	if err := dec(in); err != nil {
@@ -488,6 +472,24 @@ func _EventService_GetServiceById_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EventService_GetEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetEventsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventServiceServer).GetEvents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EventService_GetEvents_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventServiceServer).GetEvents(ctx, req.(*GetEventsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // EventService_ServiceDesc is the grpc.ServiceDesc for EventService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -524,10 +526,6 @@ var EventService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _EventService_ActivateTimeSlot_Handler,
 		},
 		{
-			MethodName: "AddServiceToTimeSlot",
-			Handler:    _EventService_AddServiceToTimeSlot_Handler,
-		},
-		{
 			MethodName: "GetLocations",
 			Handler:    _EventService_GetLocations_Handler,
 		},
@@ -542,6 +540,10 @@ var EventService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetServiceById",
 			Handler:    _EventService_GetServiceById_Handler,
+		},
+		{
+			MethodName: "GetEvents",
+			Handler:    _EventService_GetEvents_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -43,12 +43,15 @@ func convertPBTimeSlotToModel(pbTimeSlot *pb.TimeSlot) *models.TimeSlot {
 	return timeSlot
 }
 
-func convertPBTimeSlotServiceToModel(pbTimeSlotService *pb.TimeSlotService) *models.TimeSlotService {
-	return &models.TimeSlotService{
-		ID:            pbTimeSlotService.Id,
-		ServiceTypeID: pbTimeSlotService.ServiceTypeId,
-		Capacity:      pbTimeSlotService.Capacity,
-		BookingWindow: pbTimeSlotService.BookingWindow,
-		Time:          pbTimeSlotService.Time.AsTime(),
+func convertPBEventToModel(pbEvents *pb.GetEventsResponse) []*models.Event {
+	events := make([]*models.Event, len(pbEvents.Events))
+	for i, pbEvent := range pbEvents.Events {
+		events[i] = &models.Event{
+			ID:                pbEvent.Id,
+			TimeSlotServiceID: pbEvent.TimeSlotServiceId,
+			Capacity:          pbEvent.Capacity,
+			Datetime:          pbEvent.Datetime.AsTime(),
+		}
 	}
+	return events
 }

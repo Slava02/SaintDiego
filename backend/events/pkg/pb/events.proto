@@ -17,7 +17,6 @@ service EventService {
   rpc DeleteTimeSlot(DeleteTimeSlotRequest) returns (DeleteTimeSlotResponse) {}
   rpc ArchiveTimeSlot(ArchiveTimeSlotRequest) returns (TimeSlot) {}
   rpc ActivateTimeSlot(ActivateTimeSlotRequest) returns (TimeSlot) {}
-  rpc AddServiceToTimeSlot(AddServiceToTimeSlotRequest) returns (TimeSlotService) {}
 
   // Locations
   rpc GetLocations(GetLocationsRequest) returns (GetLocationsResponse) {}
@@ -26,6 +25,9 @@ service EventService {
   // Services
   rpc GetServices(GetServicesRequest) returns (GetServicesResponse) {}
   rpc GetServiceById(GetServiceByIdRequest) returns (ServiceType) {}
+
+  // Events
+  rpc GetEvents(GetEventsRequest) returns (GetEventsResponse) {}
 }
 
 // Request messages
@@ -74,6 +76,10 @@ message GetServiceByIdRequest {
   int64 id = 1;
 }
 
+message GetEventsRequest {
+  string eventStatus = 1;
+}
+
 // Response messages
 message GetTimeSlotsResponse {
   repeated TimeSlot timeSlots = 1;
@@ -93,13 +99,11 @@ message GetServicesResponse {
   repeated ServiceType services = 1;
 }
 
-message AddServiceToTimeSlotRequest {
-  int64 timeSlotId = 1;
-  int64 serviceTypeId = 2;
-  int32 capacity = 3;
-  int32 bookingWindow = 4;
-  google.protobuf.Timestamp time = 5;
+message GetEventsResponse {
+  repeated Event events = 1;
 }
+
+
 // Common messages
 message TimeSlot {
   int64 id = 1;  
@@ -140,6 +144,13 @@ message ServiceType {
   int64 id = 1;  
   string name = 2;
   string description = 3;
+}
+
+message Event {
+  int64 id = 1;
+  int64 timeSlotServiceId = 2;
+  google.protobuf.Timestamp datetime = 3;
+  int32 capacity = 4;
 }
 
 message Error {

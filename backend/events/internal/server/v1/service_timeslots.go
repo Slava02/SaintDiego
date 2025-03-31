@@ -24,7 +24,7 @@ type ITimeSlotsUC interface {
 	ActivateTimeSlot(ctx context.Context, id int64) error
 	ArchiveTimeSlot(ctx context.Context, id int64) error
 	UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*models.TimeSlot, error)
-	AddServiceToTimeSlot(ctx context.Context, id int64, req *models.TimeSlotService) (*models.TimeSlotService, error)
+	GetEvents(ctx context.Context, req *timeSlots.GetEventsReq) ([]*models.Event, error)
 }
 
 func (i *Implementation) GetTimeSlot(ctx context.Context, req *pb.GetTimeSlotRequest) (*pb.TimeSlot, error) {
@@ -164,36 +164,23 @@ func (i *Implementation) ActivateTimeSlot(ctx context.Context, req *pb.ActivateT
 	return convertModelTimeSlotToPB(timeSlot), nil
 }
 
-func (i *Implementation) AddServiceToTimeSlot(ctx context.Context, req *pb.AddServiceToTimeSlotRequest) (*pb.TimeSlotService, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "AddServiceToTimeSlot")
+func (i *Implementation) GetEvents(ctx context.Context, req *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "GetEvents")
 	defer span.Finish()
 
-	timeSlotService, err := i.timeSlotUC.AddServiceToTimeSlot(ctx, req.TimeSlotId, &models.TimeSlotService{
-		TimeSlotID:    req.TimeSlotId,
-		ServiceTypeID: req.ServiceTypeId,
-		Capacity:      req.Capacity,
-		BookingWindow: req.BookingWindow,
-		Time:          req.Time.AsTime(),
+	events, err := i.timeSlotUC.GetEvents(ctx, &timeSlots.GetEventsReq{
+		EventStatus: req.EventStatus,
 	})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to add service to time slot: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to get events: %v", err)
 	}
 
-	return convertModelTimeSlotServiceToPB(timeSlotService), nil
+	return &pb.GetEventsResponse{
+		Events: convertModelEventsToPBEvents(events),
+	}, nil
 }
 
 // Helper functions for converting between models and protobuf messages
-
-func convertModelTimeSlotServiceToPB(timeSlotService *models.TimeSlotService) *pb.TimeSlotService {
-	return &pb.TimeSlotService{
-		Id:            timeSlotService.ID,
-		ServiceTypeId: timeSlotService.ServiceTypeID,
-		Capacity:      timeSlotService.Capacity,
-		BookingWindow: timeSlotService.BookingWindow,
-		Time:          timestamppb.New(timeSlotService.Time),
-	}
-}
-
 func convertModelTimeSlotToPB(timeSlot *models.TimeSlot) *pb.TimeSlot {
 	if timeSlot == nil {
 		return nil
@@ -275,4 +262,22 @@ func convertModelRecurrenceToPBRecurrence(recurrence *models.TimeSlotRecurrence)
 		EndType:   recurrence.EndType,
 		EndValue:  timestamppb.New(recurrence.EndValue),
 	}
+}
+
+func convertModelEventsToPBEvents(events []*models.Event) []*pb.Event {
+	if events == nil {
+		return nil
+	}
+
+	pbEvents := make([]*pb.Event, len(events))
+	for i, event := range events {
+		pbEvents[i] = &pb.Event{
+			Id:                event.ID,
+			TimeSlotServiceId: event.TimeSlotServiceID,
+			Datetime:          timestamppb.New(event.DateTime),
+			Capacity:          event.Capacity,
+		}
+	}
+
+	return pbEvents
 }
