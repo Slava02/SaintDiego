@@ -32,7 +32,8 @@ go.work.sum
 .vscode/
 
 ## internals
-backend/configs/config.toml
+backend/api_gateway/configs/config.toml
+backend/events/configs/config.toml
 backend/vendor/
 
 ## frontend
