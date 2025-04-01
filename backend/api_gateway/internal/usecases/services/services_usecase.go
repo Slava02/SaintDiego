@@ -5,18 +5,28 @@ import (
 	"fmt"
 
 	pb "github.com/Slava02/SaintDiego/backend/schedule/pkg/pb"
-	"google.golang.org/grpc"
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
 )
 
+type IScheduleClient interface {
+	GetServices(ctx context.Context, req *pb.GetServicesRequest) (*pb.GetServicesResponse, error)
+	GetServiceById(ctx context.Context, req *pb.GetServiceByIdRequest) (*pb.ServiceType, error)
+}
+
+type IServicesClient interface {
+	CreateServiceTypeSettings(ctx context.Context, req *pb.CreateServiceTypeSettingsRequest) (*pb.ServiceTypeSettings, error)
+}
+
 //go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options
 type Options struct {
-	EventsClient IEventsClient `option:"mandatory" validate:"required"`
+	ScheduleClient IScheduleClient `option:"mandatory" validate:"required"`
+	ServicesClient IServicesClient `option:"mandatory" validate:"required"`
 }
 
 type UseCase struct {
-	eventsClient IEventsClient
+	scheduleClient IScheduleClient
+	servicesClient IServicesClient
 }
 
 func New(opts Options) (*UseCase, error) {
@@ -25,17 +35,13 @@ func New(opts Options) (*UseCase, error) {
 	}
 
 	return &UseCase{
-		eventsClient: opts.EventsClient,
+		scheduleClient: opts.ScheduleClient,
+		servicesClient: opts.ServicesClient,
 	}, nil
 }
 
-type IEventsClient interface {
-	GetServices(ctx context.Context, req *pb.GetServicesRequest, opts ...grpc.CallOption) (*pb.GetServicesResponse, error)
-	GetServiceById(ctx context.Context, req *pb.GetServiceByIdRequest, opts ...grpc.CallOption) (*pb.ServiceType, error)
-}
-
 func (u UseCase) GetServices(ctx context.Context) ([]*models.Service, error) {
-	resp, err := u.eventsClient.GetServices(ctx, &pb.GetServicesRequest{})
+	resp, err := u.scheduleClient.GetServices(ctx, &pb.GetServicesRequest{})
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +59,7 @@ func (u UseCase) GetServices(ctx context.Context) ([]*models.Service, error) {
 }
 
 func (u UseCase) GetServicesId(ctx context.Context, id int64) (*models.Service, error) {
-	resp, err := u.eventsClient.GetServiceById(ctx, &pb.GetServiceByIdRequest{
+	resp, err := u.scheduleClient.GetServiceById(ctx, &pb.GetServiceByIdRequest{
 		Id: id,
 	})
 	if err != nil {
@@ -64,5 +70,19 @@ func (u UseCase) GetServicesId(ctx context.Context, id int64) (*models.Service, 
 		ID:          resp.Id,
 		Name:        resp.Name,
 		Description: &resp.Description,
+	}, nil
+}
+
+func (u UseCase) CreateServiceTypeSettings(ctx context.Context, req *CreateServiceTypeSettingsReq) (*models.ServiceTypeSettings, error) {
+	resp, err := u.servicesClient.CreateServiceTypeSettings(ctx, &pb.CreateServiceTypeSettingsRequest{
+		PeriodDays: req.PeriodDays,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.ServiceTypeSettings{
+		ID:         resp.Id,
+		PeriodDays: resp.PeriodDays,
 	}, nil
 }

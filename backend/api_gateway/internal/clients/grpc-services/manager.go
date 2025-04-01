@@ -4,6 +4,10 @@ import (
 	"fmt"
 )
 
+const (
+	connectionTimeout = 3 * time.Second
+)
+
 type Manager struct {
 	scheduleClient *ScheduleClient
 }

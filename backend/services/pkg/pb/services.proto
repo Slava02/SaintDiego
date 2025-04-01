@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package services;
+
+option go_package = "github.com/Slava02/SaintDiego/backend/services/pkg/pb";
+
+// Service definition
+service ScheduleService {
+
+  // Services
+  rpc GetServices(GetServicesRequest) returns (GetServicesResponse) {}
+  rpc GetServiceById(GetServiceByIdRequest) returns (ServiceType) {}
+  rpc CreateServiceTypeSettings(CreateServiceTypeSettingsRequest) returns (ServiceTypeSettings) {}
+}
+
+// Request messages
+message GetServicesRequest {}
+
+message GetServiceByIdRequest {
+  int64 id = 1;
+}
+
+message CreateServiceTypeSettingsRequest {
+  int64 periodDays = 1;
+}
+
+// Response messages
+message GetServicesResponse {
+  repeated ServiceType services = 1;
+}
+
+
+// Common messages
+
+message ServiceType {
+  int64 id = 1;  
+  string name = 2;
+  string description = 3;
+}
+
+message ServiceTypeSettings {
+  int64 id = 1;
+  int64 serviceTypeId = 2;
+  int64 periodDays = 3;
+}
+
+message Error {
+  string code = 1;
+  string message = 2;
+  map<string, string> details = 3;
+}

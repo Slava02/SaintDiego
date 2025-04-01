@@ -32,7 +32,7 @@ import (
 
 const (
 	nameMain    = "main"
-	serviceName = "schedule"
+	serviceName = "services"
 )
 
 var configPath = flag.String("config", "configs/config.toml", "Path to config file")
@@ -82,23 +82,9 @@ func run() error {
 
 	// Repositories
 
-	timeSlotsRepo := timeslots_repo.NewTimeSlotRepository(timeslots_repo.NewOptions(db))
-	locationsRepo := locations_repo.NewLocationRepository(locations_repo.NewOptions(db))
 	servicesRepo := services_repo.NewServiceRepository(services_repo.NewOptions(db))
 
 	// Usecases
-
-	timeSlotsUsecase, err := timeSlots.New(timeSlots.NewOptions(timeSlotsRepo, db))
-	if err != nil {
-		lg.Error("init timeSlots usecase", zap.Error(err))
-		return fmt.Errorf("init timeSlots usecase: %v", err)
-	}
-
-	locationsUsecase, err := locations.New(locations.NewOptions(locationsRepo))
-	if err != nil {
-		lg.Error("init locations usecase", zap.Error(err))
-		return fmt.Errorf("init locations usecase: %v", err)
-	}
 
 	servicesUsecase, err := services.New(services.NewOptions(servicesRepo))
 	if err != nil {
@@ -109,8 +95,6 @@ func run() error {
 	// Service
 
 	eventService, err := v1.NewImplementation(v1.NewOptions(
-		timeSlotsUsecase,
-		locationsUsecase,
 		servicesUsecase,
 	))
 	if err != nil {

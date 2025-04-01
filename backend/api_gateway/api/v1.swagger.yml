@@ -148,6 +148,37 @@ paths:
                 id: 1
                 name: "Исповедь"
 
+    post:
+      summary: Добавление настроек для услуги
+      parameters:
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateServiceTypeSettingsRequest"
+        required: true
+      responses:
+        "201":
+          description: Настройки успешно добавлены
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceTypeSettings"
+        "400":
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /timeSlots:
     get:
       summary: Получение списка временных слотов
@@ -470,6 +501,16 @@ security:
 
 components:
   schemas:
+    CreateServiceTypeSettingsRequest:
+      type: object
+      properties:
+        periodDays:
+          type: integer
+          format: int32
+      required:
+        - periodDays
+      example:
+        periodDays: 30
     CreateLocationRequest:
       type: object
       properties:
@@ -736,6 +777,33 @@ components:
         timeSlotServiceId: 1
         capacity: 20
         datetime: "2024-03-20T09:00:00Z"
+    ServiceTypeSettings:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        serviceTypeId:
+          type: integer
+          format: int64
+        periodDays:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - serviceTypeId
+        - periodDays
+      example:
+        id: 1
+        serviceTypeId: 1
+        periodDays: 30
+        createdAt: "2024-03-20T09:00:00Z"
+        updatedAt: "2024-03-20T09:00:00Z"
 
   securitySchemes:
     BearerAuth:

@@ -11,10 +11,6 @@ import (
 	api "github.com/Slava02/SaintDiego/backend/schedule/pkg/pb"
 )
 
-const (
-	connectionTimeout = 3 * time.Second
-)
-
 //go:generate options-gen -out-filename=schedule_options.gen.go -from-struct=ScheduleClientOptions
 type ScheduleClientOptions struct {
 	ServerAddr string
@@ -75,4 +71,12 @@ func (c *ScheduleClient) ArchiveTimeSlot(ctx context.Context, req *api.ArchiveTi
 
 func (c *ScheduleClient) UpdateTimeSlot(ctx context.Context, req *api.TimeSlot) (*api.TimeSlot, error) {
 	return c.ScheduleServiceClient.UpdateTimeSlot(ctx, req)
+}
+
+func (c *ScheduleClient) GetServices(ctx context.Context, req *api.GetServicesRequest) (*api.GetServicesResponse, error) {
+	return c.ScheduleServiceClient.GetServices(ctx, req)
+}
+
+func (c *ScheduleClient) GetServiceById(ctx context.Context, req *api.GetServiceByIdRequest) (*api.ServiceType, error) {
+	return c.ScheduleServiceClient.GetServiceById(ctx, req)
 }

@@ -7,11 +7,13 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
+	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/services"
 )
 
 type IServicesUC interface {
 	GetServices(ctx context.Context) ([]*models.Service, error)
 	GetServicesId(ctx context.Context, id int64) (*models.Service, error)
+	CreateServiceTypeSettings(ctx context.Context, req *services.CreateServiceTypeSettingsReq) (*models.ServiceTypeSettings, error)
 }
 
 func (h Handlers) GetServices(ctx echo.Context) error {
@@ -30,4 +32,18 @@ func (h Handlers) GetServicesId(ctx echo.Context, id int64) error {
 	}
 
 	return ctx.JSON(http.StatusOK, service)
+}
+
+func (h Handlers) CreateServiceTypeSettings(ctx echo.Context) error {
+	req := &services.CreateServiceTypeSettingsReq{}
+	if err := ctx.Bind(req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	serviceTypeSettings, err := h.servicesUC.CreateServiceTypeSettings(ctx.Request().Context(), req)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusOK, serviceTypeSettings)
 }
