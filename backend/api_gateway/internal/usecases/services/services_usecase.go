@@ -4,28 +4,23 @@ import (
 	"context"
 	"fmt"
 
-	pb "github.com/Slava02/SaintDiego/backend/schedule/pkg/pb"
+	pb "github.com/Slava02/SaintDiego/backend/services/pkg/pb"
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
 )
 
-type IScheduleClient interface {
+type IServicesClient interface {
+	CreateServiceTypeSettings(ctx context.Context, req *pb.CreateServiceTypeSettingsRequest) (*pb.ServiceTypeSettings, error)
 	GetServices(ctx context.Context, req *pb.GetServicesRequest) (*pb.GetServicesResponse, error)
 	GetServiceById(ctx context.Context, req *pb.GetServiceByIdRequest) (*pb.ServiceType, error)
 }
 
-type IServicesClient interface {
-	CreateServiceTypeSettings(ctx context.Context, req *pb.CreateServiceTypeSettingsRequest) (*pb.ServiceTypeSettings, error)
-}
-
 //go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options
 type Options struct {
-	ScheduleClient IScheduleClient `option:"mandatory" validate:"required"`
 	ServicesClient IServicesClient `option:"mandatory" validate:"required"`
 }
 
 type UseCase struct {
-	scheduleClient IScheduleClient
 	servicesClient IServicesClient
 }
 
@@ -35,13 +30,12 @@ func New(opts Options) (*UseCase, error) {
 	}
 
 	return &UseCase{
-		scheduleClient: opts.ScheduleClient,
 		servicesClient: opts.ServicesClient,
 	}, nil
 }
 
 func (u UseCase) GetServices(ctx context.Context) ([]*models.Service, error) {
-	resp, err := u.scheduleClient.GetServices(ctx, &pb.GetServicesRequest{})
+	resp, err := u.servicesClient.GetServices(ctx, &pb.GetServicesRequest{})
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +53,7 @@ func (u UseCase) GetServices(ctx context.Context) ([]*models.Service, error) {
 }
 
 func (u UseCase) GetServicesId(ctx context.Context, id int64) (*models.Service, error) {
-	resp, err := u.scheduleClient.GetServiceById(ctx, &pb.GetServiceByIdRequest{
+	resp, err := u.servicesClient.GetServiceById(ctx, &pb.GetServiceByIdRequest{
 		Id: id,
 	})
 	if err != nil {
@@ -82,7 +76,8 @@ func (u UseCase) CreateServiceTypeSettings(ctx context.Context, req *CreateServi
 	}
 
 	return &models.ServiceTypeSettings{
-		ID:         resp.Id,
-		PeriodDays: resp.PeriodDays,
+		ID:            resp.Id,
+		PeriodDays:    resp.PeriodDays,
+		ServiceTypeID: resp.ServiceTypeId,
 	}, nil
 }

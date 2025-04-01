@@ -30,8 +30,8 @@ func New(opts Options) (*UseCase, error) {
 }
 
 type IEventsClient interface {
-	GetLocations(ctx context.Context, req *pb.GetLocationsRequest, opts ...grpc.CallOption) (*pb.GetLocationsResponse, error)
-	CreateLocation(ctx context.Context, req *pb.CreateLocationRequest, opts ...grpc.CallOption) (*pb.Location, error)
+	GetLocations(ctx context.Context, req *pb.GetLocationsRequest) (*pb.GetLocationsResponse, error)
+	CreateLocation(ctx context.Context, req *pb.CreateLocationRequest) (*pb.Location, error)
 }
 
 func (u UseCase) GetLocations(ctx context.Context) ([]*models.Location, error) {

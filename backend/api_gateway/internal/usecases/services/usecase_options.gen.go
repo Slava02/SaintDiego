@@ -11,14 +11,14 @@ import (
 type OptOptionsSetter func(o *Options)
 
 func NewOptions(
-	EventsClient IEventsClient,
+	ServicesClient IServicesClient,
 	options ...OptOptionsSetter,
 ) Options {
 	o := Options{}
 
 	// Setting defaults from field tag (if present)
 
-	o.EventsClient = EventsClient
+	o.ServicesClient = ServicesClient
 
 	for _, opt := range options {
 		opt(&o)
@@ -28,13 +28,13 @@ func NewOptions(
 
 func (o *Options) Validate() error {
 	errs := new(errors461e464ebed9.ValidationErrors)
-	errs.Add(errors461e464ebed9.NewValidationError("EventsClient", _validate_Options_EventsClient(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("ServicesClient", _validate_Options_ServicesClient(o)))
 	return errs.AsError()
 }
 
-func _validate_Options_EventsClient(o *Options) error {
-	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.EventsClient, "required"); err != nil {
-		return fmt461e464ebed9.Errorf("field `EventsClient` did not pass the test: %w", err)
+func _validate_Options_ServicesClient(o *Options) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.ServicesClient, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `ServicesClient` did not pass the test: %w", err)
 	}
 	return nil
 }

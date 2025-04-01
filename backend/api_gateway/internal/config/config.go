@@ -1,10 +1,10 @@
 package config
 
 type Config struct {
-	Global   GlobalConfig   `toml:"global"`
-	Log      LogConfig      `toml:"log"`
-	Servers  ServersConfig  `toml:"servers"`
-	Services ServicesConfig `toml:"services"`
+	Global   GlobalConfig        `toml:"global"`
+	Log      LogConfig           `toml:"log"`
+	Servers  ServersConfig       `toml:"servers"`
+	Services MicroservicesConfig `toml:"services"`
 }
 
 type GlobalConfig struct {
@@ -25,10 +25,15 @@ type APIGWServerConfig struct {
 	AllowOrigins []string `toml:"allow_origins" validate:"required,dive,url"`
 }
 
-type ServicesConfig struct {
-	Events EventsConfig `toml:"events"`
+type MicroservicesConfig struct {
+	Schedule ScheduleConfig `toml:"schedule"`
+	Services ServicesConfig `toml:"services"`
 }
 
-type EventsConfig struct {
+type ScheduleConfig struct {
+	Addr string `toml:"addr" validate:"required,hostname_port"`
+}
+
+type ServicesConfig struct {
 	Addr string `toml:"addr" validate:"required,hostname_port"`
 }

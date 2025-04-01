@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"time"
 )
 
 const (
@@ -10,23 +11,33 @@ const (
 
 type Manager struct {
 	scheduleClient *ScheduleClient
+	servicesClient *ServicesClient
 }
 
 //go:generate options-gen -out-filename=manager_options.gen.go -from-struct=ManagerOptions
 type ManagerOptions struct {
 	ScheduleAddr string `option:"mandatory" validate:"required"`
+	ServicesAddr string `option:"mandatory" validate:"required"`
 }
 
 func NewManager(opts ManagerOptions) (*Manager, error) {
 	scheduleClient, err := NewScheduleClient(ScheduleClientOptions{
-		ServerAddr: opts.ScheduleAddr,
+		ScheduleServerAddr: opts.ScheduleAddr,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create schedule client: %w", err)
 	}
 
+	servicesClient, err := NewServicesClient(ServicesClientOptions{
+		ServicesServerAddr: opts.ServicesAddr,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create services client: %w", err)
+	}
+
 	return &Manager{
 		scheduleClient: scheduleClient,
+		servicesClient: servicesClient,
 	}, nil
 }
 
@@ -41,4 +52,9 @@ func (m *Manager) Close() error {
 // Schedule returns the schedule service client
 func (m *Manager) Schedule() *ScheduleClient {
 	return m.scheduleClient
+}
+
+// Services returns the services service client
+func (m *Manager) Services() *ServicesClient {
+	return m.servicesClient
 }

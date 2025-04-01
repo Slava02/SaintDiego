@@ -22,6 +22,7 @@ message GetServiceByIdRequest {
 
 message CreateServiceTypeSettingsRequest {
   int64 periodDays = 1;
+  int64 serviceTypeId = 2;
 }
 
 // Response messages

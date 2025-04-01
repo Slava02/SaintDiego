@@ -3,16 +3,15 @@ package services
 import (
 	"context"
 	"fmt"
-	"time"
 
 	api "github.com/Slava02/SaintDiego/backend/schedule/pkg/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-//go:generate options-gen -out-filename=schedule_options.gen.go -from-struct=ScheduleClientOptions
+//go:generate options-gen -out-filename=services_options.gen.go -from-struct=ServicesClientOptions
 type ServicesClientOptions struct {
-	ServerAddr string
+	ServicesServerAddr string
 }
 
 type ServicesClient struct {
@@ -25,7 +24,7 @@ func NewServicesClient(opts ServicesClientOptions) (*ServicesClient, error) {
 	defer cancel()
 
 	// Create gRPC connection with tracing interceptor and blocking mode
-	conn, err := grpc.DialContext(ctx, opts.ServerAddr,
+	conn, err := grpc.DialContext(ctx, opts.ServicesServerAddr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithBlock(), // Wait for connection to be established
 	)
@@ -42,4 +41,16 @@ func NewServicesClient(opts ServicesClientOptions) (*ServicesClient, error) {
 // Close closes the gRPC connection
 func (c *ServicesClient) Close() error {
 	return c.conn.Close()
+}
+
+func (c *ServicesClient) GetServices(ctx context.Context, req *api.GetServicesRequest) (*api.GetServicesResponse, error) {
+	return c.ServicesServiceClient.GetServices(ctx, req)
+}
+
+func (c *ServicesClient) GetServiceById(ctx context.Context, req *api.GetServiceByIdRequest) (*api.ServiceType, error) {
+	return c.ServicesServiceClient.GetServiceById(ctx, req)
+}
+
+func (c *ServicesClient) CreateServiceTypeSettings(ctx context.Context, req *api.CreateServiceTypeSettingsRequest) (*api.ServiceTypeSettings, error) {
+	return c.ServicesServiceClient.CreateServiceTypeSettings(ctx, req)
 }

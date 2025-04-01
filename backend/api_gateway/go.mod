@@ -3,8 +3,8 @@ module github.com/Slava02/SaintDiego/backend/api_gateway
 go 1.23.3
 
 require (
-	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250401113959-7d0cb6c62a02
-	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250401113959-7d0cb6c62a02
+	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250401122927-51b33ebb2271
+	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250401122927-51b33ebb2271
 	github.com/getkin/kin-openapi v0.131.0
 	github.com/kazhuravlev/options-gen v0.33.2
 	github.com/labstack/echo/v4 v4.13.3
@@ -20,6 +20,7 @@ require (
 )
 
 require (
+	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250401131444-05263e9c2d09 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
@@ -54,6 +55,6 @@ require (
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250324211829-b45e905df463 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -37,7 +37,7 @@ func initServer(
 		return nil, fmt.Errorf("create timeSlots usecase: %v", err)
 	}
 
-	servicesUC, err := services.New(services.NewOptions(manager.Schedule()))
+	servicesUC, err := services.New(services.NewOptions(manager.Services()))
 	if err != nil {
 		return nil, fmt.Errorf("create services usecase: %v", err)
 	}

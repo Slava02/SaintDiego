@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -13,7 +12,7 @@ import (
 
 //go:generate options-gen -out-filename=schedule_options.gen.go -from-struct=ScheduleClientOptions
 type ScheduleClientOptions struct {
-	ServerAddr string
+	ScheduleServerAddr string
 }
 
 type ScheduleClient struct {
@@ -26,7 +25,7 @@ func NewScheduleClient(opts ScheduleClientOptions) (*ScheduleClient, error) {
 	defer cancel()
 
 	// Create gRPC connection with tracing interceptor and blocking mode
-	conn, err := grpc.DialContext(ctx, opts.ServerAddr,
+	conn, err := grpc.DialContext(ctx, opts.ScheduleServerAddr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithBlock(), // Wait for connection to be established
 	)
@@ -73,10 +72,10 @@ func (c *ScheduleClient) UpdateTimeSlot(ctx context.Context, req *api.TimeSlot) 
 	return c.ScheduleServiceClient.UpdateTimeSlot(ctx, req)
 }
 
-func (c *ScheduleClient) GetServices(ctx context.Context, req *api.GetServicesRequest) (*api.GetServicesResponse, error) {
-	return c.ScheduleServiceClient.GetServices(ctx, req)
+func (c *ScheduleClient) GetLocations(ctx context.Context, req *api.GetLocationsRequest) (*api.GetLocationsResponse, error) {
+	return c.ScheduleServiceClient.GetLocations(ctx, req)
 }
 
-func (c *ScheduleClient) GetServiceById(ctx context.Context, req *api.GetServiceByIdRequest) (*api.ServiceType, error) {
-	return c.ScheduleServiceClient.GetServiceById(ctx, req)
+func (c *ScheduleClient) CreateLocation(ctx context.Context, req *api.CreateLocationRequest) (*api.Location, error) {
+	return c.ScheduleServiceClient.CreateLocation(ctx, req)
 }

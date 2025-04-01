@@ -16,9 +16,9 @@ func NewScheduleClientOptions(
 	return o
 }
 
-func WithServerAddr(opt string) OptScheduleClientOptionsSetter {
+func WithScheduleServerAddr(opt string) OptScheduleClientOptionsSetter {
 	return func(o *ScheduleClientOptions) {
-		o.ServerAddr = opt
+		o.ScheduleServerAddr = opt
 
 	}
 }
