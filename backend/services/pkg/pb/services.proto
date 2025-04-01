@@ -29,7 +29,6 @@ message GetServicesResponse {
   repeated ServiceType services = 1;
 }
 
-
 // Common messages
 
 message ServiceType {
