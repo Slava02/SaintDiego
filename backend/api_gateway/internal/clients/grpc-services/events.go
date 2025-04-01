@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	api "github.com/Slava02/SaintDiego/backend/events/pkg/pb"
+	api "github.com/Slava02/SaintDiego/backend/schedule/pkg/pb"
 )
 
 const (

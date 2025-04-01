@@ -2,7 +2,7 @@ package timeSlots
 
 import (
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
-	pb "github.com/Slava02/SaintDiego/backend/events/pkg/pb"
+	pb "github.com/Slava02/SaintDiego/backend/schedule/pkg/pb"
 )
 
 func convertPBTimeSlotToModel(pbTimeSlot *pb.TimeSlot) *models.TimeSlot {
