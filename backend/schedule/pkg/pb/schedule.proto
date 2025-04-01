@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package events;
+package schedule;
 
 option go_package = "github.com/Slava02/SaintDiego/backend/schedule/pkg/pb";
 
@@ -8,7 +8,7 @@ import "google/protobuf/timestamp.proto";
 
 
 // Service definition
-service EventService {
+service ScheduleService {
   // Time slots
   rpc GetTimeSlot(GetTimeSlotRequest) returns (TimeSlot) {}
   rpc GetTimeSlots(GetTimeSlotsRequest) returns (GetTimeSlotsResponse) {}
@@ -25,9 +25,6 @@ service EventService {
   // Services
   rpc GetServices(GetServicesRequest) returns (GetServicesResponse) {}
   rpc GetServiceById(GetServiceByIdRequest) returns (ServiceType) {}
-
-  // Events
-  rpc GetEvents(GetEventsRequest) returns (GetEventsResponse) {}
 }
 
 // Request messages
@@ -76,10 +73,6 @@ message GetServiceByIdRequest {
   int64 id = 1;
 }
 
-message GetEventsRequest {
-  string eventStatus = 1;
-}
-
 // Response messages
 message GetTimeSlotsResponse {
   repeated TimeSlot timeSlots = 1;
@@ -97,10 +90,6 @@ message GetLocationsResponse {
 
 message GetServicesResponse {
   repeated ServiceType services = 1;
-}
-
-message GetEventsResponse {
-  repeated Event events = 1;
 }
 
 
@@ -145,14 +134,6 @@ message ServiceType {
   string name = 2;
   string description = 3;
 }
-
-message Event {
-  int64 id = 1;
-  int64 timeSlotServiceId = 2;
-  google.protobuf.Timestamp datetime = 3;
-  int32 capacity = 4;
-}
-
 message Error {
   string code = 1;
   string message = 2;

@@ -27,7 +27,3 @@ type GetTimeSlotsReq struct {
 type UpdateTimeSlotReq struct {
 	TimeSlot models.TimeSlot `json:"timeSlot" validate:"required"`
 }
-
-type GetEventsReq struct {
-	EventStatus string `json:"eventStatus" validate:"required,oneof=current past"`
-}

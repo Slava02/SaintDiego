@@ -441,36 +441,9 @@ paths:
                 code: "NOT_FOUND"
                 message: "Временной слот не найден"
                 details: "Слот с ID 999 не существует"
-
-  /events/current:
+  /events:
     get:
       summary: Получение списка событий
-      description: Возвращает список событий, которые проходят в данный момент
-      responses:
-        "200":
-          description: Успешный ответ
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Event"
-        "401":
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "500":
-          description: Внутренняя ошибка сервера
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /events/past:
-    get:
-      summary: Получение списка событий
-      description: Возвращает список событий, которые прошли
       responses:
         "200":
           description: Успешный ответ

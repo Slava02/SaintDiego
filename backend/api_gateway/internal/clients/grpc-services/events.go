@@ -48,3 +48,27 @@ func NewEventsClient(opts EventsClientOptions) (*EventsClient, error) {
 func (c *EventsClient) Close() error {
 	return c.conn.Close()
 }
+
+func (c *EventsClient) CreateTimeSlot(ctx context.Context, req *api.CreateTimeSlotRequest) (*api.TimeSlot, error) {
+	return c.EventServiceClient.CreateTimeSlot(ctx, req)
+}
+
+func (c *EventsClient) GetTimeSlots(ctx context.Context, req *api.GetTimeSlotsRequest) (*api.GetTimeSlotsResponse, error) {
+	return c.EventServiceClient.GetTimeSlots(ctx, req)
+}
+
+func (c *EventsClient) GetTimeSlot(ctx context.Context, req *api.GetTimeSlotRequest) (*api.TimeSlot, error) {
+	return c.EventServiceClient.GetTimeSlot(ctx, req)
+}
+
+func (c *EventsClient) DeleteTimeSlot(ctx context.Context, req *api.DeleteTimeSlotRequest) (*api.DeleteTimeSlotResponse, error) {
+	return c.EventServiceClient.DeleteTimeSlot(ctx, req)
+}
+
+func (c *EventsClient) ActivateTimeSlot(ctx context.Context, req *api.ActivateTimeSlotRequest) (*api.TimeSlot, error) {
+	return c.EventServiceClient.ActivateTimeSlot(ctx, req)
+}
+
+func (c *EventsClient) ArchiveTimeSlot(ctx context.Context, req *api.ArchiveTimeSlotRequest) (*api.TimeSlot, error) {
+	return c.EventServiceClient.ArchiveTimeSlot(ctx, req)
+}

@@ -6,7 +6,6 @@ import (
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
 	pb "github.com/Slava02/SaintDiego/backend/schedule/pkg/pb"
-	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -30,14 +29,13 @@ func New(opts Options) (*UseCase, error) {
 }
 
 type IEventsClient interface {
-	CreateTimeSlot(ctx context.Context, req *pb.CreateTimeSlotRequest, opts ...grpc.CallOption) (*pb.TimeSlot, error)
-	GetTimeSlots(ctx context.Context, req *pb.GetTimeSlotsRequest, opts ...grpc.CallOption) (*pb.GetTimeSlotsResponse, error)
-	GetTimeSlot(ctx context.Context, req *pb.GetTimeSlotRequest, opts ...grpc.CallOption) (*pb.TimeSlot, error)
-	DeleteTimeSlot(ctx context.Context, req *pb.DeleteTimeSlotRequest, opts ...grpc.CallOption) (*pb.DeleteTimeSlotResponse, error)
-	ActivateTimeSlot(ctx context.Context, req *pb.ActivateTimeSlotRequest, opts ...grpc.CallOption) (*pb.TimeSlot, error)
-	ArchiveTimeSlot(ctx context.Context, req *pb.ArchiveTimeSlotRequest, opts ...grpc.CallOption) (*pb.TimeSlot, error)
-	UpdateTimeSlot(ctx context.Context, req *pb.TimeSlot, opts ...grpc.CallOption) (*pb.TimeSlot, error)
-	GetEvents(ctx context.Context, req *pb.GetEventsRequest, opts ...grpc.CallOption) (*pb.GetEventsResponse, error)
+	CreateTimeSlot(ctx context.Context, req *pb.CreateTimeSlotRequest) (*pb.TimeSlot, error)
+	GetTimeSlots(ctx context.Context, req *pb.GetTimeSlotsRequest) (*pb.GetTimeSlotsResponse, error)
+	GetTimeSlot(ctx context.Context, req *pb.GetTimeSlotRequest) (*pb.TimeSlot, error)
+	DeleteTimeSlot(ctx context.Context, req *pb.DeleteTimeSlotRequest) (*pb.DeleteTimeSlotResponse, error)
+	ActivateTimeSlot(ctx context.Context, req *pb.ActivateTimeSlotRequest) (*pb.TimeSlot, error)
+	ArchiveTimeSlot(ctx context.Context, req *pb.ArchiveTimeSlotRequest) (*pb.TimeSlot, error)
+	UpdateTimeSlot(ctx context.Context, req *pb.TimeSlot) (*pb.TimeSlot, error)
 }
 
 func (u UseCase) CreateTimeSlot(ctx context.Context, req *CreateTimeSlotReq) (*models.TimeSlot, error) {
@@ -191,17 +189,4 @@ func (u UseCase) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*mod
 	}
 
 	return convertPBTimeSlotToModel(pbTimeSlot), nil
-}
-
-func (u UseCase) GetEvents(ctx context.Context, req *GetEventsReq) ([]*models.Event, error) {
-	pbReq := &pb.GetEventsRequest{
-		EventStatus: req.EventStatus,
-	}
-
-	pbEvents, err := u.eventsClient.GetEvents(ctx, pbReq)
-	if err != nil {
-		return nil, fmt.Errorf("get events: %w", err)
-	}
-
-	return convertPBEventToModel(pbEvents), nil
 }
