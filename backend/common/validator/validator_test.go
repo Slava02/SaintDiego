@@ -5,9 +5,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/Slava02/SaintDiego/backend/common/validator"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/Slava02/SaintDiego/backend/api_gateway/pkg/validator"
 )
 
 type options struct {

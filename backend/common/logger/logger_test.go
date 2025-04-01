@@ -3,16 +3,15 @@ package logger_test
 import (
 	"time"
 
+	"github.com/Slava02/SaintDiego/backend/common/logger"
 	"go.uber.org/zap"
-
-	logger2 "github.com/Slava02/SaintDiego/backend/api_gateway/pkg/logger"
 )
 
 func ExampleInit() {
-	if err := logger2.Init(logger2.NewOptions(
+	if err := logger.Init(logger.NewOptions(
 		"error",
-		logger2.WithProductionMode(true),
-		logger2.WithClock(fakeClock{}),
+		logger.WithProductionMode(true),
+		logger.WithClock(fakeClock{}),
 	)); err != nil {
 		panic(err)
 	}
