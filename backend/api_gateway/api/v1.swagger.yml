@@ -148,8 +148,8 @@ paths:
                 id: 1
                 name: "Исповедь"
 
-    post:
-      summary: Добавление настроек для услуги
+    put:
+      summary: Добавление или изменение настроек для услуги
       parameters:
         - name: id
           in: path

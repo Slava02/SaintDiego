@@ -46,11 +46,17 @@ func (r *ServiceRepository) GetServiceById(ctx context.Context, id int64) (*mode
 }
 
 func (r *ServiceRepository) CreateServiceTypeSettings(ctx context.Context, req *models.ServiceTypeSettings) (*models.ServiceTypeSettings, error) {
-	serviceTypeSettings := &models.ServiceTypeSettings{}
+	serviceTypeSettings := &models.ServiceTypeSettings{
+		ServiceTypeID: req.ServiceTypeID,
+		PeriodDays:    req.PeriodDays,
+		UpdatedAt:     req.UpdatedAt,
+	}
 
-	err := r.db.Insert(ctx, serviceTypeSettings).
+	_, err := r.db.Insert(ctx, serviceTypeSettings).
 		Model(req).
-		Scan(ctx)
+		On("DUPLICATE KEY UPDATE").
+		Set("period_days = ?", req.PeriodDays).
+		Exec(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("insert service type settings: %w", err)
 	}

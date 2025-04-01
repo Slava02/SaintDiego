@@ -36,7 +36,6 @@ type Options struct {
 	serverAddr   string             `option:"mandatory" validate:"required,hostname_port"`
 	allowOrigins []string           `option:"mandatory" validate:"min=1"`
 	v1Swagger    *openapi3.T        `option:"mandatory" validate:"required"`
-	eventsAddr   string             `option:"mandatory" validate:"required,hostname_port"`
 	v1Handlers   v1.ServerInterface `option:"mandatory" validate:"required"`
 }
 

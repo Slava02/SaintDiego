@@ -45,4 +45,7 @@ type ServiceTypeSettings struct {
 	PeriodDays    int64     `bun:"period_days" json:"period_days"`
 	CreatedAt     time.Time `bun:"created_at" json:"created_at"`
 	UpdatedAt     time.Time `bun:"updated_at" json:"updated_at"`
+
+	// Relations
+	ServiceType *ServiceType `bun:"rel:belongs-to,join:service_type_id=id" json:"service_type,omitempty"`
 }

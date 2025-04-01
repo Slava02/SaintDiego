@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	api "github.com/Slava02/SaintDiego/backend/schedule/pkg/pb"
+	api "github.com/Slava02/SaintDiego/backend/services/pkg/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

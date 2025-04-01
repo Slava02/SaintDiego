@@ -15,7 +15,7 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -o main cmd/events/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o main cmd/schedule/main.go
 
 # Final stage
 FROM alpine:latest
@@ -36,4 +36,4 @@ RUN go install github.com/githubnemo/CompileDaemon@latest && \
 COPY . .
 
 # Use JSON format for ENTRYPOINT to handle signals properly
-ENTRYPOINT ["CompileDaemon", "--build=go build cmd/events/main.go", "--command=./main -config=configs/config.docker.toml"]
+ENTRYPOINT ["CompileDaemon", "--build=go build cmd/schedule/main.go", "--command=./main -config=configs/config.docker.toml"]

@@ -9,15 +9,15 @@ const (
 	connectionTimeout = 3 * time.Second
 )
 
-type Manager struct {
-	scheduleClient *ScheduleClient
-	servicesClient *ServicesClient
-}
-
 //go:generate options-gen -out-filename=manager_options.gen.go -from-struct=ManagerOptions
 type ManagerOptions struct {
 	ScheduleAddr string `option:"mandatory" validate:"required"`
 	ServicesAddr string `option:"mandatory" validate:"required"`
+}
+
+type Manager struct {
+	scheduleClient *ScheduleClient
+	servicesClient *ServicesClient
 }
 
 func NewManager(opts ManagerOptions) (*Manager, error) {

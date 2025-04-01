@@ -59,7 +59,8 @@ func run() (errReturned error) {
 		cfg.Servers.APIGW.Addr,
 		cfg.Servers.APIGW.AllowOrigins,
 		v1Swagger,
-		cfg.Services.Events.Addr,
+		cfg.Services.Schedule.Addr,
+		cfg.Services.Services.Addr,
 	)
 	if err != nil {
 		return fmt.Errorf("init server: %v", err)

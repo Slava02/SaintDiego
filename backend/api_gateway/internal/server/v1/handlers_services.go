@@ -34,7 +34,7 @@ func (h Handlers) GetServicesId(ctx echo.Context, id int64) error {
 	return ctx.JSON(http.StatusOK, service)
 }
 
-func (h Handlers) PostServicesId(ctx echo.Context, id int64) error {
+func (h Handlers) PutServicesId(ctx echo.Context, id int64) error {
 	req := &services.CreateServiceTypeSettingsReq{}
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())

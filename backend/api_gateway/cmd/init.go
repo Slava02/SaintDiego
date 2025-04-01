@@ -22,11 +22,12 @@ func initServer(
 	allowOrigins []string,
 	v1Swagger *openapi3.T,
 	scheduleAddr string,
+	servicesAddr string,
 ) (*server.Server, error) {
 	lg := zap.L().Named(nameServer)
 
 	// Create gRPC client manager
-	manager, err := grpc_services.NewManager(grpc_services.NewManagerOptions(scheduleAddr))
+	manager, err := grpc_services.NewManager(grpc_services.NewManagerOptions(scheduleAddr, servicesAddr))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create gRPC client manager: %v", err)
 	}
@@ -57,7 +58,6 @@ func initServer(
 		addr,
 		allowOrigins,
 		v1Swagger,
-		scheduleAddr,
 		v1Handlers,
 	))
 	if err != nil {

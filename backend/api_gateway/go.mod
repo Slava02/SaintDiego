@@ -5,7 +5,7 @@ go 1.23.3
 require (
 	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250401122927-51b33ebb2271
 	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250401122927-51b33ebb2271
-	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250401131444-05263e9c2d09
+	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250401135747-afb2b732acac
 	github.com/getkin/kin-openapi v0.131.0
 	github.com/kazhuravlev/options-gen v0.33.2
 	github.com/labstack/echo/v4 v4.13.3
@@ -51,7 +51,7 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/crypto v0.36.0 // indirect
-	golang.org/x/net v0.37.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/time v0.8.0 // indirect

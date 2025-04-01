@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	pb "github.com/Slava02/SaintDiego/backend/schedule/pkg/pb"
-	"google.golang.org/grpc"
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
 )
