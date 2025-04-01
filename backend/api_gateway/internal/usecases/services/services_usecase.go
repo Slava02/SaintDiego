@@ -69,7 +69,8 @@ func (u UseCase) GetServicesId(ctx context.Context, id int64) (*models.Service, 
 
 func (u UseCase) CreateServiceTypeSettings(ctx context.Context, req *CreateServiceTypeSettingsReq) (*models.ServiceTypeSettings, error) {
 	resp, err := u.servicesClient.CreateServiceTypeSettings(ctx, &pb.CreateServiceTypeSettingsRequest{
-		PeriodDays: req.PeriodDays,
+		PeriodDays:    req.PeriodDays,
+		ServiceTypeId: req.ServiceTypeId,
 	})
 	if err != nil {
 		return nil, err
