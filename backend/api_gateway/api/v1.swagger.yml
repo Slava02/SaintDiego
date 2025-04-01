@@ -554,13 +554,11 @@ components:
         startDate: "2024-03-20T18:00:00Z"
         endDate: "2024-03-20T19:00:00Z"
         services:
-          - timeSlotId: 1
-            serviceTypeId: 1
+          - serviceTypeId: 1
             capacity: 40
             bookingWindow: 30
             time: "2024-03-20T18:00:00Z"
-          - timeSlotId: 1
-            serviceTypeId: 2
+          - serviceTypeId: 2
             capacity: 60
             bookingWindow: 30
             time: "2024-03-20T18:30:00Z"

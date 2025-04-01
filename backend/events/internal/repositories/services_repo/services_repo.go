@@ -24,7 +24,7 @@ func NewServiceRepository(opts Options) *ServiceRepository {
 func (r *ServiceRepository) GetServices(ctx context.Context) ([]*models.ServiceType, error) {
 	var services []*models.ServiceType
 
-	err := r.db.Select(ctx, &services)
+	err := r.db.Select(ctx, &services).Scan(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("select services: %w", err)
 	}

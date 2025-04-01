@@ -154,6 +154,36 @@ func (_m *ITimeSlotsRepository) DeleteTimeSlotServicesByIds(ctx context.Context,
 	return r0
 }
 
+// GetCurrentEvents provides a mock function with given fields: ctx
+func (_m *ITimeSlotsRepository) GetCurrentEvents(ctx context.Context) ([]*models.Event, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCurrentEvents")
+	}
+
+	var r0 []*models.Event
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]*models.Event, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) []*models.Event); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.Event)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetEventsByServiceIds provides a mock function with given fields: ctx, serviceIds
 func (_m *ITimeSlotsRepository) GetEventsByServiceIds(ctx context.Context, serviceIds []int64) ([]*models.Event, error) {
 	ret := _m.Called(ctx, serviceIds)
@@ -177,6 +207,36 @@ func (_m *ITimeSlotsRepository) GetEventsByServiceIds(ctx context.Context, servi
 
 	if rf, ok := ret.Get(1).(func(context.Context, []int64) error); ok {
 		r1 = rf(ctx, serviceIds)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetPastEvents provides a mock function with given fields: ctx
+func (_m *ITimeSlotsRepository) GetPastEvents(ctx context.Context) ([]*models.Event, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPastEvents")
+	}
+
+	var r0 []*models.Event
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]*models.Event, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) []*models.Event); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.Event)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
 	} else {
 		r1 = ret.Error(1)
 	}

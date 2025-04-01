@@ -24,7 +24,7 @@ func NewLocationRepository(opts Options) *LocationRepository {
 func (r *LocationRepository) GetLocations(ctx context.Context) ([]*models.Location, error) {
 	var locations []*models.Location
 
-	err := r.db.Select(ctx, &locations)
+	err := r.db.Select(ctx, &locations).Scan(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("select locations: %w", err)
 	}
