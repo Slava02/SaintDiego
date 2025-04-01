@@ -21,28 +21,28 @@ func initServer(
 	addr string,
 	allowOrigins []string,
 	v1Swagger *openapi3.T,
-	eventsAddr string,
+	scheduleAddr string,
 ) (*server.Server, error) {
 	lg := zap.L().Named(nameServer)
 
 	// Create gRPC client manager
-	manager, err := grpc_services.NewManager(grpc_services.NewManagerOptions(eventsAddr))
+	manager, err := grpc_services.NewManager(grpc_services.NewManagerOptions(scheduleAddr))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create gRPC client manager: %v", err)
 	}
 	closer.Add(manager.Close)
 
-	timeSlotsUC, err := timeSlots.New(timeSlots.NewOptions(manager.Events()))
+	timeSlotsUC, err := timeSlots.New(timeSlots.NewOptions(manager.Schedule()))
 	if err != nil {
 		return nil, fmt.Errorf("create timeSlots usecase: %v", err)
 	}
 
-	servicesUC, err := services.New(services.NewOptions(manager.Events()))
+	servicesUC, err := services.New(services.NewOptions(manager.Schedule()))
 	if err != nil {
 		return nil, fmt.Errorf("create services usecase: %v", err)
 	}
 
-	locationsUC, err := locations.New(locations.NewOptions(manager.Events()))
+	locationsUC, err := locations.New(locations.NewOptions(manager.Schedule()))
 	if err != nil {
 		return nil, fmt.Errorf("create locations usecase: %v", err)
 	}
@@ -57,7 +57,7 @@ func initServer(
 		addr,
 		allowOrigins,
 		v1Swagger,
-		eventsAddr,
+		scheduleAddr,
 		v1Handlers,
 	))
 	if err != nil {

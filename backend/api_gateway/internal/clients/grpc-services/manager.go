@@ -5,36 +5,36 @@ import (
 )
 
 type Manager struct {
-	eventsClient *EventsClient
+	scheduleClient *ScheduleClient
 }
 
 //go:generate options-gen -out-filename=manager_options.gen.go -from-struct=ManagerOptions
 type ManagerOptions struct {
-	EventsAddr string `option:"mandatory" validate:"required"`
+	ScheduleAddr string `option:"mandatory" validate:"required"`
 }
 
 func NewManager(opts ManagerOptions) (*Manager, error) {
-	eventsClient, err := NewEventsClient(EventsClientOptions{
-		ServerAddr: opts.EventsAddr,
+	scheduleClient, err := NewScheduleClient(ScheduleClientOptions{
+		ServerAddr: opts.ScheduleAddr,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to create events client: %w", err)
+		return nil, fmt.Errorf("failed to create schedule client: %w", err)
 	}
 
 	return &Manager{
-		eventsClient: eventsClient,
+		scheduleClient: scheduleClient,
 	}, nil
 }
 
 // Close closes all client connections
 func (m *Manager) Close() error {
-	if err := m.eventsClient.Close(); err != nil {
-		return fmt.Errorf("failed to close events client: %w", err)
+	if err := m.scheduleClient.Close(); err != nil {
+		return fmt.Errorf("failed to close schedule client: %w", err)
 	}
 	return nil
 }
 
-// Events returns the events service client
-func (m *Manager) Events() *EventsClient {
-	return m.eventsClient
+// Schedule returns the schedule service client
+func (m *Manager) Schedule() *ScheduleClient {
+	return m.scheduleClient
 }

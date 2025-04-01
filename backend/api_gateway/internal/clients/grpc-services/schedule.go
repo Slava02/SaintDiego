@@ -15,14 +15,14 @@ const (
 	connectionTimeout = 3 * time.Second
 )
 
-//go:generate options-gen -out-filename=Schedule_options.gen.go -from-struct=ScheduleClientOptions
+//go:generate options-gen -out-filename=schedule_options.gen.go -from-struct=ScheduleClientOptions
 type ScheduleClientOptions struct {
 	ServerAddr string
 }
 
 type ScheduleClient struct {
 	conn *grpc.ClientConn
-	api.
+	api.ScheduleServiceClient
 }
 
 func NewScheduleClient(opts ScheduleClientOptions) (*ScheduleClient, error) {
@@ -40,7 +40,7 @@ func NewScheduleClient(opts ScheduleClientOptions) (*ScheduleClient, error) {
 
 	return &ScheduleClient{
 		conn,
-		api.NewScheduleerviceClient(conn),
+		api.NewScheduleServiceClient(conn),
 	}, nil
 }
 
@@ -50,25 +50,29 @@ func (c *ScheduleClient) Close() error {
 }
 
 func (c *ScheduleClient) CreateTimeSlot(ctx context.Context, req *api.CreateTimeSlotRequest) (*api.TimeSlot, error) {
-	return c.ScheduleerviceClient.CreateTimeSlot(ctx, req)
+	return c.ScheduleServiceClient.CreateTimeSlot(ctx, req)
 }
 
 func (c *ScheduleClient) GetTimeSlots(ctx context.Context, req *api.GetTimeSlotsRequest) (*api.GetTimeSlotsResponse, error) {
-	return c.ScheduleerviceClient.GetTimeSlots(ctx, req)
+	return c.ScheduleServiceClient.GetTimeSlots(ctx, req)
 }
 
 func (c *ScheduleClient) GetTimeSlot(ctx context.Context, req *api.GetTimeSlotRequest) (*api.TimeSlot, error) {
-	return c.ScheduleerviceClient.GetTimeSlot(ctx, req)
+	return c.ScheduleServiceClient.GetTimeSlot(ctx, req)
 }
 
 func (c *ScheduleClient) DeleteTimeSlot(ctx context.Context, req *api.DeleteTimeSlotRequest) (*api.DeleteTimeSlotResponse, error) {
-	return c.ScheduleerviceClient.DeleteTimeSlot(ctx, req)
+	return c.ScheduleServiceClient.DeleteTimeSlot(ctx, req)
 }
 
 func (c *ScheduleClient) ActivateTimeSlot(ctx context.Context, req *api.ActivateTimeSlotRequest) (*api.TimeSlot, error) {
-	return c.ScheduleerviceClient.ActivateTimeSlot(ctx, req)
+	return c.ScheduleServiceClient.ActivateTimeSlot(ctx, req)
 }
 
 func (c *ScheduleClient) ArchiveTimeSlot(ctx context.Context, req *api.ArchiveTimeSlotRequest) (*api.TimeSlot, error) {
-	return c.ScheduleerviceClient.ArchiveTimeSlot(ctx, req)
+	return c.ScheduleServiceClient.ArchiveTimeSlot(ctx, req)
+}
+
+func (c *ScheduleClient) UpdateTimeSlot(ctx context.Context, req *api.TimeSlot) (*api.TimeSlot, error) {
+	return c.ScheduleServiceClient.UpdateTimeSlot(ctx, req)
 }

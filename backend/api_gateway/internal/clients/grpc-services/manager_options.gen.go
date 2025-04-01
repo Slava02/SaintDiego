@@ -11,14 +11,14 @@ import (
 type OptManagerOptionsSetter func(o *ManagerOptions)
 
 func NewManagerOptions(
-	EventsAddr string,
+	ScheduleAddr string,
 	options ...OptManagerOptionsSetter,
 ) ManagerOptions {
 	o := ManagerOptions{}
 
 	// Setting defaults from field tag (if present)
 
-	o.EventsAddr = EventsAddr
+	o.ScheduleAddr = ScheduleAddr
 
 	for _, opt := range options {
 		opt(&o)
@@ -28,13 +28,13 @@ func NewManagerOptions(
 
 func (o *ManagerOptions) Validate() error {
 	errs := new(errors461e464ebed9.ValidationErrors)
-	errs.Add(errors461e464ebed9.NewValidationError("EventsAddr", _validate_ManagerOptions_EventsAddr(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("ScheduleAddr", _validate_ManagerOptions_ScheduleAddr(o)))
 	return errs.AsError()
 }
 
-func _validate_ManagerOptions_EventsAddr(o *ManagerOptions) error {
-	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.EventsAddr, "required"); err != nil {
-		return fmt461e464ebed9.Errorf("field `EventsAddr` did not pass the test: %w", err)
+func _validate_ManagerOptions_ScheduleAddr(o *ManagerOptions) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.ScheduleAddr, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `ScheduleAddr` did not pass the test: %w", err)
 	}
 	return nil
 }
