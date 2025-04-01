@@ -18,7 +18,6 @@ type ITimeSlotsUC interface {
 	ActivateTimeSlot(ctx context.Context, id int64) error
 	ArchiveTimeSlot(ctx context.Context, id int64) error
 	UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*models.TimeSlot, error)
-	AddServiceToTimeSlot(ctx context.Context, id int64, req *timeSlots.CreateTimeSlotServiceReq) (*models.TimeSlotService, error)
 	GetEvents(ctx context.Context, req *timeSlots.GetEventsReq) ([]*models.Event, error)
 }
 

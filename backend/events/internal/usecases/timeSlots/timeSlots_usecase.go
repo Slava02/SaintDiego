@@ -23,7 +23,8 @@ type ITimeSlotsRepository interface {
 	CreateTimeSlotServices(ctx context.Context, id int64, req []*models.TimeSlotService) ([]*models.TimeSlotService, error)
 	DeleteEventsByServiceIds(ctx context.Context, serviceIds []int64) error
 	GetEventsByServiceIds(ctx context.Context, serviceIds []int64) ([]*models.Event, error)
-	GetEvents(ctx context.Context, status string) ([]*models.Event, error)
+	GetCurrentEvents(ctx context.Context) ([]*models.Event, error)
+	GetPastEvents(ctx context.Context) ([]*models.Event, error)
 }
 
 type Transactor interface {
@@ -227,7 +228,13 @@ func (u UseCase) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*mod
 }
 
 func (u UseCase) GetEvents(ctx context.Context, req *GetEventsReq) ([]*models.Event, error) {
-	return u.timeSlotsRepository.GetEvents(ctx, req.EventStatus)
+	switch req.EventStatus {
+	case "current":
+		return u.timeSlotsRepository.GetCurrentEvents(ctx)
+	case "past":
+		return u.timeSlotsRepository.GetPastEvents(ctx)
+	}
+	return nil, fmt.Errorf("invalid event status: %s", req.EventStatus)
 }
 
 func recurrenceChanged(existingTimeSlot *models.TimeSlot, newTimeSlot *models.TimeSlot) bool {

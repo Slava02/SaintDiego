@@ -33,8 +33,13 @@ go.work.sum
 
 ## internals
 backend/api_gateway/configs/config.toml
+backend/api_gateway/configs/config.docker.toml
 backend/events/configs/config.toml
+backend/events/configs/config.docker.toml
 backend/vendor/
+
+db/configs/config.toml
+db/configs/config.docker.toml
 
 ## frontend
 frontend/saintEgidio/node_modules/

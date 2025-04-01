@@ -3,7 +3,7 @@ module github.com/Slava02/SaintDiego/backend/api_gateway
 go 1.23.3
 
 require (
-	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250329145324-38d8faa44e9c
+	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250331123426-dd955a7b55d6
 	github.com/getkin/kin-openapi v0.131.0
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/kazhuravlev/options-gen v0.33.2
