@@ -16,7 +16,7 @@ type OptOptionsSetter func(o *Options)
 func NewOptions(
 	Lg *zap.Logger,
 	ServerConfig *config.ServerConfig,
-	EventService pb.EventServiceServer,
+	ScheduleService pb.ScheduleServiceServer,
 	options ...OptOptionsSetter,
 ) Options {
 	o := Options{}
@@ -28,7 +28,7 @@ func NewOptions(
 
 	o.ServerConfig = ServerConfig
 
-	o.EventService = EventService
+	o.ScheduleService = ScheduleService
 
 	for _, opt := range options {
 		opt(&o)
@@ -47,7 +47,7 @@ func (o *Options) Validate() error {
 	errs := new(errors461e464ebed9.ValidationErrors)
 	errs.Add(errors461e464ebed9.NewValidationError("Lg", _validate_Options_Lg(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("ServerConfig", _validate_Options_ServerConfig(o)))
-	errs.Add(errors461e464ebed9.NewValidationError("EventService", _validate_Options_EventService(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("ScheduleService", _validate_Options_ScheduleService(o)))
 	return errs.AsError()
 }
 
@@ -65,9 +65,9 @@ func _validate_Options_ServerConfig(o *Options) error {
 	return nil
 }
 
-func _validate_Options_EventService(o *Options) error {
-	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.EventService, "required"); err != nil {
-		return fmt461e464ebed9.Errorf("field `EventService` did not pass the test: %w", err)
+func _validate_Options_ScheduleService(o *Options) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.ScheduleService, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `ScheduleService` did not pass the test: %w", err)
 	}
 	return nil
 }

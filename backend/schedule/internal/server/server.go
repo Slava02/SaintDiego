@@ -23,18 +23,18 @@ import (
 
 //go:generate options-gen -out-filename=server_options.gen.go -from-struct=Options
 type Options struct {
-	Lg           *zap.Logger           `option:"mandatory" validate:"required"`
-	ServerConfig *config.ServerConfig  `option:"mandatory" validate:"required"`
-	Production   bool                  `option:"optional" default:"false"`
-	EventService pb.EventServiceServer `option:"mandatory" validate:"required"`
+	Lg              *zap.Logger              `option:"mandatory" validate:"required"`
+	ServerConfig    *config.ServerConfig     `option:"mandatory" validate:"required"`
+	Production      bool                     `option:"optional" default:"false"`
+	ScheduleService pb.ScheduleServiceServer `option:"mandatory" validate:"required"`
 }
 
 type Server struct {
-	lg           *zap.Logger
-	srv          *grpc.Server
-	production   bool
-	addr         string
-	EventService pb.EventServiceServer
+	lg              *zap.Logger
+	srv             *grpc.Server
+	production      bool
+	addr            string
+	ScheduleService pb.ScheduleServiceServer
 }
 
 func New(opts Options) (*Server, error) {
@@ -58,18 +58,18 @@ func New(opts Options) (*Server, error) {
 	)
 
 	return &Server{
-		lg:           opts.Lg,
-		srv:          srv,
-		production:   opts.Production,
-		addr:         opts.ServerConfig.Addr,
-		EventService: opts.EventService,
+		lg:              opts.Lg,
+		srv:             srv,
+		production:      opts.Production,
+		addr:            opts.ServerConfig.Addr,
+		ScheduleService: opts.ScheduleService,
 	}, nil
 }
 
 func (s *Server) Run(ctx context.Context) error {
 	defer closer.CloseAll()
 
-	pb.RegisterEventServiceServer(s.srv, s.EventService)
+	pb.RegisterScheduleServiceServer(s.srv, s.ScheduleService)
 
 	l, err := net.Listen("tcp", s.addr)
 	if err != nil {

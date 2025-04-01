@@ -14,7 +14,7 @@ type Options struct {
 }
 
 type Implementation struct {
-	pb.UnimplementedEventServiceServer
+	pb.UnimplementedScheduleServiceServer
 	timeSlotUC  ITimeSlotsUC
 	locationsUC ILocationsUC
 	servicesUC  IServicesUC

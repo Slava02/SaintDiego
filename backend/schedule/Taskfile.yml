@@ -20,7 +20,8 @@ vars:
     github.com/kazhuravlev/options-gen/cmd/options-gen@v0.33.1
     mvdan.cc/gofumpt@v0.7.0
     github.com/vektra/mockery/v2@v2.53.3
-    github.com/stretchr/testify/mock@latest
+    github.com/stretchr/testify/mock@v1.10.0
+    google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
 
   DOCKER_COMPOSE_PATHS: |
     ./deploy/local/docker-compose.yml

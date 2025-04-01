@@ -24,7 +24,6 @@ type ITimeSlotsUC interface {
 	ActivateTimeSlot(ctx context.Context, id int64) error
 	ArchiveTimeSlot(ctx context.Context, id int64) error
 	UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*models.TimeSlot, error)
-	GetEvents(ctx context.Context, req *timeSlots.GetEventsReq) ([]*models.Event, error)
 }
 
 func (i *Implementation) GetTimeSlot(ctx context.Context, req *pb.GetTimeSlotRequest) (*pb.TimeSlot, error) {
@@ -164,22 +163,6 @@ func (i *Implementation) ActivateTimeSlot(ctx context.Context, req *pb.ActivateT
 	return convertModelTimeSlotToPB(timeSlot), nil
 }
 
-func (i *Implementation) GetEvents(ctx context.Context, req *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "GetEvents")
-	defer span.Finish()
-
-	events, err := i.timeSlotUC.GetEvents(ctx, &timeSlots.GetEventsReq{
-		EventStatus: req.EventStatus,
-	})
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get events: %v", err)
-	}
-
-	return &pb.GetEventsResponse{
-		Events: convertModelEventsToPBEvents(events),
-	}, nil
-}
-
 // Helper functions for converting between models and protobuf messages
 func convertModelTimeSlotToPB(timeSlot *models.TimeSlot) *pb.TimeSlot {
 	if timeSlot == nil {
@@ -262,22 +245,4 @@ func convertModelRecurrenceToPBRecurrence(recurrence *models.TimeSlotRecurrence)
 		EndType:   recurrence.EndType,
 		EndValue:  timestamppb.New(recurrence.EndValue),
 	}
-}
-
-func convertModelEventsToPBEvents(events []*models.Event) []*pb.Event {
-	if events == nil {
-		return nil
-	}
-
-	pbEvents := make([]*pb.Event, len(events))
-	for i, event := range events {
-		pbEvents[i] = &pb.Event{
-			Id:                event.ID,
-			TimeSlotServiceId: event.TimeSlotServiceID,
-			Datetime:          timestamppb.New(event.DateTime),
-			Capacity:          event.Capacity,
-		}
-	}
-
-	return pbEvents
 }

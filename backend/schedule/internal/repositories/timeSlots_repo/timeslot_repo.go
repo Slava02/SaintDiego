@@ -325,25 +325,3 @@ func (r *TimeSlotRepository) InsertUpdateEvents(ctx context.Context, events []*m
 	}
 	return nil
 }
-
-func (r *TimeSlotRepository) GetCurrentEvents(ctx context.Context) ([]*models.Event, error) {
-	var events []*models.Event
-	err := r.db.Select(ctx, &events).
-		Where("datetime >= ?", time.Now()).
-		Scan(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("select current events: %w", err)
-	}
-	return events, nil
-}
-
-func (r *TimeSlotRepository) GetPastEvents(ctx context.Context) ([]*models.Event, error) {
-	var events []*models.Event
-	err := r.db.Select(ctx, &events).
-		Where("datetime < ?", time.Now()).
-		Scan(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("select past events: %w", err)
-	}
-	return events, nil
-}
