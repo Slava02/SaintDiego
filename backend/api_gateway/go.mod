@@ -3,9 +3,9 @@ module github.com/Slava02/SaintDiego/backend/api_gateway
 go 1.23.3
 
 require (
+	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250401094425-299e0a46c792
 	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250331123426-dd955a7b55d6
 	github.com/getkin/kin-openapi v0.131.0
-	github.com/go-playground/validator/v10 v10.25.0
 	github.com/kazhuravlev/options-gen v0.33.2
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/oapi-codegen/echo-middleware v1.0.2
@@ -13,7 +13,6 @@ require (
 	github.com/opentracing-contrib/echo v0.1.0
 	github.com/pelletier/go-toml v1.9.5
 	github.com/stretchr/testify v1.10.0
-	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	go.uber.org/zap v1.27.0
 	golang.org/x/sync v0.12.0
 	google.golang.org/grpc v1.71.0
@@ -29,6 +28,7 @@ require (
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/go-playground/validator/v10 v10.26.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
@@ -44,6 +44,7 @@ require (
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/uber/jaeger-client-go v2.30.0+incompatible // indirect
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/Slava02/SaintDiego/backend/api_gateway/pkg/closer"
+	"github.com/Slava02/SaintDiego/backend/common/closer"
 	"github.com/getkin/kin-openapi/openapi3"
 	"go.uber.org/zap"
 

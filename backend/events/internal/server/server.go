@@ -8,9 +8,9 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/Slava02/SaintDiego/backend/common/closer"
 	"github.com/Slava02/SaintDiego/backend/events/internal/config"
 	"github.com/Slava02/SaintDiego/backend/events/internal/interceptors"
-	"github.com/Slava02/SaintDiego/backend/events/pkg/closer"
 	"github.com/Slava02/SaintDiego/backend/events/pkg/pb"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"

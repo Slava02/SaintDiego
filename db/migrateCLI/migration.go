@@ -15,9 +15,9 @@ import (
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 
+	"github.com/Slava02/SaintDiego/backend/common/logger"
 	"github.com/Slava02/SaintDiego/db/configs"
 	"github.com/Slava02/SaintDiego/db/migrations"
-	"github.com/Slava02/SaintDiego/db/pkg/logger"
 
 	_ "github.com/go-sql-driver/mysql"
 )

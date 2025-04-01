@@ -14,8 +14,8 @@ import (
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/config"
 	v1 "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1"
-	logger "github.com/Slava02/SaintDiego/backend/api_gateway/pkg/logger"
-	"github.com/Slava02/SaintDiego/backend/api_gateway/pkg/tracing"
+	logger "github.com/Slava02/SaintDiego/backend/common/logger"
+	"github.com/Slava02/SaintDiego/backend/common/tracing"
 )
 
 const nameMain = "main"

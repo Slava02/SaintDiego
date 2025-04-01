@@ -9,7 +9,7 @@ import (
 
 	oapimdlwr "github.com/oapi-codegen/echo-middleware"
 
-	"github.com/Slava02/SaintDiego/backend/api_gateway/pkg/closer"
+	"github.com/Slava02/SaintDiego/backend/common/closer"
 	"github.com/labstack/echo/v4"
 
 	"github.com/getkin/kin-openapi/openapi3"

@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/Slava02/SaintDiego/backend/events/pkg/validator"
+	"github.com/Slava02/SaintDiego/backend/common/validator"
 	"github.com/pelletier/go-toml"
 )
 

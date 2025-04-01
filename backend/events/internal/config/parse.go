@@ -7,7 +7,7 @@ import (
 
 	"github.com/pelletier/go-toml"
 
-	"github.com/Slava02/SaintDiego/backend/api_gateway/pkg/validator"
+	"github.com/Slava02/SaintDiego/backend/common/validator"
 )
 
 func ParseAndValidate(filename string) (Config, error) {
