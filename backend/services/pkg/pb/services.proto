@@ -5,7 +5,7 @@ package services;
 option go_package = "github.com/Slava02/SaintDiego/backend/services/pkg/pb";
 
 // Service definition
-service ScheduleService {
+service ServicesService {
 
   // Services
   rpc GetServices(GetServicesRequest) returns (GetServicesResponse) {}

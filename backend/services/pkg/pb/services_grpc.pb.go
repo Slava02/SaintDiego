@@ -19,183 +19,183 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ScheduleService_GetServices_FullMethodName               = "/services.ScheduleService/GetServices"
-	ScheduleService_GetServiceById_FullMethodName            = "/services.ScheduleService/GetServiceById"
-	ScheduleService_CreateServiceTypeSettings_FullMethodName = "/services.ScheduleService/CreateServiceTypeSettings"
+	ServicesService_GetServices_FullMethodName               = "/services.ServicesService/GetServices"
+	ServicesService_GetServiceById_FullMethodName            = "/services.ServicesService/GetServiceById"
+	ServicesService_CreateServiceTypeSettings_FullMethodName = "/services.ServicesService/CreateServiceTypeSettings"
 )
 
-// ScheduleServiceClient is the client API for ScheduleService service.
+// ServicesServiceClient is the client API for ServicesService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // Service definition
-type ScheduleServiceClient interface {
+type ServicesServiceClient interface {
 	// Services
 	GetServices(ctx context.Context, in *GetServicesRequest, opts ...grpc.CallOption) (*GetServicesResponse, error)
 	GetServiceById(ctx context.Context, in *GetServiceByIdRequest, opts ...grpc.CallOption) (*ServiceType, error)
 	CreateServiceTypeSettings(ctx context.Context, in *CreateServiceTypeSettingsRequest, opts ...grpc.CallOption) (*ServiceTypeSettings, error)
 }
 
-type scheduleServiceClient struct {
+type servicesServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewScheduleServiceClient(cc grpc.ClientConnInterface) ScheduleServiceClient {
-	return &scheduleServiceClient{cc}
+func NewServicesServiceClient(cc grpc.ClientConnInterface) ServicesServiceClient {
+	return &servicesServiceClient{cc}
 }
 
-func (c *scheduleServiceClient) GetServices(ctx context.Context, in *GetServicesRequest, opts ...grpc.CallOption) (*GetServicesResponse, error) {
+func (c *servicesServiceClient) GetServices(ctx context.Context, in *GetServicesRequest, opts ...grpc.CallOption) (*GetServicesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetServicesResponse)
-	err := c.cc.Invoke(ctx, ScheduleService_GetServices_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ServicesService_GetServices_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *scheduleServiceClient) GetServiceById(ctx context.Context, in *GetServiceByIdRequest, opts ...grpc.CallOption) (*ServiceType, error) {
+func (c *servicesServiceClient) GetServiceById(ctx context.Context, in *GetServiceByIdRequest, opts ...grpc.CallOption) (*ServiceType, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ServiceType)
-	err := c.cc.Invoke(ctx, ScheduleService_GetServiceById_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ServicesService_GetServiceById_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *scheduleServiceClient) CreateServiceTypeSettings(ctx context.Context, in *CreateServiceTypeSettingsRequest, opts ...grpc.CallOption) (*ServiceTypeSettings, error) {
+func (c *servicesServiceClient) CreateServiceTypeSettings(ctx context.Context, in *CreateServiceTypeSettingsRequest, opts ...grpc.CallOption) (*ServiceTypeSettings, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ServiceTypeSettings)
-	err := c.cc.Invoke(ctx, ScheduleService_CreateServiceTypeSettings_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ServicesService_CreateServiceTypeSettings_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ScheduleServiceServer is the server API for ScheduleService service.
-// All implementations must embed UnimplementedScheduleServiceServer
+// ServicesServiceServer is the server API for ServicesService service.
+// All implementations must embed UnimplementedServicesServiceServer
 // for forward compatibility.
 //
 // Service definition
-type ScheduleServiceServer interface {
+type ServicesServiceServer interface {
 	// Services
 	GetServices(context.Context, *GetServicesRequest) (*GetServicesResponse, error)
 	GetServiceById(context.Context, *GetServiceByIdRequest) (*ServiceType, error)
 	CreateServiceTypeSettings(context.Context, *CreateServiceTypeSettingsRequest) (*ServiceTypeSettings, error)
-	mustEmbedUnimplementedScheduleServiceServer()
+	mustEmbedUnimplementedServicesServiceServer()
 }
 
-// UnimplementedScheduleServiceServer must be embedded to have
+// UnimplementedServicesServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedScheduleServiceServer struct{}
+type UnimplementedServicesServiceServer struct{}
 
-func (UnimplementedScheduleServiceServer) GetServices(context.Context, *GetServicesRequest) (*GetServicesResponse, error) {
+func (UnimplementedServicesServiceServer) GetServices(context.Context, *GetServicesRequest) (*GetServicesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetServices not implemented")
 }
-func (UnimplementedScheduleServiceServer) GetServiceById(context.Context, *GetServiceByIdRequest) (*ServiceType, error) {
+func (UnimplementedServicesServiceServer) GetServiceById(context.Context, *GetServiceByIdRequest) (*ServiceType, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetServiceById not implemented")
 }
-func (UnimplementedScheduleServiceServer) CreateServiceTypeSettings(context.Context, *CreateServiceTypeSettingsRequest) (*ServiceTypeSettings, error) {
+func (UnimplementedServicesServiceServer) CreateServiceTypeSettings(context.Context, *CreateServiceTypeSettingsRequest) (*ServiceTypeSettings, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateServiceTypeSettings not implemented")
 }
-func (UnimplementedScheduleServiceServer) mustEmbedUnimplementedScheduleServiceServer() {}
-func (UnimplementedScheduleServiceServer) testEmbeddedByValue()                         {}
+func (UnimplementedServicesServiceServer) mustEmbedUnimplementedServicesServiceServer() {}
+func (UnimplementedServicesServiceServer) testEmbeddedByValue()                         {}
 
-// UnsafeScheduleServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ScheduleServiceServer will
+// UnsafeServicesServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ServicesServiceServer will
 // result in compilation errors.
-type UnsafeScheduleServiceServer interface {
-	mustEmbedUnimplementedScheduleServiceServer()
+type UnsafeServicesServiceServer interface {
+	mustEmbedUnimplementedServicesServiceServer()
 }
 
-func RegisterScheduleServiceServer(s grpc.ServiceRegistrar, srv ScheduleServiceServer) {
-	// If the following call pancis, it indicates UnimplementedScheduleServiceServer was
+func RegisterServicesServiceServer(s grpc.ServiceRegistrar, srv ServicesServiceServer) {
+	// If the following call pancis, it indicates UnimplementedServicesServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&ScheduleService_ServiceDesc, srv)
+	s.RegisterService(&ServicesService_ServiceDesc, srv)
 }
 
-func _ScheduleService_GetServices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ServicesService_GetServices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetServicesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ScheduleServiceServer).GetServices(ctx, in)
+		return srv.(ServicesServiceServer).GetServices(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ScheduleService_GetServices_FullMethodName,
+		FullMethod: ServicesService_GetServices_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ScheduleServiceServer).GetServices(ctx, req.(*GetServicesRequest))
+		return srv.(ServicesServiceServer).GetServices(ctx, req.(*GetServicesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ScheduleService_GetServiceById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ServicesService_GetServiceById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetServiceByIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ScheduleServiceServer).GetServiceById(ctx, in)
+		return srv.(ServicesServiceServer).GetServiceById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ScheduleService_GetServiceById_FullMethodName,
+		FullMethod: ServicesService_GetServiceById_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ScheduleServiceServer).GetServiceById(ctx, req.(*GetServiceByIdRequest))
+		return srv.(ServicesServiceServer).GetServiceById(ctx, req.(*GetServiceByIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ScheduleService_CreateServiceTypeSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ServicesService_CreateServiceTypeSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateServiceTypeSettingsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ScheduleServiceServer).CreateServiceTypeSettings(ctx, in)
+		return srv.(ServicesServiceServer).CreateServiceTypeSettings(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ScheduleService_CreateServiceTypeSettings_FullMethodName,
+		FullMethod: ServicesService_CreateServiceTypeSettings_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ScheduleServiceServer).CreateServiceTypeSettings(ctx, req.(*CreateServiceTypeSettingsRequest))
+		return srv.(ServicesServiceServer).CreateServiceTypeSettings(ctx, req.(*CreateServiceTypeSettingsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// ScheduleService_ServiceDesc is the grpc.ServiceDesc for ScheduleService service.
+// ServicesService_ServiceDesc is the grpc.ServiceDesc for ServicesService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ScheduleService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "services.ScheduleService",
-	HandlerType: (*ScheduleServiceServer)(nil),
+var ServicesService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "services.ServicesService",
+	HandlerType: (*ServicesServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetServices",
-			Handler:    _ScheduleService_GetServices_Handler,
+			Handler:    _ServicesService_GetServices_Handler,
 		},
 		{
 			MethodName: "GetServiceById",
-			Handler:    _ScheduleService_GetServiceById_Handler,
+			Handler:    _ServicesService_GetServiceById_Handler,
 		},
 		{
 			MethodName: "CreateServiceTypeSettings",
-			Handler:    _ScheduleService_CreateServiceTypeSettings_Handler,
+			Handler:    _ServicesService_CreateServiceTypeSettings_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
