@@ -3,8 +3,8 @@ module github.com/Slava02/SaintDiego/backend/api_gateway
 go 1.23.3
 
 require (
-	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250401094425-299e0a46c792
-	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250331123426-dd955a7b55d6
+	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250401095744-2dfad9d50075
+	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250401111913-0958237f111b
 	github.com/getkin/kin-openapi v0.131.0
 	github.com/kazhuravlev/options-gen v0.33.2
 	github.com/labstack/echo/v4 v4.13.3
@@ -15,12 +15,11 @@ require (
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/sync v0.12.0
-	google.golang.org/grpc v1.71.0
+	google.golang.org/grpc v1.71.1
 	google.golang.org/protobuf v1.36.6
 )
 
 require (
-	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
@@ -55,6 +54,6 @@ require (
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250324211829-b45e905df463 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
