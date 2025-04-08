@@ -13,7 +13,6 @@ type OptOptionsSetter func(o *Options)
 func NewOptions(
 	timeSlotUC ITimeSlotsUC,
 	locationsUC ILocationsUC,
-	servicesUC IServicesUC,
 	options ...OptOptionsSetter,
 ) Options {
 	o := Options{}
@@ -23,8 +22,6 @@ func NewOptions(
 	o.timeSlotUC = timeSlotUC
 
 	o.locationsUC = locationsUC
-
-	o.servicesUC = servicesUC
 
 	for _, opt := range options {
 		opt(&o)
@@ -36,7 +33,6 @@ func (o *Options) Validate() error {
 	errs := new(errors461e464ebed9.ValidationErrors)
 	errs.Add(errors461e464ebed9.NewValidationError("timeSlotUC", _validate_Options_timeSlotUC(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("locationsUC", _validate_Options_locationsUC(o)))
-	errs.Add(errors461e464ebed9.NewValidationError("servicesUC", _validate_Options_servicesUC(o)))
 	return errs.AsError()
 }
 
@@ -50,13 +46,6 @@ func _validate_Options_timeSlotUC(o *Options) error {
 func _validate_Options_locationsUC(o *Options) error {
 	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.locationsUC, "required"); err != nil {
 		return fmt461e464ebed9.Errorf("field `locationsUC` did not pass the test: %w", err)
-	}
-	return nil
-}
-
-func _validate_Options_servicesUC(o *Options) error {
-	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.servicesUC, "required"); err != nil {
-		return fmt461e464ebed9.Errorf("field `servicesUC` did not pass the test: %w", err)
 	}
 	return nil
 }

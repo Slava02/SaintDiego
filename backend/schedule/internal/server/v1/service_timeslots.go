@@ -191,12 +191,12 @@ func convertPBServicesToModel(services []*pb.TimeSlotService, timeSlotID int64) 
 	modelServices := make([]*models.TimeSlotService, len(services))
 	for i, service := range services {
 		modelServices[i] = &models.TimeSlotService{
-			TimeSlotID:    timeSlotID,
-			ID:            service.Id,
-			ServiceTypeID: service.ServiceTypeId,
-			Capacity:      service.Capacity,
-			BookingWindow: service.BookingWindow,
-			Time:          service.Time.AsTime(),
+			TimeSlotID:            timeSlotID,
+			ID:                    service.Id,
+			ServiceRegistrationID: service.ServiceTypeId,
+			Capacity:              service.Capacity,
+			BookingWindow:         service.BookingWindow,
+			Time:                  service.Time.AsTime(),
 		}
 	}
 	return modelServices
@@ -211,7 +211,7 @@ func convertModelServicesToPBServices(services []*models.TimeSlotService) []*pb.
 	for i, service := range services {
 		pbServices[i] = &pb.TimeSlotService{
 			Id:            service.ID,
-			ServiceTypeId: service.ServiceTypeID,
+			ServiceTypeId: service.ServiceRegistrationID,
 			Capacity:      service.Capacity,
 			BookingWindow: service.BookingWindow,
 			Time:          timestamppb.New(service.Time),

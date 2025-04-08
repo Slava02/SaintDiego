@@ -1,0 +1,213 @@
+Project SaintEgidio {
+  database_type: 'MySQL'
+}
+
+// ВСЕ, ЧТО КАСАЕТСЯ ТАЙМ-СЛОТОВ:
+Table time_slot {
+  Note: 'Информация о тайм-слотах'
+
+  id int [pk, increment]
+  title varchar(255) [not null]
+  type enum('single', 'recurring') [not null]
+  location_id int [not null]
+  capacity int [not null]
+  start_date datetime [not null]
+  end_date datetime [not null]
+  status enum('active', 'archived') [not null, default: 'active']
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at datetime [not null, default: `CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`]
+
+  indexes {
+    status
+    (start_date, end_date)
+  }
+
+}
+
+Table time_slot_recurrence {
+  Note: 'Информация о настройках повторения тайм-слотов, указывается при создании, бывает не у каждого тайм-слота'
+
+  time_slot_id int [pk]
+  frequency enum('daily', 'weekly', 'monthly') [not null]
+  end_type enum('never', 'date') [not null]
+  end_value datetime
+}
+
+Table time_slot_service {
+  Note: 'Информация об услугах, которые оказывается в рамках данного тайм-слота. Услуга в таймслоте - это выбранный service + настройки вместимости, времени и окна бронирования'
+
+  id int [pk, increment]
+  time_slot_id int [not null]
+  service_registration_id int [not null]
+  capacity int [not null]
+  booking_window int [not null]
+  time time [not null]
+
+  indexes {
+    time_slot_id
+    service_registration_id
+  }
+}
+
+Table location {
+  Note: 'Список локаций. При создании таймслота можно выбрать локацию или создать новую'
+
+  id int [pk, increment]
+  name varchar(255) [not null]
+  address varchar(255)
+
+}
+
+// ВСЕ, ЧТО КАСАЕТСЯ УСЛУГ:
+Table service_registration {
+  Note: 'Услуги, доступные для записи и настройки по ним. Добавлются вручную админом, выбираются из общего списка услуг'
+
+  id int [pk, increment]
+  min_period_days int [not null]
+  service_type_id int [not null]
+  service_type_name varchar(255) [not null]
+
+  indexes {
+    service_type_id
+  }
+}
+
+Table service_type {
+  Note: '[ТАБЛИЦА ИЗ СИСТЕМЫ МКС]  Описание типа предоставляемых услуг. ВАЖНО - не на все услуги можно записаться, некоторые оказываются только непосредственно в центре'
+
+  id int [pk, increment]
+  created_by_id int
+  updated_by_id int
+  name varchar(255)
+  pay tinyint(1)
+  document tinyint(1)
+  sync_id int
+  sort int
+  created_at datetime
+  updated_at datetime
+
+  indexes {
+    created_by_id
+    updated_by_id
+  }
+}
+
+Table service {
+  Note: '[ТАБЛИЦА ИЗ СИСТЕМЫ МКС] Информация об оказанных услугах. Когда человек записался на услугу и пришел, на поещении он может получить и другие услуги, которые не доступны для записи, они нас мало интересуют, но нужно учитывать, что любая услуга потенциально может открыться для записи.'
+
+  id int [pk, increment]
+  client_id int
+  type_id int
+  created_by_id int
+  updated_by_id int
+  comment longtext
+  amount int
+  sync_id int
+  sort int
+  created_at datetime
+  updated_at datetime
+
+  indexes {
+    client_id
+    type_id
+    created_by_id
+    updated_by_id
+  }
+}
+
+// ВСЕ, ЧТО КАСАЕТСЯ КОНКРЕТНЫХ ЗАПИСЕЙ:
+Table event {
+  Note: 'Это выражение time_slot_service в конкретном дне, согласно настройкам повторения time_slot. Именно на event записывается сlient'
+
+  id int [pk, increment]
+  time_slot_service_id int [not null]
+  service_type_id int [not null]
+  capacity int [not null]
+  datetime datetime [not null]
+  service_name varchar(255) [not null, note: 'добавлено для денормализации данных']
+
+  indexes {
+    time_slot_service_id
+    service_type_id
+  }
+}
+
+Table event_client {
+  Note: 'Список записанных на event клиентов и статусы по ним'
+
+  id int [pk, increment]
+  event_id int [not null]
+  client_id int [not null]
+  volounteer_id int [not null]
+  status enum('attend', 'absent') [not null, default: 'absent']
+
+  indexes {
+    event_id
+    client_id
+    volounteer_id
+  }
+}
+
+// ВСЕ, ЧТО КАСАЕТСЯ КЛИЕНТОВ:
+Table client {
+  Note: '[ТАБЛИЦА ИЗ СИСТЕМЫ МКС] Информация о клиенте и его статусе'
+
+  id int [pk, not null]
+  last_residence_district_id int
+  last_registration_district_id int
+  created_by_id int
+  updated_by_id int
+  photo_name varchar(255)
+  birth_date date
+  birth_place varchar(255)
+  gender int
+  firstname varchar(255)
+  middlename varchar(255)
+  lastname varchar(255)
+  sync_id int
+  sort int
+  created_at datetime
+  updated_at datetime
+  is_homeless int [not null, default: 1]
+  is_blocked boolean [not null, default: false]
+  blocked_reason text
+  blocked_at datetime
+
+  indexes {
+    last_residence_district_id
+    last_registration_district_id
+    created_by_id
+    updated_by_id
+  }
+}
+
+Table volounteer {
+  Note: 'Информация о волонтерах, которые записывают client на события'
+
+  id int [pk, increment]
+}
+
+// References
+Ref: time_slot.location_id - location.id
+
+Ref: time_slot_recurrence.time_slot_id - time_slot.id [delete: cascade]
+
+Ref: time_slot_service.time_slot_id - time_slot.id [delete: cascade]
+Ref: time_slot_service.service_registration_id - service_registration.id
+
+Ref: service_registration.service_type_id - service_type.id
+
+Ref: service.client_id - client.id
+Ref: service.type_id - service_type.id
+
+Ref: event.time_slot_service_id - time_slot_service.id [delete: cascade, update: cascade]
+Ref: event.service_type_id - service_type.id
+
+Ref: event_client.event_id - event.id [delete: cascade]
+Ref: event_client.client_id - client.id [delete: cascade]
+Ref: event_client.volounteer_id - volounteer.id [delete: cascade]
+
+
+
+
+

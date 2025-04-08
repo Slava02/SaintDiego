@@ -1,0 +1,30 @@
+patch:
+  summary: Архивация временного слота
+  parameters:
+    - name: id
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '200':
+      description: Временной слот успешно архивирован
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/TimeSlot.yml
+    '400':
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml

@@ -1,0 +1,23 @@
+type: object
+properties:
+  id:
+    type: integer
+    format: int64
+  timeSlotServiceId:
+    type: integer
+    format: int64
+  capacity:
+    type: integer
+    format: int32
+  datetime:
+    type: string
+    format: date-time
+required:
+  - timeSlotServiceId
+  - capacity
+  - datetime
+example:
+  id: 1
+  timeSlotServiceId: 1
+  capacity: 20
+  datetime: '2024-03-20T09:00:00Z'

@@ -1,0 +1,69 @@
+get:
+  summary: Получение информации об услуге по идентификатору
+  parameters:
+    - name: id
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '200':
+      description: Успешный ответ
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/ServiceType.yml
+          example:
+            id: 1
+            name: Исповедь
+    '400':
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+put:
+  summary: Добавление или изменение настроек для услуги
+  parameters:
+    - name: id
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/CreateServiceTypeSettingsRequest.yml
+    required: true
+  responses:
+    '201':
+      description: Настройки успешно добавлены
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/ServiceTypeSettings.yml
+    '400':
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml

@@ -1,0 +1,55 @@
+get:
+  summary: Получение списка локаций
+  responses:
+    '200':
+      description: Успешный ответ
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../components/schemas/Location.yml
+            maxItems: 100
+    '400':
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+post:
+  summary: Создание новой локации
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/CreateLocationRequest.yml
+    required: true
+  responses:
+    '201':
+      description: Локация успешно создана
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Location.yml
+          example:
+            id: 3
+            name: Новый храм
+            address: ул. Новая, 67
+    '400':
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml

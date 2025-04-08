@@ -1,0 +1,30 @@
+type: object
+properties:
+  frequency:
+    type: string
+    enum:
+      - daily
+      - weekly
+      - monthly
+  interval:
+    type: integer
+    format: int32
+    minimum: 1
+  endType:
+    type: string
+    enum:
+      - never
+      - date
+  endValue:
+    type: string
+    format: date-time
+    nullable: true
+required:
+  - frequency
+  - interval
+  - endType
+example:
+  frequency: weekly
+  interval: 1
+  endType: date
+  endValue: "2024-04-20T19:00:00Z"

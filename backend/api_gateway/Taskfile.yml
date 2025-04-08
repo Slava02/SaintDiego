@@ -21,7 +21,9 @@ vars:
     go.uber.org/mock/mockgen@v0.5.0
     github.com/onsi/ginkgo/v2/ginkgo@v2.9.1
 
-  V1_SRC: ./api/v1.swagger.yml
+  V1_SRC: ./api/v1.yml
+  V1_SPLIT_DIR: ./api/split
+  V1_BUNDLE_SRC: ./api/split/openapi.yml
   V1_DST: ./internal/server/v1/server.gen.go
   V1_PKG: v1
 
@@ -86,4 +88,16 @@ tasks:
     cmds:
       - echo "Generate server..."
       - oapi-codegen -old-config-style -generate skip-prune,types,server,spec -package {{.V1_PKG}} {{.V1_SRC}} > {{.V1_DST}}
+      - task: tidy
+
+  api:split:
+    cmds:
+      - echo "Split API..."
+      - docker run --rm -v $PWD:/spec -w /spec redocly/cli split /spec/{{.V1_SRC}} --outDir /spec/{{.V1_SPLIT_DIR}}
+      - task: tidy
+
+  api:bundle:
+    cmds:
+      - echo "Bundle API..."
+      - docker run --rm -v $PWD:/spec -w /spec redocly/cli bundle /spec/{{.V1_BUNDLE_SRC}} --output /spec/{{.V1_SRC}}
       - task: tidy

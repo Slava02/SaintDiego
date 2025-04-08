@@ -11,11 +11,9 @@ import (
 	"syscall"
 
 	"github.com/Slava02/SaintDiego/backend/schedule/internal/repositories/locations_repo"
-	"github.com/Slava02/SaintDiego/backend/schedule/internal/repositories/services_repo"
 	timeslots_repo "github.com/Slava02/SaintDiego/backend/schedule/internal/repositories/timeSlots_repo"
 	"github.com/Slava02/SaintDiego/backend/schedule/internal/storage"
 	"github.com/Slava02/SaintDiego/backend/schedule/internal/usecases/locations"
-	"github.com/Slava02/SaintDiego/backend/schedule/internal/usecases/services"
 	"github.com/Slava02/SaintDiego/backend/schedule/internal/usecases/timeSlots"
 
 	"github.com/Slava02/SaintDiego/backend/common/closer"
@@ -84,7 +82,6 @@ func run() error {
 
 	timeSlotsRepo := timeslots_repo.NewTimeSlotRepository(timeslots_repo.NewOptions(db))
 	locationsRepo := locations_repo.NewLocationRepository(locations_repo.NewOptions(db))
-	servicesRepo := services_repo.NewServiceRepository(services_repo.NewOptions(db))
 
 	// Usecases
 
@@ -100,18 +97,11 @@ func run() error {
 		return fmt.Errorf("init locations usecase: %v", err)
 	}
 
-	servicesUsecase, err := services.New(services.NewOptions(servicesRepo))
-	if err != nil {
-		lg.Error("init services usecase", zap.Error(err))
-		return fmt.Errorf("init services usecase: %v", err)
-	}
-
 	// Service
 
 	eventService, err := v1.NewImplementation(v1.NewOptions(
 		timeSlotsUsecase,
 		locationsUsecase,
-		servicesUsecase,
 	))
 	if err != nil {
 		return fmt.Errorf("init event service: %v", err)

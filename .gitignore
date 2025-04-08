@@ -40,6 +40,8 @@ backend/vendor/
 
 db/configs/config.toml
 db/configs/config.docker.toml
+db/local_db/
+db/mig
 
 ## frontend
 frontend/saintEgidio/node_modules/

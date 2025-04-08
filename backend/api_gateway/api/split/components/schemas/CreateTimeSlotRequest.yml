@@ -1,0 +1,56 @@
+type: object
+properties:
+  title:
+    type: string
+  type:
+    type: string
+    enum:
+      - single
+      - recurring
+  locationId:
+    type: integer
+    format: int64
+  capacity:
+    type: integer
+    format: int32
+  startDate:
+    type: string
+    format: date-time
+  endDate:
+    type: string
+    format: date-time
+  services:
+    type: array
+    items:
+      $ref: ./TimeSlotService.yml
+  recurrence:
+    $ref: ./Recurrence.yml
+required:
+  - title
+  - type
+  - locationId
+  - capacity
+  - startDate
+  - endDate
+  - services
+example:
+  title: Вечерняя служба
+  type: recurring
+  locationId: 1
+  capacity: 100
+  startDate: '2024-03-20T18:00:00Z'
+  endDate: '2024-03-20T19:00:00Z'
+  services:
+    - serviceTypeId: 1
+      capacity: 40
+      bookingWindow: 30
+      time: '2024-03-20T18:00:00Z'
+    - serviceTypeId: 2
+      capacity: 60
+      bookingWindow: 30
+      time: '2024-03-20T18:30:00Z'
+  recurrence:
+    frequency: weekly
+    interval: 1
+    endType: date
+    endValue: '2024-04-20T19:00:00Z'

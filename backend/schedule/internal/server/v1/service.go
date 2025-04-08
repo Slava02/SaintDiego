@@ -10,14 +10,12 @@ import (
 type Options struct {
 	timeSlotUC  ITimeSlotsUC `option:"mandatory" validate:"required"`
 	locationsUC ILocationsUC `option:"mandatory" validate:"required"`
-	servicesUC  IServicesUC  `option:"mandatory" validate:"required"`
 }
 
 type Implementation struct {
 	pb.UnimplementedScheduleServiceServer
 	timeSlotUC  ITimeSlotsUC
 	locationsUC ILocationsUC
-	servicesUC  IServicesUC
 }
 
 func NewImplementation(opts Options) (*Implementation, error) {
@@ -28,6 +26,5 @@ func NewImplementation(opts Options) (*Implementation, error) {
 	return &Implementation{
 		timeSlotUC:  opts.timeSlotUC,
 		locationsUC: opts.locationsUC,
-		servicesUC:  opts.servicesUC,
 	}, nil
 }

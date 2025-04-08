@@ -1,0 +1,35 @@
+openapi: 3.0.0
+info:
+  title: Saint Egidio Admin API
+  description: >-
+    API для управления временными слотами, локациями и услугами в
+    административной панели Saint Egidio
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/v1
+    description: Development server
+security:
+  - BearerAuth: []
+paths:
+  /locations:
+    $ref: paths/locations.yml
+  /services:
+    $ref: paths/services.yml
+  /services/{id}:
+    $ref: paths/services_{id}.yml
+  /timeSlots:
+    $ref: paths/timeSlots.yml
+  /timeSlots/{id}:
+    $ref: paths/timeSlots_{id}.yml
+  /timeSlots/{id}/activate:
+    $ref: paths/timeSlots_{id}_activate.yml
+  /timeSlots/{id}/archive:
+    $ref: paths/timeSlots_{id}_archive.yml
+  /events:
+    $ref: paths/events.yml
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

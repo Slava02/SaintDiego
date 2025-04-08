@@ -114,16 +114,6 @@ func (u UseCase) ArchiveTimeSlot(ctx context.Context, id int64) error {
 	return u.timeSlotsRepository.ArchiveTimeSlot(ctx, id)
 }
 
-// Deprecated: Use UpdateTimeSlot instead
-func (u UseCase) AddServiceToTimeSlot(ctx context.Context, id int64, req *models.TimeSlotService) (*models.TimeSlotService, error) {
-	res, err := u.timeSlotsRepository.CreateTimeSlotServices(ctx, id, []*models.TimeSlotService{req})
-	if err != nil {
-		return nil, fmt.Errorf("add service to time slot: %v", err)
-	}
-
-	return res[0], nil
-}
-
 func (u UseCase) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*models.TimeSlot, error) {
 	var newTimeSlot *models.TimeSlot
 

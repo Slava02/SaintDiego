@@ -28,10 +28,9 @@ func (i *Implementation) GetLocations(ctx context.Context, _ *pb.GetLocationsReq
 	pbLocations := make([]*pb.Location, len(locations))
 	for i, location := range locations {
 		pbLocations[i] = &pb.Location{
-			Id:          location.ID,
-			Name:        location.Name,
-			Address:     location.Address,
-			Description: "", // Not used in the current implementation
+			Id:      location.ID,
+			Name:    location.Name,
+			Address: location.Address,
 		}
 	}
 
@@ -53,9 +52,8 @@ func (i *Implementation) CreateLocation(ctx context.Context, req *pb.CreateLocat
 	}
 
 	return &pb.Location{
-		Id:          location.ID,
-		Name:        location.Name,
-		Address:     location.Address,
-		Description: "", // Not used in the current implementation
+		Id:      location.ID,
+		Name:    location.Name,
+		Address: location.Address,
 	}, nil
 }

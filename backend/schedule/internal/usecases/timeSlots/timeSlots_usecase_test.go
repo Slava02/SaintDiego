@@ -34,11 +34,11 @@ func TestUpdateTimeSlot(t *testing.T) {
 		Status:     "active",
 		Services: []*models.TimeSlotService{
 			{
-				ID:            1,
-				ServiceTypeID: 1,
-				Capacity:      5,
-				BookingWindow: 30,
-				Time:          time.Now(),
+				ID:                    1,
+				ServiceRegistrationID: 1,
+				Capacity:              5,
+				BookingWindow:         30,
+				Time:                  time.Now(),
 			},
 		},
 	}
@@ -50,10 +50,10 @@ func TestUpdateTimeSlot(t *testing.T) {
 		// Подготовка
 		newTimeSlot := *existingTimeSlot
 		newService := &models.TimeSlotService{
-			ServiceTypeID: 2,
-			Capacity:      3,
-			BookingWindow: 30,
-			Time:          time.Now(),
+			ServiceRegistrationID: 2,
+			Capacity:              3,
+			BookingWindow:         30,
+			Time:                  time.Now(),
 		}
 		newTimeSlot.Services = append(newTimeSlot.Services, newService)
 
@@ -80,7 +80,7 @@ func TestUpdateTimeSlot(t *testing.T) {
 		assert.NotNil(t, result)
 		assert.Len(t, result.Services, 2)
 		assert.Equal(t, int64(1), result.Services[0].ID)
-		assert.Equal(t, int64(2), result.Services[1].ServiceTypeID)
+		assert.Equal(t, int64(2), result.Services[1].ServiceRegistrationID)
 		mockRepo.AssertExpectations(t)
 		mockTransactor.AssertExpectations(t)
 	})
@@ -122,7 +122,6 @@ func TestUpdateTimeSlot(t *testing.T) {
 		newTimeSlot.Type = "recurring"
 		newTimeSlot.Recurrence = &models.TimeSlotRecurrence{
 			Frequency: "daily",
-			Interval:  1,
 			EndType:   "date",
 			EndValue:  time.Now().AddDate(0, 1, 0),
 		}
@@ -156,7 +155,6 @@ func TestUpdateTimeSlot(t *testing.T) {
 		recurringTimeSlot.Type = "recurring"
 		recurringTimeSlot.Recurrence = &models.TimeSlotRecurrence{
 			Frequency: "daily",
-			Interval:  1,
 			EndType:   "date",
 			EndValue:  time.Now().AddDate(0, 1, 0),
 		}

@@ -1,0 +1,16 @@
+type: object
+properties:
+  id:
+    type: integer
+    format: int64
+  name:
+    type: string
+  address:
+    type: string
+required:
+  - id
+  - name
+example:
+  id: 1
+  name: Главный храм
+  address: ул. Примерная, 123

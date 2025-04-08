@@ -1,42 +1,31 @@
+// Тип услуги
 Table service_type {
   id int [pk, increment]
-  created_by_id int
-  updated_by_id int
   name varchar(255)
-  pay boolean
-  document boolean
-  sync_id int
-  sort int
-  created_at datetime
-  updated_at datetime
-  
-  indexes {
-    created_by_id [name: 'IDX_429DE3C5B03A8386']
-    updated_by_id [name: 'IDX_429DE3C5896DBBDE']
-  }
 }
 
+// Таблица полученных клиентом услуг
 Table service {
   id int [pk, increment]
   client_id int
   type_id int
-  created_by_id int
-  updated_by_id int
-  comment longtext
-  amount int
-  sync_id int
-  sort int
-  created_at datetime
-  updated_at datetime
 
   indexes {
     client_id [name: 'IDX_E19D9AD219EB6921']
     type_id [name: 'IDX_E19D9AD2C54C8C93']
-    created_by_id [name: 'IDX_E19D9AD2B03A8386']
-    updated_by_id [name: 'IDX_E19D9AD2896DBBDE']
   }
 }
 
+// Таблица с услугами, достпуными для регистрации и настройками для них
+Table services_registration {
+  id int [pk, increment]
+  service_type_id int [not null]
+  name varchar(255) [not null]
+  period_days int [not null]    
+  updated_at datetime [default: `CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`]
+}
+
+// Список мест 
 Table location {
   id int [pk, increment]
   name varchar(255) [not null]
@@ -47,6 +36,7 @@ Table location {
   updated_at datetime [not null, default: `CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`]
 }
 
+// Таймслот
 Table time_slot {
   id int [pk, increment]
   title varchar(255) [not null]
@@ -65,6 +55,7 @@ Table time_slot {
   }
 }
 
+// Настройки повторения для таймслота
 Table time_slot_recurrence {
   time_slot_id int [pk]
   frequency enum('daily', 'weekly', 'monthly') [not null]
@@ -73,6 +64,7 @@ Table time_slot_recurrence {
   end_value datetime
 }
 
+// Настройка для услуги, которая оказывается в некоторый таймслот
 Table time_slot_service {
   id int [pk, increment]
   time_slot_id int [not null]
@@ -82,7 +74,9 @@ Table time_slot_service {
   default_time time [not null]
 }
 
-
+// Событие создатся на основании настроек повторения для таймслота. 
+// Например: для повторяющегося каждую неделю слота на протяжении 4 недель - 
+// создатся 4 соыбтия на каждую из недель под каждую из услуг
 Table event {
   id int [pk, increment]
   time_slot_service_id int [not null]
@@ -91,6 +85,8 @@ Table event {
   remaining_capacity int [not null, default: 'capacity'] // Автоматический расчёт
   service_type_id int [not null] // подставляется по триггеру, нужно для денормализации данных
 }
+
+// Описание триггеров для данной таблицы:
 
 // -- Триггер для обновления remaining_capacity после вставки записи в event_client
 // CREATE TRIGGER update_remaining_capacity_insert
@@ -149,6 +145,7 @@ Table event {
 //   WHERE id = NEW.time_slot_service_id
 // );
 
+// Список записавшихся на определнное событие
 Table event_client {
   id int [pk, increment]
   event_id int [not null]
@@ -157,66 +154,53 @@ Table event_client {
   status enum('attend', 'absent') [not null, default: 'absent']
 }
 
+// Клиент 
 Table client {
   id int [pk, not null]
+  name varchar(255)
 }
 
-Table client_settings {
+// Настройки по клиенту: блокировки
+Table client_blocks {
   client_id int [pk, not null]
-  is_blocked boolean [not null, default: false]
   blocked_reason text
   blocked_at datetime
+}
+
+Table client_group {
+  id int pk [not null]
+  name varchar(255) [not null]
+  updated_at datetime
+}
+
+Table client_group_service {
+  id int pk [not null]
+  group_id int [not null]
+  service_registration_id int [not null]
+  updated_at datetime
 }
 
 Table volounteer {
   id int pk [not null]
 }
 
-Table service_type_settings {
-  id int [pk, increment]
-  service_type_id int [not null]
-  period_days int [not null]    
-  created_at datetime [default: `CURRENT_TIMESTAMP`]
-  updated_at datetime [default: `CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`]
-}
-
-// Materialized views
-
-Table client_service_history {
-  client_id int [pk]
-  service_type_id int [pk]
-  last_attended_date datetime
-}
-
-// -- Триггер для client_service_history
-// CREATE TRIGGER after_event_client_update
-// AFTER INSERT ON event_client
-// FOR EACH ROW
-// BEGIN
-//   INSERT INTO client_service_history (client_id, service_type_id, last_attended_date)
-//   VALUES (
-//     NEW.client_id,
-//     (SELECT service_type_id FROM event WHERE id = NEW.event_id),
-//     NOW()
-//   )
-//   ON DUPLICATE KEY UPDATE 
-//     last_attended_date = IF(NEW.status = 'attend', NOW(), last_attended_date);
-// END$$
-
 
 // References
 Ref: service.type_id > service_type.id
+Ref: service.client_id > client.id
 Ref: time_slot.location_id > location.id
 Ref: time_slot_recurrence.time_slot_id > time_slot.id [delete: cascade]
 Ref: time_slot_service.time_slot_id > time_slot.id [delete: cascade]
-Ref: time_slot_service.service_type_id > service_type.id
+Ref: time_slot_service.service_type_id > services_registration.id
 Ref: event.time_slot_service_id > time_slot_service.id
 Ref: client.id > event_client.client_id 
-Ref: event.id > event_client.event_id
+Ref: event_client.event_id > event.id
 Ref: volounteer.id > event_client.volounteer_id 
-Ref: service_type_settings.service_type_id > service_type.id 
-Ref: client_settings.client_id > client.id
+Ref: services_registration.service_type_id > service_type.id 
+Ref: client_blocks.client_id > client.id
+Ref: client_group_service.group_id > client_group.id
+Ref: client_group_service.service_registration_id > services_registration.id
 
-// Mat views
-Ref: client_service_history.client_id > client.id [delete: cascade]
-Ref: client_service_history.service_type_id > service_type.id [delete: cascade]
+
+
+

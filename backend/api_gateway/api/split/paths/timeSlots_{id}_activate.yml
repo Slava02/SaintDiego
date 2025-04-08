@@ -1,0 +1,31 @@
+patch:
+  summary: Активация временного слота
+  parameters:
+    - name: id
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+      example: 1
+  responses:
+    '200':
+      description: Временной слот успешно активирован
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/TimeSlot.yml
+    '400':
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
