@@ -175,11 +175,11 @@ func (u UseCase) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*mod
 
 	for i, service := range req.Services {
 		pbTimeSlot.Services[i] = &pb.TimeSlotService{
-			Id:            service.ID,
-			ServiceTypeId: service.ServiceTypeID,
-			Capacity:      service.Capacity,
-			BookingWindow: service.BookingWindow,
-			Time:          timestamppb.New(service.Time),
+			Id:                    service.ID,
+			ServiceRegistrationId: service.ServiceRegistrationID,
+			Capacity:              service.Capacity,
+			BookingWindow:         service.BookingWindow,
+			Time:                  timestamppb.New(service.Time),
 		}
 	}
 
