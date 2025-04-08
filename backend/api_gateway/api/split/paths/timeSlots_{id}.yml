@@ -1,4 +1,6 @@
 get:
+  tags:
+    - timeSlots
   summary: Получение временного слота по идентификатору
   parameters:
     - name: id
@@ -10,25 +12,27 @@ get:
         type: integer
         format: int64
   responses:
-    '200':
+    "200":
       description: Временной слот
       content:
         application/json:
           schema:
             $ref: ../components/schemas/TimeSlot.yml
-    '400':
+    "400":
       description: Ошибка валидации
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    '500':
+    "500":
       description: Internal server error
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
 put:
+  tags:
+    - timeSlots
   summary: Обновление временного слота
   parameters:
     - name: id
@@ -46,25 +50,27 @@ put:
           $ref: ../components/schemas/TimeSlot.yml
     required: true
   responses:
-    '200':
+    "200":
       description: Временной слот успешно обновлен
       content:
         application/json:
           schema:
             $ref: ../components/schemas/TimeSlot.yml
-    '400':
+    "400":
       description: Ошибка валидации
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    '500':
+    "500":
       description: Internal server error
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
 delete:
+  tags:
+    - timeSlots
   summary: Удаление временного слота
   parameters:
     - name: id
@@ -76,7 +82,7 @@ delete:
         type: integer
         format: int64
   responses:
-    '200':
+    "200":
       description: Временной слот успешно удален
       content:
         application/json:
@@ -85,13 +91,13 @@ delete:
             properties:
               success:
                 type: boolean
-    '400':
+    "400":
       description: Ошибка валидации
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    '500':
+    "500":
       description: Internal server error
       content:
         application/json:

@@ -1,4 +1,6 @@
 get:
+  tags:
+    - timeSlots
   summary: Получение списка временных слотов
   description: Возвращает список временных слотов с возможностью фильтрации
   parameters:
@@ -26,7 +28,7 @@ get:
         type: string
         format: date-time
   responses:
-    '200':
+    "200":
       description: OK
       content:
         application/json:
@@ -35,19 +37,21 @@ get:
             items:
               $ref: ../components/schemas/TimeSlot.yml
             maxItems: 100
-    '400':
+    "400":
       description: Ошибка валидации
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    '500':
+    "500":
       description: Internal server error
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
 post:
+  tags:
+    - timeSlots
   summary: Создание нового временного слота
   requestBody:
     content:
@@ -56,19 +60,19 @@ post:
           $ref: ../components/schemas/CreateTimeSlotRequest.yml
     required: true
   responses:
-    '201':
+    "201":
       description: Временной слот успешно создан
       content:
         application/json:
           schema:
             $ref: ../components/schemas/TimeSlot.yml
-    '400':
+    "400":
       description: Ошибка валидации
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    '500':
+    "500":
       description: Internal server error
       content:
         application/json:

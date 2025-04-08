@@ -62,10 +62,10 @@ func (u UseCase) CreateTimeSlot(ctx context.Context, req *CreateTimeSlotReq) (*m
 
 	for i, service := range req.Services {
 		pbReq.Services[i] = &pb.TimeSlotService{
-			ServiceTypeId: service.ServiceTypeID,
-			Capacity:      service.Capacity,
-			BookingWindow: service.BookingWindow,
-			Time:          timestamppb.New(service.Time),
+			ServiceRegistrationId: service.ServiceRegistrationID,
+			Capacity:              service.Capacity,
+			BookingWindow:         service.BookingWindow,
+			Time:                  timestamppb.New(service.Time),
 		}
 	}
 

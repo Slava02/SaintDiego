@@ -3,8 +3,8 @@ github.com/HdrHistogram/hdrhistogram-go v1.1.2/go.mod h1:yDgFjdqOqDEKOvasDdhWNXY
 github.com/RaveNoX/go-jsoncommentstrip v1.0.0/go.mod h1:78ihd09MekBnJnxpICcwzCMzGrKSKYe4AqU6PDYYpjk=
 github.com/Slava02/SaintDiego/backend/common v0.0.0-20250401122927-51b33ebb2271 h1:6rziEQlGWnwxLJOG+KJiy6VPWKhcnyahlp7pQ0q9wTU=
 github.com/Slava02/SaintDiego/backend/common v0.0.0-20250401122927-51b33ebb2271/go.mod h1:Y4meo/BlPqsPN9dYLm9fSw6cRB+8u/Hk2LUY9D0UXLk=
-github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250401122927-51b33ebb2271 h1:yxvkcF2Ca9bNoTrJvoIdr1AR2RdCN5uJ+4RO14pnEm4=
-github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250401122927-51b33ebb2271/go.mod h1:gSkAV0301rDpg16riId20XyO1cHTiP8opoYar4MaLrs=
+github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250408064410-1a6963d8d9e5 h1:nKPxqDb14WufkL5nT/pCWGjwAKpwVOTl9zl9VWZ+eUM=
+github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250408064410-1a6963d8d9e5/go.mod h1:gSkAV0301rDpg16riId20XyO1cHTiP8opoYar4MaLrs=
 github.com/Slava02/SaintDiego/backend/services v0.0.0-20250401135747-afb2b732acac h1:ZCoezwIbQQr1kP+0uVK8vPTj7pVj3ds5cop7bepvVH4=
 github.com/Slava02/SaintDiego/backend/services v0.0.0-20250401135747-afb2b732acac/go.mod h1:CO3dB9z/HK74oWsqra9fN/ZRz3wIOGBhz7oroJ7RZOg=
 github.com/apapsch/go-jsonmerge/v2 v2.0.0 h1:axGnT1gRIfimI7gJifB699GoE/oq+F2MU7Dml6nw9rQ=

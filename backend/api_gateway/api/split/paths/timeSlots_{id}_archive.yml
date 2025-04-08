@@ -1,4 +1,6 @@
 patch:
+  tags:
+    - timeSlots
   summary: Архивация временного слота
   parameters:
     - name: id
@@ -10,19 +12,19 @@ patch:
         type: integer
         format: int64
   responses:
-    '200':
+    "200":
       description: Временной слот успешно архивирован
       content:
         application/json:
           schema:
             $ref: ../components/schemas/TimeSlot.yml
-    '400':
+    "400":
       description: Ошибка валидации
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    '500':
+    "500":
       description: Internal server error
       content:
         application/json:

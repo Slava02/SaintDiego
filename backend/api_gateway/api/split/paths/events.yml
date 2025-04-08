@@ -1,7 +1,9 @@
 get:
+  tags:
+    - events
   summary: Получение списка событий
   responses:
-    '200':
+    "200":
       description: Успешный ответ
       content:
         application/json:
@@ -9,13 +11,13 @@ get:
             type: array
             items:
               $ref: ../components/schemas/Event.yml
-    '400':
+    "400":
       description: Ошибка валидации
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    '500':
+    "500":
       description: Internal server error
       content:
         application/json:

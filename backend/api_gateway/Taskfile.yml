@@ -26,6 +26,7 @@ vars:
   V1_BUNDLE_SRC: ./api/split/openapi.yml
   V1_DST: ./internal/server/v1/server.gen.go
   V1_PKG: v1
+  POSTMAN_COLLECTION: ./api/postman/SaintEgidioAdmin.postman_collection.json
 
 tasks:
   default:
@@ -101,3 +102,15 @@ tasks:
       - echo "Bundle API..."
       - docker run --rm -v $PWD:/spec -w /spec redocly/cli bundle /spec/{{.V1_BUNDLE_SRC}} --output /spec/{{.V1_SRC}}
       - task: tidy
+
+  api:postman:
+    cmds:
+      - echo "Generate Postman collection..."
+      - mkdir -p ./api/postman
+      - |
+        docker run --rm \
+          -v "$(pwd):/app" -w /app \
+          node:18-alpine \
+          sh -c "npm install -g openapi-to-postmanv2 && \
+          openapi2postmanv2 -s /app/{{.V1_SRC}} -o /app/{{.POSTMAN_COLLECTION}} -p \
+          -O folderStrategy=Tags,includeAuthInfoInExample=true,requestParametersResolution=Example,optimizeConversion=false,stackLimit=50"
