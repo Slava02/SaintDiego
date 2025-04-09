@@ -100,7 +100,7 @@ message TimeSlot {
 message TimeSlotService {
   int64 id = 1;
   int64 timeSlotId = 2;
-  int64 serviceRegistrationId = 3;  
+  int64 serviceTypeId = 3;  
   int32 capacity = 4;
   int32 bookingWindow = 5;
   google.protobuf.Timestamp time = 6;

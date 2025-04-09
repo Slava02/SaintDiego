@@ -1,5 +1,7 @@
 CREATE TABLE IF NOT EXISTS `volounteer` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
+    `name` varchar(255) NOT NULL,
+    `tg_login` varchar(255) NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 --bun:split
@@ -59,6 +61,12 @@ CREATE TABLE IF NOT EXISTS `service_type` (
     CONSTRAINT `FK_429DE3C5B03A8386` FOREIGN KEY (`created_by_id`) REFERENCES `fos_user_user` (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 --bun:split
+ALTER TABLE `service_type`
+ADD COLUMN IF NOT EXISTS `registration_available` boolean NOT NULL DEFAULT false;
+--bun:split
+ALTER TABLE `service_type`
+ADD COLUMN IF NOT EXISTS `min_period_days` int NOT NULL DEFAULT 0;
+--bun:split
 CREATE TABLE IF NOT EXISTS `location` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `name` varchar(255) NOT NULL,
@@ -117,25 +125,15 @@ CREATE TABLE IF NOT EXISTS `service` (
 CREATE TABLE IF NOT EXISTS `time_slot_service` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `time_slot_id` int(11) NOT NULL,
-    `service_registration_id` int(11) NOT NULL,
+    `service_type_id` int(11) NOT NULL,
     `capacity` int NOT NULL,
     `booking_window` int NOT NULL,
     `time` time NOT NULL,
     PRIMARY KEY (`id`),
     KEY `IDX_time_slot_service_time_slot_id` (`time_slot_id`),
-    KEY `IDX_time_slot_service_service_registration_id` (`service_registration_id`),
+    KEY `IDX_time_slot_service_service_type_id` (`service_type_id`),
     CONSTRAINT `FK_time_slot_service_slot` FOREIGN KEY (`time_slot_id`) REFERENCES `time_slot` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `FK_time_slot_service_registration` FOREIGN KEY (`service_registration_id`) REFERENCES `service` (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
---bun:split
-CREATE TABLE IF NOT EXISTS `service_registration` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `min_period_days` int NOT NULL,
-    `service_type_id` int(11) NOT NULL,
-    `service_type_name` varchar(255) NOT NULL,
-    PRIMARY KEY (`id`),
-    KEY `IDX_service_registration_service_type_id` (`service_type_id`),
-    CONSTRAINT `FK_service_registration_service_type` FOREIGN KEY (`service_type_id`) REFERENCES `service_type` (`id`)
+    CONSTRAINT `FK_time_slot_service_type` FOREIGN KEY (`service_type_id`) REFERENCES `service_type` (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 --bun:split
 CREATE TABLE IF NOT EXISTS `time_slot_recurrence` (
@@ -157,7 +155,7 @@ CREATE TABLE IF NOT EXISTS `event` (
     `service_name` varchar(255) NOT NULL,
     PRIMARY KEY (`id`),
     KEY `IDX_event_time_slot_service_id` (`time_slot_service_id`),
-    KEY `IDX_event_service_type` (`service_type_id`),
+    KEY `IDX_event_service_type_id` (`service_type_id`),
     CONSTRAINT `FK_event_time_slot_service` FOREIGN KEY (`time_slot_service_id`) REFERENCES `time_slot_service` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `FK_event_service_type` FOREIGN KEY (`service_type_id`) REFERENCES `service_type` (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;

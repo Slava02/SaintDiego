@@ -1,27 +1,63 @@
--- SELECT ts.id as time_slot_id,
---     ts.status as time_slot_status,
---     tsr.frequency as recurrence_frequency,
---     tsr.end_type as recurrence_end_type,
---     tsr.end_value as recurrence_end_value,
---     GROUP_CONCAT(
---         DISTINCT tss.id
---         ORDER BY tss.id SEPARATOR ' '
---     ) as services,
---     COUNT(DISTINCT e.id) as total_events
--- FROM time_slot ts
---     LEFT JOIN time_slot_recurrence tsr ON ts.id = tsr.time_slot_id
---     LEFT JOIN time_slot_service tss ON ts.id = tss.time_slot_id
---     LEFT JOIN service_type st ON tss.service_type_id = st.id
---     LEFT JOIN event e ON tss.id = e.time_slot_service_id
--- GROUP BY ts.id,
---     ts.title,
---     ts.type,
---     ts.capacity,
---     ts.status,
---     tsr.frequency,
---     tsr.interval,
---     tsr.end_type,
---     tsr.end_value
--- ORDER BY ts.id;
-DROP TABLE IF EXISTS `bun_migrations`;
-DROP TABLE IF EXISTS `bun_migration_locks`;
+INSERT INTO service_registration (
+        min_period_days,
+        service_type_id,
+        service_type_name
+    )
+VALUES (14, 2, 'Продуктовый набор (без дома)');
+INSERT INTO service_registration (
+        min_period_days,
+        service_type_id,
+        service_type_name
+    )
+VALUES (7, 3, 'Комплект одежды');
+-- First, ensure the service type exists
+INSERT INTO `service_type` (`id`, `name`)
+VALUES (1, 'Исповедь') ON DUPLICATE KEY
+UPDATE id = id;
+-- Then insert or update the event
+INSERT INTO `event` (
+        `id`,
+        `time_slot_service_id`,
+        `service_name`,
+        `capacity`,
+        `datetime`,
+        `service_type_id`
+    )
+VALUES (
+        DEFAULT,
+        1,
+        'Исповедь',
+        40,
+        '2024-03-20 18:00:00',
+        1
+    ) ON DUPLICATE KEY
+UPDATE capacity = 40,
+    datetime = '2024-03-20 18:00:00',
+    time_slot_service_id = 1;
+INSERT INTO `time_slot` (
+        `id`,
+        `title`,
+        `type`,
+        `location_id`,
+        `capacity`,
+        `start_date`,
+        `end_date`,
+        `status`,
+        `created_at`,
+        `updated_at`
+    )
+VALUES (
+        2,
+        'Вечерняя служба',
+        'recurring',
+        1,
+        100,
+        '2024-03-20 18:00:00',
+        '2024-03-20 19:00:00',
+        'active',
+        NOW(),
+        NOW()
+    ) ON DUPLICATE KEY
+UPDATE start_date = '2024-03-20 18:00:00',
+    end_date = '2024-03-20 19:00:00',
+    status = 'active';

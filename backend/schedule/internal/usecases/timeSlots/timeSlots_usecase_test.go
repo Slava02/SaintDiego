@@ -34,11 +34,11 @@ func TestUpdateTimeSlot(t *testing.T) {
 		Status:     "active",
 		Services: []*models.TimeSlotService{
 			{
-				ID:                    1,
-				ServiceRegistrationID: 1,
-				Capacity:              5,
-				BookingWindow:         30,
-				Time:                  time.Now(),
+				ID:            1,
+				ServiceTypeID: 1,
+				Capacity:      5,
+				BookingWindow: 30,
+				Time:          time.Now(),
 			},
 		},
 	}
@@ -50,10 +50,10 @@ func TestUpdateTimeSlot(t *testing.T) {
 		// Подготовка
 		newTimeSlot := *existingTimeSlot
 		newService := &models.TimeSlotService{
-			ServiceRegistrationID: 2,
-			Capacity:              3,
-			BookingWindow:         30,
-			Time:                  time.Now(),
+			ServiceTypeID: 2,
+			Capacity:      3,
+			BookingWindow: 30,
+			Time:          time.Now(),
 		}
 		newTimeSlot.Services = append(newTimeSlot.Services, newService)
 
@@ -80,7 +80,7 @@ func TestUpdateTimeSlot(t *testing.T) {
 		assert.NotNil(t, result)
 		assert.Len(t, result.Services, 2)
 		assert.Equal(t, int64(1), result.Services[0].ID)
-		assert.Equal(t, int64(2), result.Services[1].ServiceRegistrationID)
+		assert.Equal(t, int64(2), result.Services[1].ServiceTypeID)
 		mockRepo.AssertExpectations(t)
 		mockTransactor.AssertExpectations(t)
 	})

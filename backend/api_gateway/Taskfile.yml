@@ -21,7 +21,7 @@ vars:
     go.uber.org/mock/mockgen@v0.5.0
     github.com/onsi/ginkgo/v2/ginkgo@v2.9.1
 
-  V1_SRC: ./api/v1.yml
+  V1_SRC: ./api/api.yml
   V1_SPLIT_DIR: ./api/split
   V1_BUNDLE_SRC: ./api/split/openapi.yml
   V1_DST: ./internal/server/v1/server.gen.go

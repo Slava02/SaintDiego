@@ -107,10 +107,28 @@ func (u UseCase) DeleteTimeSlot(ctx context.Context, id int64) error {
 }
 
 func (u UseCase) ActivateTimeSlot(ctx context.Context, id int64) error {
+	timeSlot, err := u.timeSlotsRepository.GetTimeSlot(ctx, id)
+	if err != nil {
+		return fmt.Errorf("get time slot: %v", err)
+	}
+
+	if timeSlot.Status == "active" {
+		return fmt.Errorf("time slot already active")
+	}
+
 	return u.timeSlotsRepository.ActivateTimeSlot(ctx, id)
 }
 
 func (u UseCase) ArchiveTimeSlot(ctx context.Context, id int64) error {
+	timeSlot, err := u.timeSlotsRepository.GetTimeSlot(ctx, id)
+	if err != nil {
+		return fmt.Errorf("get time slot: %v", err)
+	}
+
+	if timeSlot.Status == "archived" {
+		return fmt.Errorf("time slot already archived")
+	}
+
 	return u.timeSlotsRepository.ArchiveTimeSlot(ctx, id)
 }
 
@@ -280,6 +298,7 @@ func generateEvents(timeSlot *models.TimeSlot, services []*models.TimeSlotServic
 				TimeSlotServiceID: service.ID,
 				Capacity:          service.Capacity,
 				DateTime:          timeSlot.StartDate,
+				ServiceTypeID:     service.ServiceTypeID,
 			}
 			events = append(events, event)
 		}
@@ -292,7 +311,7 @@ func generateEvents(timeSlot *models.TimeSlot, services []*models.TimeSlotServic
 	}
 
 	// Calculate end date for recurring events
-	endDate := timeSlot.EndDate
+	endDate := timeSlot.Recurrence.EndValue
 	if timeSlot.Recurrence.EndType == "date" {
 		endDate = timeSlot.Recurrence.EndValue
 	} else if timeSlot.Recurrence.EndType == "never" {
@@ -308,6 +327,7 @@ func generateEvents(timeSlot *models.TimeSlot, services []*models.TimeSlotServic
 				TimeSlotServiceID: service.ID,
 				Capacity:          service.Capacity,
 				DateTime:          currentDate,
+				ServiceTypeID:     service.ServiceTypeID,
 			}
 			events = append(events, event)
 		}

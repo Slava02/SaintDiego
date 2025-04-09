@@ -16,9 +16,17 @@ properties:
   startDate:
     type: string
     format: date-time
+    x-validate:
+      - rule: startDate must be in the future
+        condition: startDate > now
+      - rule: startDate must be before endDate
+        condition: startDate < endDate
   endDate:
     type: string
     format: date-time
+    x-validate:
+      - rule: endDate must be after startDate
+        condition: endDate > startDate
   services:
     type: array
     items:
