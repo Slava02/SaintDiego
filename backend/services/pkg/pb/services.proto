@@ -8,26 +8,29 @@ option go_package = "github.com/Slava02/SaintDiego/backend/services/pkg/pb";
 service ServicesService {
 
   // Services
-  rpc GetServices(GetServicesRequest) returns (GetServicesResponse) {}
-  rpc GetServiceById(GetServiceByIdRequest) returns (ServiceType) {}
-  rpc CreateServiceTypeSettings(CreateServiceTypeSettingsRequest) returns (ServiceTypeSettings) {}
+  rpc GetServiceTypes(GetServiceTypesRequest) returns (GetServiceTypesResponse) {}
+  rpc GetServiceTypeById(GetServiceTypeByIdRequest) returns (ServiceType) {}
+  rpc UpdateServiceType(UpdateServiceTypeRequest) returns (ServiceType) {}
 }
 
 // Request messages
-message GetServicesRequest {}
+message GetServiceTypesRequest {
+  bool registrationAvailable = 1;
+}
 
-message GetServiceByIdRequest {
+message GetServiceTypeByIdRequest {
   int64 id = 1;
 }
 
-message CreateServiceTypeSettingsRequest {
-  int64 periodDays = 1;
-  int64 serviceTypeId = 2;
+message UpdateServiceTypeRequest {
+  int64 id = 1;
+  int64 minPeriodDays = 2;
+  bool registrationAvailable = 3;
 }
 
 // Response messages
-message GetServicesResponse {
-  repeated ServiceType services = 1;
+message GetServiceTypesResponse {
+  repeated ServiceType serviceTypes = 1;
 }
 
 // Common messages
@@ -35,13 +38,8 @@ message GetServicesResponse {
 message ServiceType {
   int64 id = 1;  
   string name = 2;
-  string description = 3;
-}
-
-message ServiceTypeSettings {
-  int64 id = 1;
-  int64 serviceTypeId = 2;
-  int64 periodDays = 3;
+  int64 minPeriodDays = 3;
+  bool registrationAvailable = 4;
 }
 
 message Error {

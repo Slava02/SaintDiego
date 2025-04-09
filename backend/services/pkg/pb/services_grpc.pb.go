@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ServicesService_GetServices_FullMethodName               = "/services.ServicesService/GetServices"
-	ServicesService_GetServiceById_FullMethodName            = "/services.ServicesService/GetServiceById"
-	ServicesService_CreateServiceTypeSettings_FullMethodName = "/services.ServicesService/CreateServiceTypeSettings"
+	ServicesService_GetServiceTypes_FullMethodName    = "/services.ServicesService/GetServiceTypes"
+	ServicesService_GetServiceTypeById_FullMethodName = "/services.ServicesService/GetServiceTypeById"
+	ServicesService_UpdateServiceType_FullMethodName  = "/services.ServicesService/UpdateServiceType"
 )
 
 // ServicesServiceClient is the client API for ServicesService service.
@@ -31,9 +31,9 @@ const (
 // Service definition
 type ServicesServiceClient interface {
 	// Services
-	GetServices(ctx context.Context, in *GetServicesRequest, opts ...grpc.CallOption) (*GetServicesResponse, error)
-	GetServiceById(ctx context.Context, in *GetServiceByIdRequest, opts ...grpc.CallOption) (*ServiceType, error)
-	CreateServiceTypeSettings(ctx context.Context, in *CreateServiceTypeSettingsRequest, opts ...grpc.CallOption) (*ServiceTypeSettings, error)
+	GetServiceTypes(ctx context.Context, in *GetServiceTypesRequest, opts ...grpc.CallOption) (*GetServiceTypesResponse, error)
+	GetServiceTypeById(ctx context.Context, in *GetServiceTypeByIdRequest, opts ...grpc.CallOption) (*ServiceType, error)
+	UpdateServiceType(ctx context.Context, in *UpdateServiceTypeRequest, opts ...grpc.CallOption) (*ServiceType, error)
 }
 
 type servicesServiceClient struct {
@@ -44,30 +44,30 @@ func NewServicesServiceClient(cc grpc.ClientConnInterface) ServicesServiceClient
 	return &servicesServiceClient{cc}
 }
 
-func (c *servicesServiceClient) GetServices(ctx context.Context, in *GetServicesRequest, opts ...grpc.CallOption) (*GetServicesResponse, error) {
+func (c *servicesServiceClient) GetServiceTypes(ctx context.Context, in *GetServiceTypesRequest, opts ...grpc.CallOption) (*GetServiceTypesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetServicesResponse)
-	err := c.cc.Invoke(ctx, ServicesService_GetServices_FullMethodName, in, out, cOpts...)
+	out := new(GetServiceTypesResponse)
+	err := c.cc.Invoke(ctx, ServicesService_GetServiceTypes_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *servicesServiceClient) GetServiceById(ctx context.Context, in *GetServiceByIdRequest, opts ...grpc.CallOption) (*ServiceType, error) {
+func (c *servicesServiceClient) GetServiceTypeById(ctx context.Context, in *GetServiceTypeByIdRequest, opts ...grpc.CallOption) (*ServiceType, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ServiceType)
-	err := c.cc.Invoke(ctx, ServicesService_GetServiceById_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ServicesService_GetServiceTypeById_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *servicesServiceClient) CreateServiceTypeSettings(ctx context.Context, in *CreateServiceTypeSettingsRequest, opts ...grpc.CallOption) (*ServiceTypeSettings, error) {
+func (c *servicesServiceClient) UpdateServiceType(ctx context.Context, in *UpdateServiceTypeRequest, opts ...grpc.CallOption) (*ServiceType, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ServiceTypeSettings)
-	err := c.cc.Invoke(ctx, ServicesService_CreateServiceTypeSettings_FullMethodName, in, out, cOpts...)
+	out := new(ServiceType)
+	err := c.cc.Invoke(ctx, ServicesService_UpdateServiceType_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -81,9 +81,9 @@ func (c *servicesServiceClient) CreateServiceTypeSettings(ctx context.Context, i
 // Service definition
 type ServicesServiceServer interface {
 	// Services
-	GetServices(context.Context, *GetServicesRequest) (*GetServicesResponse, error)
-	GetServiceById(context.Context, *GetServiceByIdRequest) (*ServiceType, error)
-	CreateServiceTypeSettings(context.Context, *CreateServiceTypeSettingsRequest) (*ServiceTypeSettings, error)
+	GetServiceTypes(context.Context, *GetServiceTypesRequest) (*GetServiceTypesResponse, error)
+	GetServiceTypeById(context.Context, *GetServiceTypeByIdRequest) (*ServiceType, error)
+	UpdateServiceType(context.Context, *UpdateServiceTypeRequest) (*ServiceType, error)
 	mustEmbedUnimplementedServicesServiceServer()
 }
 
@@ -94,14 +94,14 @@ type ServicesServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedServicesServiceServer struct{}
 
-func (UnimplementedServicesServiceServer) GetServices(context.Context, *GetServicesRequest) (*GetServicesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetServices not implemented")
+func (UnimplementedServicesServiceServer) GetServiceTypes(context.Context, *GetServiceTypesRequest) (*GetServiceTypesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetServiceTypes not implemented")
 }
-func (UnimplementedServicesServiceServer) GetServiceById(context.Context, *GetServiceByIdRequest) (*ServiceType, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetServiceById not implemented")
+func (UnimplementedServicesServiceServer) GetServiceTypeById(context.Context, *GetServiceTypeByIdRequest) (*ServiceType, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetServiceTypeById not implemented")
 }
-func (UnimplementedServicesServiceServer) CreateServiceTypeSettings(context.Context, *CreateServiceTypeSettingsRequest) (*ServiceTypeSettings, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateServiceTypeSettings not implemented")
+func (UnimplementedServicesServiceServer) UpdateServiceType(context.Context, *UpdateServiceTypeRequest) (*ServiceType, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateServiceType not implemented")
 }
 func (UnimplementedServicesServiceServer) mustEmbedUnimplementedServicesServiceServer() {}
 func (UnimplementedServicesServiceServer) testEmbeddedByValue()                         {}
@@ -124,56 +124,56 @@ func RegisterServicesServiceServer(s grpc.ServiceRegistrar, srv ServicesServiceS
 	s.RegisterService(&ServicesService_ServiceDesc, srv)
 }
 
-func _ServicesService_GetServices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetServicesRequest)
+func _ServicesService_GetServiceTypes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetServiceTypesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServicesServiceServer).GetServices(ctx, in)
+		return srv.(ServicesServiceServer).GetServiceTypes(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ServicesService_GetServices_FullMethodName,
+		FullMethod: ServicesService_GetServiceTypes_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServicesServiceServer).GetServices(ctx, req.(*GetServicesRequest))
+		return srv.(ServicesServiceServer).GetServiceTypes(ctx, req.(*GetServiceTypesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ServicesService_GetServiceById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetServiceByIdRequest)
+func _ServicesService_GetServiceTypeById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetServiceTypeByIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServicesServiceServer).GetServiceById(ctx, in)
+		return srv.(ServicesServiceServer).GetServiceTypeById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ServicesService_GetServiceById_FullMethodName,
+		FullMethod: ServicesService_GetServiceTypeById_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServicesServiceServer).GetServiceById(ctx, req.(*GetServiceByIdRequest))
+		return srv.(ServicesServiceServer).GetServiceTypeById(ctx, req.(*GetServiceTypeByIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ServicesService_CreateServiceTypeSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateServiceTypeSettingsRequest)
+func _ServicesService_UpdateServiceType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateServiceTypeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServicesServiceServer).CreateServiceTypeSettings(ctx, in)
+		return srv.(ServicesServiceServer).UpdateServiceType(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ServicesService_CreateServiceTypeSettings_FullMethodName,
+		FullMethod: ServicesService_UpdateServiceType_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServicesServiceServer).CreateServiceTypeSettings(ctx, req.(*CreateServiceTypeSettingsRequest))
+		return srv.(ServicesServiceServer).UpdateServiceType(ctx, req.(*UpdateServiceTypeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -186,16 +186,16 @@ var ServicesService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ServicesServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetServices",
-			Handler:    _ServicesService_GetServices_Handler,
+			MethodName: "GetServiceTypes",
+			Handler:    _ServicesService_GetServiceTypes_Handler,
 		},
 		{
-			MethodName: "GetServiceById",
-			Handler:    _ServicesService_GetServiceById_Handler,
+			MethodName: "GetServiceTypeById",
+			Handler:    _ServicesService_GetServiceTypeById_Handler,
 		},
 		{
-			MethodName: "CreateServiceTypeSettings",
-			Handler:    _ServicesService_CreateServiceTypeSettings_Handler,
+			MethodName: "UpdateServiceType",
+			Handler:    _ServicesService_UpdateServiceType_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
