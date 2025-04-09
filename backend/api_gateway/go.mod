@@ -4,7 +4,7 @@ go 1.23.3
 
 require (
 	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250401122927-51b33ebb2271
-	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250408081344-a7d6c4e9c25f
+	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250409090206-cbee6121b246
 	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250401135747-afb2b732acac
 	github.com/getkin/kin-openapi v0.131.0
 	github.com/kazhuravlev/options-gen v0.33.2

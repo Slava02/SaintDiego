@@ -38,6 +38,7 @@ type IEventsClient interface {
 	UpdateTimeSlot(ctx context.Context, req *pb.TimeSlot) (*pb.TimeSlot, error)
 }
 
+// TODO: тут бы проверять открыт ли данный сервис для регистрации
 func (u UseCase) CreateTimeSlot(ctx context.Context, req *CreateTimeSlotReq) (*models.TimeSlot, error) {
 	pbReq := &pb.CreateTimeSlotRequest{
 		Title:      req.Title,
@@ -62,10 +63,10 @@ func (u UseCase) CreateTimeSlot(ctx context.Context, req *CreateTimeSlotReq) (*m
 
 	for i, service := range req.Services {
 		pbReq.Services[i] = &pb.TimeSlotService{
-			ServiceRegistrationId: service.ServiceRegistrationID,
-			Capacity:              service.Capacity,
-			BookingWindow:         service.BookingWindow,
-			Time:                  timestamppb.New(service.Time),
+			ServiceTypeId: service.ServiceTypeID,
+			Capacity:      service.Capacity,
+			BookingWindow: service.BookingWindow,
+			Time:          timestamppb.New(service.Time),
 		}
 	}
 
@@ -175,11 +176,11 @@ func (u UseCase) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*mod
 
 	for i, service := range req.Services {
 		pbTimeSlot.Services[i] = &pb.TimeSlotService{
-			Id:                    service.ID,
-			ServiceRegistrationId: service.ServiceRegistrationID,
-			Capacity:              service.Capacity,
-			BookingWindow:         service.BookingWindow,
-			Time:                  timestamppb.New(service.Time),
+			Id:            service.ID,
+			ServiceTypeId: service.ServiceTypeID,
+			Capacity:      service.Capacity,
+			BookingWindow: service.BookingWindow,
+			Time:          timestamppb.New(service.Time),
 		}
 	}
 

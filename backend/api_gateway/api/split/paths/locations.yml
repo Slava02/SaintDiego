@@ -3,7 +3,7 @@ get:
     - locations
   summary: Получение списка локаций
   responses:
-    "200":
+    '200':
       description: Успешный ответ
       content:
         application/json:
@@ -12,13 +12,13 @@ get:
             items:
               $ref: ../components/schemas/Location.yml
             maxItems: 100
-    "400":
+    '400':
       description: Ошибка валидации
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    "500":
+    '500':
       description: Internal server error
       content:
         application/json:
@@ -35,7 +35,7 @@ post:
           $ref: ../components/schemas/CreateLocationRequest.yml
     required: true
   responses:
-    "201":
+    '201':
       description: Локация успешно создана
       content:
         application/json:
@@ -45,13 +45,13 @@ post:
             id: 3
             name: Новый храм
             address: ул. Новая, 67
-    "400":
+    '400':
       description: Ошибка валидации
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    "500":
+    '500':
       description: Internal server error
       content:
         application/json:

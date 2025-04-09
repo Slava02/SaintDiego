@@ -5,9 +5,18 @@ properties:
     format: int64
   name:
     type: string
+  min_period_days:
+    type: integer
+    format: int32
+  registration_available:
+    type: boolean
 required:
   - id
   - name
+  - min_period_days
+  - registration_available
 example:
   id: 1
   name: Исповедь
+  min_period_days: 1
+  registration_available: true
