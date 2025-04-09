@@ -10,9 +10,9 @@ import (
 )
 
 type IServicesClient interface {
-	CreateServiceTypeSettings(ctx context.Context, req *pb.CreateServiceTypeSettingsRequest) (*pb.ServiceTypeSettings, error)
-	GetServices(ctx context.Context, req *pb.GetServicesRequest) (*pb.GetServicesResponse, error)
-	GetServiceById(ctx context.Context, req *pb.GetServiceByIdRequest) (*pb.ServiceType, error)
+	GetServiceTypes(ctx context.Context, req *pb.GetServiceTypesRequest) (*pb.GetServiceTypesResponse, error)
+	GetServiceTypeById(ctx context.Context, req *pb.GetServiceTypeByIdRequest) (*pb.ServiceType, error)
+	UpdateServiceType(ctx context.Context, req *pb.UpdateServiceTypeRequest) (*pb.ServiceType, error)
 }
 
 //go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options
@@ -34,51 +34,57 @@ func New(opts Options) (*UseCase, error) {
 	}, nil
 }
 
-func (u UseCase) GetServices(ctx context.Context) ([]*models.Service, error) {
-	resp, err := u.servicesClient.GetServices(ctx, &pb.GetServicesRequest{})
+func (u UseCase) GetServiceTypes(ctx context.Context, req *GetServicesParams) ([]*models.ServiceType, error) {
+	resp, err := u.servicesClient.GetServiceTypes(ctx, &pb.GetServiceTypesRequest{
+		RegistrationAvailable: req.RegistrationAvailable,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	services := make([]*models.Service, len(resp.Services))
-	for i, service := range resp.Services {
-		services[i] = &models.Service{
-			ID:          service.Id,
-			Name:        service.Name,
-			Description: &service.Description,
+	services := make([]*models.ServiceType, len(resp.ServiceTypes))
+	for i, service := range resp.ServiceTypes {
+		services[i] = &models.ServiceType{
+			ID:                    service.Id,
+			Name:                  service.Name,
+			MinPeriodDays:         service.MinPeriodDays,
+			RegistrationAvailable: service.RegistrationAvailable,
 		}
 	}
 
 	return services, nil
 }
 
-func (u UseCase) GetServicesId(ctx context.Context, id int64) (*models.Service, error) {
-	resp, err := u.servicesClient.GetServiceById(ctx, &pb.GetServiceByIdRequest{
+func (u UseCase) GetServiceTypeById(ctx context.Context, id int64) (*models.ServiceType, error) {
+	resp, err := u.servicesClient.GetServiceTypeById(ctx, &pb.GetServiceTypeByIdRequest{
 		Id: id,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	return &models.Service{
-		ID:          resp.Id,
-		Name:        resp.Name,
-		Description: &resp.Description,
+	return &models.ServiceType{
+		ID:                    resp.Id,
+		Name:                  resp.Name,
+		MinPeriodDays:         resp.MinPeriodDays,
+		RegistrationAvailable: resp.RegistrationAvailable,
 	}, nil
 }
 
-func (u UseCase) CreateServiceTypeSettings(ctx context.Context, req *CreateServiceTypeSettingsReq) (*models.ServiceTypeSettings, error) {
-	resp, err := u.servicesClient.CreateServiceTypeSettings(ctx, &pb.CreateServiceTypeSettingsRequest{
-		PeriodDays:    req.PeriodDays,
-		ServiceTypeId: req.ServiceTypeId,
+func (u UseCase) UpdateServiceType(ctx context.Context, req *UpdateServiceTypeReq) (*models.ServiceType, error) {
+	resp, err := u.servicesClient.UpdateServiceType(ctx, &pb.UpdateServiceTypeRequest{
+		Id:                    req.ServiceTypeID,
+		MinPeriodDays:         req.MinPeriodDays,
+		RegistrationAvailable: req.RegistrationAvailable,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	return &models.ServiceTypeSettings{
-		ID:            resp.Id,
-		PeriodDays:    resp.PeriodDays,
-		ServiceTypeID: resp.ServiceTypeId,
+	return &models.ServiceType{
+		ID:                    resp.Id,
+		Name:                  resp.Name,
+		MinPeriodDays:         resp.MinPeriodDays,
+		RegistrationAvailable: resp.RegistrationAvailable,
 	}, nil
 }

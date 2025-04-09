@@ -12,16 +12,18 @@ import (
 )
 
 type IServicesUC interface {
-	GetServices(ctx context.Context) ([]*models.ServiceType, error)
-	GetServicesId(ctx context.Context, id int64) (*models.ServiceType, error)
-	CreateServiceTypeSettings(ctx context.Context, req *services.CreateServiceTypeSettingsRequest) (*models.ServiceTypeSettings, error)
+	GetServiceTypes(ctx context.Context, req *services.GetServicesParams) ([]*models.ServiceType, error)
+	GetServiceTypeById(ctx context.Context, id int64) (*models.ServiceType, error)
+	UpdateServiceType(ctx context.Context, req *services.UpdateServiceTypeReq) (*models.ServiceType, error)
 }
 
-func (i *Implementation) GetServices(ctx context.Context, _ *pb.GetServicesRequest) (*pb.GetServicesResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "GetServices")
+func (i *Implementation) GetServiceTypes(ctx context.Context, req *pb.GetServiceTypesRequest) (*pb.GetServiceTypesResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "GetServiceTypes")
 	defer span.Finish()
 
-	services, err := i.servicesUC.GetServices(ctx)
+	services, err := i.servicesUC.GetServiceTypes(ctx, &services.GetServicesParams{
+		RegistrationAvailable: req.RegistrationAvailable,
+	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get services: %v", err)
 	}
@@ -29,50 +31,54 @@ func (i *Implementation) GetServices(ctx context.Context, _ *pb.GetServicesReque
 	pbServices := make([]*pb.ServiceType, len(services))
 	for i, service := range services {
 		pbServices[i] = &pb.ServiceType{
-			Id:          service.ID,
-			Name:        service.Name,
-			Description: "", // Not used in the current implementation
+			Id:                    service.ID,
+			Name:                  service.Name,
+			MinPeriodDays:         service.MinPeriodDays,
+			RegistrationAvailable: service.RegistrationAvailable,
 		}
 	}
 
-	return &pb.GetServicesResponse{
-		Services: pbServices,
+	return &pb.GetServiceTypesResponse{
+		ServiceTypes: pbServices,
 	}, nil
 }
 
-func (i *Implementation) GetServiceById(ctx context.Context, req *pb.GetServiceByIdRequest) (*pb.ServiceType, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "GetServiceById")
+func (i *Implementation) GetServiceTypeById(ctx context.Context, req *pb.GetServiceTypeByIdRequest) (*pb.ServiceType, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "GetServiceTypeById")
 	defer span.Finish()
 
 	span.SetTag("id", req.Id)
 
-	service, err := i.servicesUC.GetServicesId(ctx, req.Id)
+	service, err := i.servicesUC.GetServiceTypeById(ctx, req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get service: %v", err)
 	}
 
 	return &pb.ServiceType{
-		Id:          service.ID,
-		Name:        service.Name,
-		Description: "", // Not used in the current implementation
+		Id:                    service.ID,
+		Name:                  service.Name,
+		MinPeriodDays:         service.MinPeriodDays,
+		RegistrationAvailable: service.RegistrationAvailable,
 	}, nil
 }
 
-func (i *Implementation) CreateServiceTypeSettings(ctx context.Context, req *pb.CreateServiceTypeSettingsRequest) (*pb.ServiceTypeSettings, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "CreateServiceTypeSettings")
+func (i *Implementation) UpdateServiceType(ctx context.Context, req *pb.UpdateServiceTypeRequest) (*pb.ServiceType, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UpdateServiceType")
 	defer span.Finish()
 
-	serviceTypeSettings, err := i.servicesUC.CreateServiceTypeSettings(ctx, &services.CreateServiceTypeSettingsRequest{
-		ServiceTypeID: req.ServiceTypeId,
-		PeriodDays:    req.PeriodDays,
+	serviceType, err := i.servicesUC.UpdateServiceType(ctx, &services.UpdateServiceTypeReq{
+		ServiceTypeID:         req.Id,
+		MinPeriodDays:         req.MinPeriodDays,
+		RegistrationAvailable: req.RegistrationAvailable,
 	})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to create service type settings: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to update service type: %v", err)
 	}
 
-	return &pb.ServiceTypeSettings{
-		Id:            serviceTypeSettings.ID,
-		ServiceTypeId: serviceTypeSettings.ServiceTypeID,
-		PeriodDays:    serviceTypeSettings.PeriodDays,
+	return &pb.ServiceType{
+		Id:                    serviceType.ID,
+		Name:                  serviceType.Name,
+		MinPeriodDays:         serviceType.MinPeriodDays,
+		RegistrationAvailable: serviceType.RegistrationAvailable,
 	}, nil
 }

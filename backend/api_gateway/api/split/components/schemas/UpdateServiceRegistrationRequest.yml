@@ -1,0 +1,13 @@
+type: object
+properties:
+  min_period_days:
+    type: integer
+    format: int32
+  registration_available:
+    type: boolean
+required:
+  - min_period_days
+  - registration_available
+example:
+  min_period_days: 1
+  registration_available: true

@@ -8,16 +8,21 @@ import (
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/services"
+	"github.com/Slava02/SaintDiego/backend/common/pointer"
 )
 
 type IServicesUC interface {
-	GetServices(ctx context.Context) ([]*models.Service, error)
-	GetServicesId(ctx context.Context, id int64) (*models.Service, error)
-	CreateServiceTypeSettings(ctx context.Context, req *services.CreateServiceTypeSettingsReq) (*models.ServiceTypeSettings, error)
+	GetServiceTypes(ctx context.Context, req *services.GetServicesParams) ([]*models.ServiceType, error)
+	GetServiceTypeById(ctx context.Context, id int64) (*models.ServiceType, error)
+	UpdateServiceType(ctx context.Context, req *services.UpdateServiceTypeReq) (*models.ServiceType, error)
 }
 
-func (h Handlers) GetServices(ctx echo.Context) error {
-	services, err := h.servicesUC.GetServices(ctx.Request().Context())
+func (h Handlers) GetServices(ctx echo.Context, params GetServicesParams) error {
+	req := &services.GetServicesParams{
+		RegistrationAvailable: pointer.Indirect(params.RegistrationAvailable),
+	}
+
+	services, err := h.servicesUC.GetServiceTypes(ctx.Request().Context(), req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -26,7 +31,7 @@ func (h Handlers) GetServices(ctx echo.Context) error {
 }
 
 func (h Handlers) GetServicesId(ctx echo.Context, id int64) error {
-	service, err := h.servicesUC.GetServicesId(ctx.Request().Context(), id)
+	service, err := h.servicesUC.GetServiceTypeById(ctx.Request().Context(), id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -35,14 +40,14 @@ func (h Handlers) GetServicesId(ctx echo.Context, id int64) error {
 }
 
 func (h Handlers) PutServicesId(ctx echo.Context, id int64) error {
-	req := &services.CreateServiceTypeSettingsReq{}
+	req := &services.UpdateServiceTypeReq{}
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	req.ServiceTypeId = id
+	req.ServiceTypeID = id
 
-	serviceTypeSettings, err := h.servicesUC.CreateServiceTypeSettings(ctx.Request().Context(), req)
+	serviceTypeSettings, err := h.servicesUC.UpdateServiceType(ctx.Request().Context(), req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

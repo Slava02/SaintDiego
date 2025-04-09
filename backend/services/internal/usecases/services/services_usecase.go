@@ -3,15 +3,14 @@ package services
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/Slava02/SaintDiego/backend/services/internal/models"
 )
 
 type IServiceRepository interface {
-	GetServices(ctx context.Context) ([]*models.ServiceType, error)
-	GetServiceById(ctx context.Context, id int64) (*models.ServiceType, error)
-	CreateServiceTypeSettings(ctx context.Context, req *models.ServiceTypeSettings) (*models.ServiceTypeSettings, error)
+	GetServiceTypes(ctx context.Context, registrationAvailableFilter bool) ([]*models.ServiceType, error)
+	GetServiceTypeById(ctx context.Context, id int64) (*models.ServiceType, error)
+	UpdateServiceType(ctx context.Context, id int64, minPeriodDays int64, registrationAvailable bool) (*models.ServiceType, error)
 }
 
 //go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options
@@ -33,18 +32,14 @@ func New(opts Options) (*UseCase, error) {
 	}, nil
 }
 
-func (u UseCase) GetServices(ctx context.Context) ([]*models.ServiceType, error) {
-	return u.serviceRepository.GetServices(ctx)
+func (u UseCase) GetServiceTypes(ctx context.Context, req *GetServicesParams) ([]*models.ServiceType, error) {
+	return u.serviceRepository.GetServiceTypes(ctx, req.RegistrationAvailable)
 }
 
-func (u UseCase) GetServicesId(ctx context.Context, id int64) (*models.ServiceType, error) {
-	return u.serviceRepository.GetServiceById(ctx, id)
+func (u UseCase) GetServiceTypeById(ctx context.Context, id int64) (*models.ServiceType, error) {
+	return u.serviceRepository.GetServiceTypeById(ctx, id)
 }
 
-func (u UseCase) CreateServiceTypeSettings(ctx context.Context, req *CreateServiceTypeSettingsRequest) (*models.ServiceTypeSettings, error) {
-	return u.serviceRepository.CreateServiceTypeSettings(ctx, &models.ServiceTypeSettings{
-		ServiceTypeID: req.ServiceTypeID,
-		PeriodDays:    req.PeriodDays,
-		UpdatedAt:     time.Now(),
-	})
+func (u UseCase) UpdateServiceType(ctx context.Context, req *UpdateServiceTypeReq) (*models.ServiceType, error) {
+	return u.serviceRepository.UpdateServiceType(ctx, req.ServiceTypeID, req.MinPeriodDays, req.RegistrationAvailable)
 }

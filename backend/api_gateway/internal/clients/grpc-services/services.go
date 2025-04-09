@@ -43,14 +43,14 @@ func (c *ServicesClient) Close() error {
 	return c.conn.Close()
 }
 
-func (c *ServicesClient) GetServices(ctx context.Context, req *api.GetServicesRequest) (*api.GetServicesResponse, error) {
-	return c.ServicesServiceClient.GetServices(ctx, req)
+func (c *ServicesClient) GetServiceTypes(ctx context.Context, req *api.GetServiceTypesRequest) (*api.GetServiceTypesResponse, error) {
+	return c.ServicesServiceClient.GetServiceTypes(ctx, req)
 }
 
-func (c *ServicesClient) GetServiceById(ctx context.Context, req *api.GetServiceByIdRequest) (*api.ServiceType, error) {
-	return c.ServicesServiceClient.GetServiceById(ctx, req)
+func (c *ServicesClient) GetServiceTypeById(ctx context.Context, req *api.GetServiceTypeByIdRequest) (*api.ServiceType, error) {
+	return c.ServicesServiceClient.GetServiceTypeById(ctx, req)
 }
 
-func (c *ServicesClient) CreateServiceTypeSettings(ctx context.Context, req *api.CreateServiceTypeSettingsRequest) (*api.ServiceTypeSettings, error) {
-	return c.ServicesServiceClient.CreateServiceTypeSettings(ctx, req)
+func (c *ServicesClient) UpdateServiceType(ctx context.Context, req *api.UpdateServiceTypeRequest) (*api.ServiceType, error) {
+	return c.ServicesServiceClient.UpdateServiceType(ctx, req)
 }

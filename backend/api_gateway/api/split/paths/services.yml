@@ -2,6 +2,13 @@ get:
   tags:
     - services
   summary: Получение списка услуг
+  parameters:
+    - name: registration_available
+      in: query
+      style: form
+      explode: true
+      schema:
+        type: boolean
   responses:
     '200':
       description: Успешный ответ
