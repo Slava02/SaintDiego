@@ -50,11 +50,3 @@ type Recurrence struct {
 	//nolint:lll // Long line in struct tag is unavoidable
 	EndValue *time.Time `json:"endValue,omitempty" validate:"required_if=EndType date,omitempty,gtfield=TimeSlot.StartDate"`
 }
-
-// Event represents an event that occurred in a time slot.
-type Event struct {
-	ID                int64     `json:"id" validate:"omitempty"`
-	TimeSlotServiceID int64     `json:"timeSlotServiceId" validate:"required"`
-	Capacity          int32     `json:"capacity" validate:"required,min=1"`
-	Datetime          time.Time `json:"datetime" validate:"required"`
-}

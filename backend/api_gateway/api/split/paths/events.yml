@@ -1,4 +1,42 @@
 get:
+  parameters:
+    - name: participant_id
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int64
+    - name: status
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - upcoming
+          - past
+    - name: location
+      in: query
+      required: false
+      schema:
+        type: string
+    - name: service_id
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int64
+    - name: from_date
+      in: query
+      required: false
+      schema:
+        type: string
+        format: date-time
+    - name: to_date
+      in: query
+      required: false
+      schema:
+        type: string
+        format: date-time
   tags:
     - events
   summary: Получение списка событий

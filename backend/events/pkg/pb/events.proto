@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package services;
+
+option go_package = "github.com/Slava02/SaintDiego/backend/events/pkg/pb";
+
+import "google/protobuf/timestamp.proto";
+
+// Service definition
+service ServicesService {
+
+  // Services
+  rpc GetEvents(GetEventsRequest) returns (GetEventsResponse) {}
+  rpc GetEventById(GetEventByIdRequest) returns (Event) {}
+  rpc UpdateEvent(UpdateEventRequest) returns (Event) {}
+  rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse) {}
+}
+
+// Request messages
+message GetEventsRequest {
+  optional int64 participant_id = 1;
+  optional string status = 2;
+  optional string location = 3;
+  optional int64 service_id = 4;
+  optional google.protobuf.Timestamp from_date = 5;
+  optional google.protobuf.Timestamp to_date = 6;
+}
+
+message GetEventByIdRequest {
+  int64 id = 1;
+}
+
+message UpdateEventRequest {
+  int64 id = 1;
+  int32 capacity = 2;
+  google.protobuf.Timestamp datetime = 3;
+}
+
+message DeleteEventRequest {
+  int64 id = 1;
+}
+
+// Response messages
+message GetEventsResponse {
+  repeated Event events = 1;
+}
+
+message GetEventByIdResponse {
+  Event event = 1;
+}
+
+message DeleteEventResponse {
+  bool success = 1;
+}
+
+// Common messages
+message Event {
+  int64 id = 1;
+  int64 timeSlotServiceId = 2;
+  int64 serviceTypeId = 3;
+  int32 capacity = 4;
+  google.protobuf.Timestamp datetime = 5;
+}
+
+
+

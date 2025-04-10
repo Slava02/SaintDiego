@@ -9,12 +9,14 @@ type Options struct {
 	timeSlotUC  ITimeSlotsUC `option:"mandatory" validate:"required"`
 	locationsUC ILocationsUC `option:"mandatory" validate:"required"`
 	servicesUC  IServicesUC  `option:"mandatory" validate:"required"`
+	eventsUC    IEventsUC    `option:"mandatory" validate:"required"`
 }
 
 type Handlers struct {
 	timeSlotUC  ITimeSlotsUC
 	locationsUC ILocationsUC
 	servicesUC  IServicesUC
+	eventsUC    IEventsUC
 }
 
 func NewHandlers(opts Options) (Handlers, error) {
@@ -26,5 +28,6 @@ func NewHandlers(opts Options) (Handlers, error) {
 		timeSlotUC:  opts.timeSlotUC,
 		locationsUC: opts.locationsUC,
 		servicesUC:  opts.servicesUC,
+		eventsUC:    opts.eventsUC,
 	}, nil
 }

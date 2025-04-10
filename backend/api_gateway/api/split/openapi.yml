@@ -27,6 +27,8 @@ paths:
     $ref: paths/timeSlots_{id}_archive.yml
   /events:
     $ref: paths/events.yml
+  /events/{id}:
+    $ref: paths/events_{id}.yml
 components:
   securitySchemes:
     BearerAuth:

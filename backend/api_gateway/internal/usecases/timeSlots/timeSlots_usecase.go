@@ -9,13 +9,23 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+type IScheduleClient interface {
+	CreateTimeSlot(ctx context.Context, req *pb.CreateTimeSlotRequest) (*pb.TimeSlot, error)
+	GetTimeSlots(ctx context.Context, req *pb.GetTimeSlotsRequest) (*pb.GetTimeSlotsResponse, error)
+	GetTimeSlot(ctx context.Context, req *pb.GetTimeSlotRequest) (*pb.TimeSlot, error)
+	DeleteTimeSlot(ctx context.Context, req *pb.DeleteTimeSlotRequest) (*pb.DeleteTimeSlotResponse, error)
+	ActivateTimeSlot(ctx context.Context, req *pb.ActivateTimeSlotRequest) (*pb.TimeSlot, error)
+	ArchiveTimeSlot(ctx context.Context, req *pb.ArchiveTimeSlotRequest) (*pb.TimeSlot, error)
+	UpdateTimeSlot(ctx context.Context, req *pb.TimeSlot) (*pb.TimeSlot, error)
+}
+
 //go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options
 type Options struct {
-	EventsClient IEventsClient `option:"mandatory" validate:"required"`
+	ScheduleClient IScheduleClient `option:"mandatory" validate:"required"`
 }
 
 type UseCase struct {
-	eventsClient IEventsClient
+	scheduleClient IScheduleClient
 }
 
 func New(opts Options) (*UseCase, error) {
@@ -24,18 +34,8 @@ func New(opts Options) (*UseCase, error) {
 	}
 
 	return &UseCase{
-		eventsClient: opts.EventsClient,
+		scheduleClient: opts.ScheduleClient,
 	}, nil
-}
-
-type IEventsClient interface {
-	CreateTimeSlot(ctx context.Context, req *pb.CreateTimeSlotRequest) (*pb.TimeSlot, error)
-	GetTimeSlots(ctx context.Context, req *pb.GetTimeSlotsRequest) (*pb.GetTimeSlotsResponse, error)
-	GetTimeSlot(ctx context.Context, req *pb.GetTimeSlotRequest) (*pb.TimeSlot, error)
-	DeleteTimeSlot(ctx context.Context, req *pb.DeleteTimeSlotRequest) (*pb.DeleteTimeSlotResponse, error)
-	ActivateTimeSlot(ctx context.Context, req *pb.ActivateTimeSlotRequest) (*pb.TimeSlot, error)
-	ArchiveTimeSlot(ctx context.Context, req *pb.ArchiveTimeSlotRequest) (*pb.TimeSlot, error)
-	UpdateTimeSlot(ctx context.Context, req *pb.TimeSlot) (*pb.TimeSlot, error)
 }
 
 // TODO: тут бы проверять открыт ли данный сервис для регистрации
@@ -70,7 +70,7 @@ func (u UseCase) CreateTimeSlot(ctx context.Context, req *CreateTimeSlotReq) (*m
 		}
 	}
 
-	pbTimeSlot, err := u.eventsClient.CreateTimeSlot(ctx, pbReq)
+	pbTimeSlot, err := u.scheduleClient.CreateTimeSlot(ctx, pbReq)
 	if err != nil {
 		return nil, fmt.Errorf("create time slot: %w", err)
 	}
@@ -85,7 +85,7 @@ func (u UseCase) GetTimeSlots(ctx context.Context, request *GetTimeSlotsReq) ([]
 		EndDate:   timestamppb.New(request.EndDate),
 	}
 
-	pbResponse, err := u.eventsClient.GetTimeSlots(ctx, pbReq)
+	pbResponse, err := u.scheduleClient.GetTimeSlots(ctx, pbReq)
 	if err != nil {
 		return nil, fmt.Errorf("get time slots: %w", err)
 	}
@@ -103,7 +103,7 @@ func (u UseCase) GetTimeSlot(ctx context.Context, id int64) (*models.TimeSlot, e
 		Id: id,
 	}
 
-	pbTimeSlot, err := u.eventsClient.GetTimeSlot(ctx, pbReq)
+	pbTimeSlot, err := u.scheduleClient.GetTimeSlot(ctx, pbReq)
 	if err != nil {
 		return nil, fmt.Errorf("get time slot: %w", err)
 	}
@@ -116,7 +116,7 @@ func (u UseCase) DeleteTimeSlot(ctx context.Context, id int64) error {
 		Id: id,
 	}
 
-	_, err := u.eventsClient.DeleteTimeSlot(ctx, pbReq)
+	_, err := u.scheduleClient.DeleteTimeSlot(ctx, pbReq)
 	if err != nil {
 		return fmt.Errorf("delete time slot: %w", err)
 	}
@@ -129,7 +129,7 @@ func (u UseCase) ActivateTimeSlot(ctx context.Context, id int64) error {
 		Id: id,
 	}
 
-	_, err := u.eventsClient.ActivateTimeSlot(ctx, pbReq)
+	_, err := u.scheduleClient.ActivateTimeSlot(ctx, pbReq)
 	if err != nil {
 		return fmt.Errorf("activate time slot: %w", err)
 	}
@@ -142,7 +142,7 @@ func (u UseCase) ArchiveTimeSlot(ctx context.Context, id int64) error {
 		Id: id,
 	}
 
-	_, err := u.eventsClient.ArchiveTimeSlot(ctx, pbReq)
+	_, err := u.scheduleClient.ArchiveTimeSlot(ctx, pbReq)
 	if err != nil {
 		return fmt.Errorf("archive time slot: %w", err)
 	}
@@ -184,7 +184,7 @@ func (u UseCase) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*mod
 		}
 	}
 
-	pbTimeSlot, err := u.eventsClient.UpdateTimeSlot(ctx, pbTimeSlot)
+	pbTimeSlot, err := u.scheduleClient.UpdateTimeSlot(ctx, pbTimeSlot)
 	if err != nil {
 		return nil, fmt.Errorf("update time slot: %w", err)
 	}

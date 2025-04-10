@@ -8,7 +8,6 @@ import (
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/services"
-	"github.com/Slava02/SaintDiego/backend/common/pointer"
 )
 
 type IServicesUC interface {
@@ -18,11 +17,15 @@ type IServicesUC interface {
 }
 
 func (h Handlers) GetServices(ctx echo.Context, params GetServicesParams) error {
-	req := &services.GetServicesParams{
-		RegistrationAvailable: pointer.Indirect(params.RegistrationAvailable),
+	var req services.GetServicesParams
+	if err := ctx.Bind(&req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	services, err := h.servicesUC.GetServiceTypes(ctx.Request().Context(), req)
+	if err := ctx.Validate(&req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	services, err := h.servicesUC.GetServiceTypes(ctx.Request().Context(), &req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -42,6 +45,10 @@ func (h Handlers) GetServicesId(ctx echo.Context, id int64) error {
 func (h Handlers) PutServicesId(ctx echo.Context, id int64) error {
 	req := &services.UpdateServiceTypeReq{}
 	if err := ctx.Bind(req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	if err := ctx.Validate(&req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
