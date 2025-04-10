@@ -122,17 +122,3 @@ func convertModelEventToPB(event *models.Event) *pb.Event {
 		ServiceTypeId:     event.ServiceTypeID,
 	}
 }
-
-func convertPBEventToModel(event *pb.Event) *models.Event {
-	if event == nil {
-		return nil
-	}
-
-	return &models.Event{
-		ID:                event.Id,
-		TimeSlotServiceID: event.TimeSlotServiceId,
-		Capacity:          event.Capacity,
-		Datetime:          event.Datetime.AsTime(),
-		ServiceTypeID:     event.ServiceTypeId,
-	}
-}

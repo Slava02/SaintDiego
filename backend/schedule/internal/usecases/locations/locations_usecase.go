@@ -10,6 +10,8 @@ import (
 type ILocationRepository interface {
 	GetLocations(ctx context.Context) ([]*models.Location, error)
 	CreateLocation(ctx context.Context, req *models.Location) (*models.Location, error)
+	UpdateLocation(ctx context.Context, id int64, name, address string) (*models.Location, error)
+	DeleteLocation(ctx context.Context, id int64) error
 }
 
 //go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options
@@ -40,4 +42,12 @@ func (u UseCase) CreateLocation(ctx context.Context, req *CreateLocationRequest)
 		Name:    req.Name,
 		Address: req.Address,
 	})
+}
+
+func (u UseCase) UpdateLocation(ctx context.Context, req *UpdateLocationRequest) (*models.Location, error) {
+	return u.locationRepository.UpdateLocation(ctx, req.ID, req.Name, req.Address)
+}
+
+func (u UseCase) DeleteLocation(ctx context.Context, id int64) error {
+	return u.locationRepository.DeleteLocation(ctx, id)
 }

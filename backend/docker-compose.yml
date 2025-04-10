@@ -11,7 +11,7 @@ services:
       - jaeger
       - events
 
-  events:
+  schedule:
     build:
       context: ./schedule
       dockerfile: Dockerfile
@@ -26,6 +26,15 @@ services:
       dockerfile: Dockerfile
     ports:
       - "50052:50052"
+    depends_on:
+      - jaeger
+
+  events:
+    build:
+      context: ./events
+      dockerfile: Dockerfile
+    ports:
+      - "50053:50053"
     depends_on:
       - jaeger
 

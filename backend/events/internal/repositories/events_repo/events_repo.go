@@ -2,11 +2,15 @@ package events_repo
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/Slava02/SaintDiego/backend/common/storage"
 	"github.com/Slava02/SaintDiego/backend/events/internal/models"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 //go:generate options-gen -out-filename=events_repo_options.gen.go -from-struct=Options
@@ -87,17 +91,40 @@ func (r *EventRepository) GetEvent(ctx context.Context, id int64) (*models.Event
 	var event models.Event
 	err := r.db.Select(ctx, &event).Where("id = ?", id).Scan(ctx)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, status.Errorf(codes.NotFound, "event not found")
+		}
+
 		return nil, fmt.Errorf("scan event: %w", err)
 	}
 	return &event, nil
 }
 
 func (r *EventRepository) UpdateEvent(ctx context.Context, id int64, capacity int32, datetime time.Time) (*models.Event, error) {
-	_, err := r.db.Update(ctx, &models.Event{ID: id, Capacity: capacity, Datetime: datetime}).Where("id = ?", id).Exec(ctx)
+	existingEvent := &models.Event{}
+
+	err := r.db.Select(ctx, existingEvent).Where("id = ?", id).Scan(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("get existing event: %w", err)
+	}
+
+	// Update only capacity and datetime
+	_, err = r.db.Update(ctx, &models.Event{}).
+		Column("capacity").
+		Column("datetime").
+		Where("id = ?", id).
+		Exec(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("update event: %w", err)
 	}
-	return &models.Event{ID: id, Capacity: capacity, Datetime: datetime}, nil
+
+	return &models.Event{
+		ID:                id,
+		Capacity:          capacity,
+		Datetime:          datetime,
+		TimeSlotServiceID: existingEvent.TimeSlotServiceID,
+		ServiceTypeID:     existingEvent.ServiceTypeID,
+	}, nil
 }
 
 func (r *EventRepository) DeleteEvent(ctx context.Context, id int64) error {

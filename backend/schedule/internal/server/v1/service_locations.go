@@ -14,6 +14,8 @@ import (
 type ILocationsUC interface {
 	GetLocations(ctx context.Context) ([]*models.Location, error)
 	CreateLocation(ctx context.Context, req *locations.CreateLocationRequest) (*models.Location, error)
+	UpdateLocation(ctx context.Context, req *locations.UpdateLocationRequest) (*models.Location, error)
+	DeleteLocation(ctx context.Context, id int64) error
 }
 
 func (i *Implementation) GetLocations(ctx context.Context, _ *pb.GetLocationsRequest) (*pb.GetLocationsResponse, error) {
@@ -56,4 +58,36 @@ func (i *Implementation) CreateLocation(ctx context.Context, req *pb.CreateLocat
 		Name:    location.Name,
 		Address: location.Address,
 	}, nil
+}
+
+func (i *Implementation) UpdateLocation(ctx context.Context, req *pb.UpdateLocationRequest) (*pb.Location, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UpdateLocation")
+	defer span.Finish()
+
+	location, err := i.locationsUC.UpdateLocation(ctx, &locations.UpdateLocationRequest{
+		ID:      req.Id,
+		Name:    req.Name,
+		Address: req.Address,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to update location: %v", err)
+	}
+
+	return &pb.Location{
+		Id:      location.ID,
+		Name:    location.Name,
+		Address: location.Address,
+	}, nil
+}
+
+func (i *Implementation) DeleteLocation(ctx context.Context, req *pb.DeleteLocationRequest) (*pb.DeleteLocationResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "DeleteLocation")
+	defer span.Finish()
+
+	err := i.locationsUC.DeleteLocation(ctx, req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to delete location: %v", err)
+	}
+
+	return &pb.DeleteLocationResponse{}, nil
 }

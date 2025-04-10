@@ -40,3 +40,37 @@ func (r *LocationRepository) CreateLocation(ctx context.Context, req *models.Loc
 
 	return req, nil
 }
+
+func (r *LocationRepository) UpdateLocation(ctx context.Context, id int64, name, address string) (*models.Location, error) {
+	existingLocation := &models.Location{}
+	err := r.db.Select(ctx, existingLocation).Where("id = ?", id).Scan(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("select location: %w", err)
+	}
+
+	_, err = r.db.Update(ctx, &models.Location{
+		Name:    name,
+		Address: address,
+	}).
+		Column("name").
+		Column("address").
+		Where("id = ?", id).
+		Exec(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("update location: %w", err)
+	}
+
+	return &models.Location{
+		ID:      id,
+		Name:    name,
+		Address: address,
+	}, nil
+}
+
+func (r *LocationRepository) DeleteLocation(ctx context.Context, id int64) error {
+	_, err := r.db.Delete(ctx, &models.Location{ID: id}).Where("id = ?", id).Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("delete location: %w", err)
+	}
+	return nil
+}
