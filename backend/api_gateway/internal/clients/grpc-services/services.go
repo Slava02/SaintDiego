@@ -11,7 +11,7 @@ import (
 
 //go:generate options-gen -out-filename=services_options.gen.go -from-struct=ServicesClientOptions
 type ServicesClientOptions struct {
-	ServicesServerAddr string
+	ServicesServerAddr string `option:"mandatory" validate:"required"`
 }
 
 type ServicesClient struct {
@@ -20,6 +20,10 @@ type ServicesClient struct {
 }
 
 func NewServicesClient(opts ServicesClientOptions) (*ServicesClient, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, fmt.Errorf("validate options: %w", err)
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), connectionTimeout)
 	defer cancel()
 

@@ -1,10 +1,11 @@
 module github.com/Slava02/SaintDiego/backend/api_gateway
 
-go 1.23.3
+go 1.24.2
 
 require (
 	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250409104414-54a8e25fcb75
-	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250409104414-54a8e25fcb75
+	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250410090307-f718e533a784
+	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250410090307-f718e533a784
 	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250409105843-f7888a3c34a2
 	github.com/getkin/kin-openapi v0.131.0
 	github.com/kazhuravlev/options-gen v0.33.2
@@ -21,7 +22,6 @@ require (
 )
 
 require (
-	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250401094425-299e0a46c792 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect

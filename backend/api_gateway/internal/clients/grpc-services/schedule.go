@@ -12,7 +12,7 @@ import (
 
 //go:generate options-gen -out-filename=schedule_options.gen.go -from-struct=ScheduleClientOptions
 type ScheduleClientOptions struct {
-	ScheduleServerAddr string
+	ScheduleServerAddr string `option:"mandatory" validate:"required"`
 }
 
 type ScheduleClient struct {
@@ -21,6 +21,10 @@ type ScheduleClient struct {
 }
 
 func NewScheduleClient(opts ScheduleClientOptions) (*ScheduleClient, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, fmt.Errorf("validate options: %w", err)
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), connectionTimeout)
 	defer cancel()
 
@@ -78,4 +82,12 @@ func (c *ScheduleClient) GetLocations(ctx context.Context, req *api.GetLocations
 
 func (c *ScheduleClient) CreateLocation(ctx context.Context, req *api.CreateLocationRequest) (*api.Location, error) {
 	return c.ScheduleServiceClient.CreateLocation(ctx, req)
+}
+
+func (c *ScheduleClient) UpdateLocation(ctx context.Context, req *api.UpdateLocationRequest) (*api.Location, error) {
+	return c.ScheduleServiceClient.UpdateLocation(ctx, req)
+}
+
+func (c *ScheduleClient) DeleteLocation(ctx context.Context, req *api.DeleteLocationRequest) (*api.DeleteLocationResponse, error) {
+	return c.ScheduleServiceClient.DeleteLocation(ctx, req)
 }

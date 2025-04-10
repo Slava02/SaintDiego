@@ -20,7 +20,7 @@ service EventsService {
 message GetEventsRequest {
   optional int64 participant_id = 1;
   optional string status = 2;
-  optional string location = 3;
+  optional int64 location = 3;
   optional int64 service_id = 4;
   optional google.protobuf.Timestamp from_date = 5;
   optional google.protobuf.Timestamp to_date = 6;
@@ -43,10 +43,6 @@ message DeleteEventRequest {
 // Response messages
 message GetEventsResponse {
   repeated Event events = 1;
-}
-
-message GetEventByIdResponse {
-  Event event = 1;
 }
 
 message DeleteEventResponse {

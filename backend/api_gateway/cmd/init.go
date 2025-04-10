@@ -10,6 +10,7 @@ import (
 	grpc_services "github.com/Slava02/SaintDiego/backend/api_gateway/internal/clients/grpc-services"
 	server "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server"
 	v1 "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1"
+	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/events"
 	locations "github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/locations"
 	services "github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/services"
 	timeSlots "github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/timeSlots"
@@ -23,11 +24,12 @@ func initServer(
 	v1Swagger *openapi3.T,
 	scheduleAddr string,
 	servicesAddr string,
+	eventsAddr string,
 ) (*server.Server, error) {
 	lg := zap.L().Named(nameServer)
 
 	// Create gRPC client manager
-	manager, err := grpc_services.NewManager(grpc_services.NewManagerOptions(scheduleAddr, servicesAddr))
+	manager, err := grpc_services.NewManager(grpc_services.NewManagerOptions(scheduleAddr, servicesAddr, eventsAddr))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create gRPC client manager: %v", err)
 	}
@@ -48,7 +50,12 @@ func initServer(
 		return nil, fmt.Errorf("create locations usecase: %v", err)
 	}
 
-	v1Handlers, err := v1.NewHandlers(v1.NewOptions(timeSlotsUC, locationsUC, servicesUC))
+	eventsUC, err := events.New(events.NewOptions(manager.Events()))
+	if err != nil {
+		return nil, fmt.Errorf("create events usecase: %v", err)
+	}
+
+	v1Handlers, err := v1.NewHandlers(v1.NewOptions(timeSlotsUC, locationsUC, servicesUC, eventsUC))
 	if err != nil {
 		return nil, fmt.Errorf("create v1 handlers: %v", err)
 	}

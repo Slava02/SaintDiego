@@ -28,6 +28,7 @@ type APIGWServerConfig struct {
 type MicroservicesConfig struct {
 	Schedule ScheduleConfig `toml:"schedule"`
 	Services ServicesConfig `toml:"services"`
+	Events   EventsConfig   `toml:"events"`
 }
 
 type ScheduleConfig struct {
@@ -35,5 +36,9 @@ type ScheduleConfig struct {
 }
 
 type ServicesConfig struct {
+	Addr string `toml:"addr" validate:"required,hostname_port"`
+}
+
+type EventsConfig struct {
 	Addr string `toml:"addr" validate:"required,hostname_port"`
 }

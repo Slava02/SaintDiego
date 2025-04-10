@@ -69,6 +69,80 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /locations/{id}:
+    put:
+      tags:
+        - locations
+      summary: Обновление локации по идентификатору
+      parameters:
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLocationRequest'
+        required: true
+      responses:
+        '200':
+          description: Локация успешно обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+        '400':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - locations
+      summary: Удаление локации по идентификатору
+      parameters:
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Локация успешно удалена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '400':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /services:
     get:
       tags:
@@ -455,7 +529,8 @@ paths:
           in: query
           required: false
           schema:
-            type: string
+            type: integer
+            format: int64
         - name: service_id
           in: query
           required: false
@@ -645,6 +720,19 @@ components:
         message: Ошибка валидации
         details: Поле 'name' обязательно для заполнения
     CreateLocationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+      required:
+        - name
+        - address
+      example:
+        name: Новый храм
+        address: ул. Новая, 67
+    UpdateLocationRequest:
       type: object
       properties:
         name:

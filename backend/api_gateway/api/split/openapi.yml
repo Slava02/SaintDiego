@@ -13,6 +13,8 @@ security:
 paths:
   /locations:
     $ref: paths/locations.yml
+  /locations/{id}:
+    $ref: paths/locations_{id}.yml
   /services:
     $ref: paths/services.yml
   /services/{id}:

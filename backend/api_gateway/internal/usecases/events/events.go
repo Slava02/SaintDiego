@@ -6,12 +6,13 @@ import (
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
 	"github.com/Slava02/SaintDiego/backend/events/pkg/pb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type IEventsClient interface {
 	GetEvents(ctx context.Context, req *pb.GetEventsRequest) (*pb.GetEventsResponse, error)
-	GetEventById(ctx context.Context, req *pb.) (*pb.GetEventByIdResponse, error)
-	UpdateEvent(ctx context.Context, req *pb.UpdateEventRequest) (*pb.UpdateEventResponse, error)
+	GetEventById(ctx context.Context, req *pb.GetEventByIdRequest) (*pb.Event, error)
+	UpdateEvent(ctx context.Context, req *pb.UpdateEventRequest) (*pb.Event, error)
 	DeleteEvent(ctx context.Context, req *pb.DeleteEventRequest) (*pb.DeleteEventResponse, error)
 }
 
@@ -35,17 +36,89 @@ func New(opts Options) (*UseCase, error) {
 }
 
 func (u *UseCase) GetEvents(ctx context.Context, req *GetEventsParams) ([]*models.Event, error) {
-	return u.eventsClient.GetEvents(ctx, req)
+	pbReq := &pb.GetEventsRequest{
+		ParticipantId: req.ParticipantID,
+		Status:        req.Status,
+		Location:      req.Location,
+		ServiceId:     req.ServiceID,
+	}
+
+	if req.FromDate != nil {
+		pbReq.FromDate = timestamppb.New(*req.FromDate)
+	}
+
+	if req.ToDate != nil {
+		pbReq.ToDate = timestamppb.New(*req.ToDate)
+	}
+
+	pbRes, err := u.eventsClient.GetEvents(ctx, pbReq)
+	if err != nil {
+		return nil, err
+	}
+
+	events := make([]*models.Event, len(pbRes.Events))
+	for i, event := range pbRes.Events {
+		events[i] = &models.Event{
+			ID:                event.Id,
+			TimeSlotServiceID: event.TimeSlotServiceId,
+			Capacity:          event.Capacity,
+			Datetime:          event.Datetime.AsTime(),
+			ServiceTypeID:     event.ServiceTypeId,
+		}
+	}
+
+	return events, nil
 }
 
 func (u *UseCase) GetEvent(ctx context.Context, id int64) (*models.Event, error) {
-	return u.eventsClient.GetEvent(ctx, id)
+	pbReq := &pb.GetEventByIdRequest{
+		Id: id,
+	}
+
+	pbRes, err := u.eventsClient.GetEventById(ctx, pbReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.Event{
+		ID:                pbRes.Id,
+		TimeSlotServiceID: pbRes.TimeSlotServiceId,
+		Capacity:          pbRes.Capacity,
+		Datetime:          pbRes.Datetime.AsTime(),
+		ServiceTypeID:     pbRes.ServiceTypeId,
+	}, nil
 }
 
 func (u *UseCase) UpdateEvent(ctx context.Context, req *UpdateEventRequest) (*models.Event, error) {
-	return u.eventsClient.UpdateEvent(ctx, req)
+	pbReq := &pb.UpdateEventRequest{
+		Id:       req.ID,
+		Capacity: req.Capacity,
+		Datetime: timestamppb.New(req.Datetime),
+	}
+
+	pbRes, err := u.eventsClient.UpdateEvent(ctx, pbReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.Event{
+		ID:                pbRes.Id,
+		TimeSlotServiceID: pbRes.TimeSlotServiceId,
+		Capacity:          pbRes.Capacity,
+		Datetime:          pbRes.Datetime.AsTime(),
+		ServiceTypeID:     pbRes.ServiceTypeId,
+	}, nil
 }
 
-func (u *UseCase) DeleteEvent(ctx context.Context, id int64) (*models.Event, error) {
-	return u.eventsClient.DeleteEvent(ctx, id)
+func (u *UseCase) DeleteEvent(ctx context.Context, id int64) error {
+	pbReq := &pb.DeleteEventRequest{
+		Id: id,
+	}
+
+	_, err := u.eventsClient.DeleteEvent(ctx, pbReq)
+	if err != nil {
+		return fmt.Errorf("delete event: %v", err)
+	}
+
+	return nil
 }

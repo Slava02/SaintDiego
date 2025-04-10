@@ -13,7 +13,7 @@ type IEventsUC interface {
 	GetEvents(ctx context.Context, req *events.GetEventsParams) ([]*models.Event, error)
 	GetEvent(ctx context.Context, id int64) (*models.Event, error)
 	UpdateEvent(ctx context.Context, req *events.UpdateEventRequest) (*models.Event, error)
-	DeleteEvent(ctx context.Context, id int64) (*models.Event, error)
+	DeleteEvent(ctx context.Context, id int64) error
 }
 
 func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
@@ -21,11 +21,6 @@ func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-
-	if err := c.Validate(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
-	}
-
 	events, err := h.eventsUC.GetEvents(c.Request().Context(), &req)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -49,10 +44,6 @@ func (h Handlers) PutEventsId(c echo.Context, id int64) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	if err := c.Validate(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
-	}
-
 	req.ID = id
 
 	event, err := h.eventsUC.UpdateEvent(c.Request().Context(), &req)
@@ -64,10 +55,10 @@ func (h Handlers) PutEventsId(c echo.Context, id int64) error {
 }
 
 func (h Handlers) DeleteEventsId(c echo.Context, id int64) error {
-	event, err := h.eventsUC.DeleteEvent(c.Request().Context(), id)
+	err := h.eventsUC.DeleteEvent(c.Request().Context(), id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, event)
+	return c.NoContent(http.StatusNoContent)
 }

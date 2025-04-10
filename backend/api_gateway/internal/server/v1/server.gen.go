@@ -167,6 +167,12 @@ type UpdateEventRequest struct {
 	Datetime time.Time `json:"datetime"`
 }
 
+// UpdateLocationRequest defines model for UpdateLocationRequest.
+type UpdateLocationRequest struct {
+	Address string `json:"address"`
+	Name    string `json:"name"`
+}
+
 // UpdateServiceRegistrationRequest defines model for UpdateServiceRegistrationRequest.
 type UpdateServiceRegistrationRequest struct {
 	MinPeriodDays         int32 `json:"min_period_days"`
@@ -177,7 +183,7 @@ type UpdateServiceRegistrationRequest struct {
 type GetEventsParams struct {
 	ParticipantId *int64                 `form:"participant_id,omitempty" json:"participant_id,omitempty"`
 	Status        *GetEventsParamsStatus `form:"status,omitempty" json:"status,omitempty"`
-	Location      *string                `form:"location,omitempty" json:"location,omitempty"`
+	Location      *int64                 `form:"location,omitempty" json:"location,omitempty"`
 	ServiceId     *int64                 `form:"service_id,omitempty" json:"service_id,omitempty"`
 	FromDate      *time.Time             `form:"from_date,omitempty" json:"from_date,omitempty"`
 	ToDate        *time.Time             `form:"to_date,omitempty" json:"to_date,omitempty"`
@@ -206,6 +212,9 @@ type PutEventsIdJSONRequestBody = UpdateEventRequest
 
 // PostLocationsJSONRequestBody defines body for PostLocations for application/json ContentType.
 type PostLocationsJSONRequestBody = CreateLocationRequest
+
+// PutLocationsIdJSONRequestBody defines body for PutLocationsId for application/json ContentType.
+type PutLocationsIdJSONRequestBody = UpdateLocationRequest
 
 // PutServicesIdJSONRequestBody defines body for PutServicesId for application/json ContentType.
 type PutServicesIdJSONRequestBody = UpdateServiceRegistrationRequest
@@ -236,6 +245,12 @@ type ServerInterface interface {
 	// Создание новой локации
 	// (POST /locations)
 	PostLocations(ctx echo.Context) error
+	// Удаление локации по идентификатору
+	// (DELETE /locations/{id})
+	DeleteLocationsId(ctx echo.Context, id int64) error
+	// Обновление локации по идентификатору
+	// (PUT /locations/{id})
+	PutLocationsId(ctx echo.Context, id int64) error
 	// Получение списка услуг
 	// (GET /services)
 	GetServices(ctx echo.Context, params GetServicesParams) error
@@ -401,6 +416,42 @@ func (w *ServerInterfaceWrapper) PostLocations(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.PostLocations(ctx)
+	return err
+}
+
+// DeleteLocationsId converts echo context to params.
+func (w *ServerInterfaceWrapper) DeleteLocationsId(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.DeleteLocationsId(ctx, id)
+	return err
+}
+
+// PutLocationsId converts echo context to params.
+func (w *ServerInterfaceWrapper) PutLocationsId(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.PutLocationsId(ctx, id)
 	return err
 }
 
@@ -629,6 +680,8 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.PUT(baseURL+"/events/:id", wrapper.PutEventsId)
 	router.GET(baseURL+"/locations", wrapper.GetLocations)
 	router.POST(baseURL+"/locations", wrapper.PostLocations)
+	router.DELETE(baseURL+"/locations/:id", wrapper.DeleteLocationsId)
+	router.PUT(baseURL+"/locations/:id", wrapper.PutLocationsId)
 	router.GET(baseURL+"/services", wrapper.GetServices)
 	router.GET(baseURL+"/services/:id", wrapper.GetServicesId)
 	router.PUT(baseURL+"/services/:id", wrapper.PutServicesId)
@@ -645,50 +698,51 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"/xFNX+UFSQAA",
+	"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",
+	"//9NYxKBHlAAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
