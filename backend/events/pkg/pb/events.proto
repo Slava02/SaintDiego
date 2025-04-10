@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package services;
+package events;
 
 option go_package = "github.com/Slava02/SaintDiego/backend/events/pkg/pb";
 
 import "google/protobuf/timestamp.proto";
 
 // Service definition
-service ServicesService {
+service EventsService {
 
   // Services
   rpc GetEvents(GetEventsRequest) returns (GetEventsResponse) {}

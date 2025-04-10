@@ -5,9 +5,14 @@ import (
 	"fmt"
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
+	"github.com/Slava02/SaintDiego/backend/events/pkg/pb"
 )
 
 type IEventsClient interface {
+	GetEvents(ctx context.Context, req *pb.GetEventsRequest) (*pb.GetEventsResponse, error)
+	GetEventById(ctx context.Context, req *pb.) (*pb.GetEventByIdResponse, error)
+	UpdateEvent(ctx context.Context, req *pb.UpdateEventRequest) (*pb.UpdateEventResponse, error)
+	DeleteEvent(ctx context.Context, req *pb.DeleteEventRequest) (*pb.DeleteEventResponse, error)
 }
 
 //go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options

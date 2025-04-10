@@ -21,6 +21,7 @@ require (
 )
 
 require (
+	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250401094425-299e0a46c792 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
