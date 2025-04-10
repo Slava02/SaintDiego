@@ -26,7 +26,7 @@ func (s *Implementation) GetEvents(ctx context.Context, req *pb.GetEventsRequest
 	eventParams := &events.GetEventsParams{
 		ParticipantID: req.ParticipantId,
 		Status:        req.Status,
-		Location:      req.Location,
+		LocationID:    req.LocationId,
 		ServiceID:     req.ServiceId,
 		Page:          req.Page,
 		PerPage:       req.PerPage,
@@ -53,11 +53,10 @@ func (s *Implementation) GetEvents(ctx context.Context, req *pb.GetEventsRequest
 	}
 
 	return &pb.GetEventsResponse{
-		Events:     pbEvents,
-		Total:      total,
-		Page:       req.Page,
-		PerPage:    req.PerPage,
-		TotalPages: total / req.PerPage,
+		Events:  pbEvents,
+		Total:   total,
+		Page:    req.Page,
+		PerPage: req.PerPage,
 	}, nil
 }
 

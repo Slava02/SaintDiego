@@ -1,5 +1,22 @@
 get:
   parameters:
+    - name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+    - name: per_page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
     - name: participant_id
       in: query
       required: false
@@ -14,7 +31,7 @@ get:
         enum:
           - upcoming
           - past
-    - name: location
+    - name: location_id
       in: query
       required: false
       schema:
@@ -47,9 +64,7 @@ get:
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: ../components/schemas/Event.yml
+            $ref: ../components/schemas/GetEventsResponse.yml
     "400":
       description: Ошибка валидации
       content:

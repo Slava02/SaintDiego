@@ -11,10 +11,10 @@ type UpdateEventRequest struct {
 type GetEventsParams struct {
 	ParticipantID *int64     `json:"participant_id"`
 	Status        *string    `json:"status"`
-	Location      *int64     `json:"location"`
+	LocationID    *int64     `json:"location_id"`
 	ServiceID     *int64     `json:"service_id"`
 	FromDate      *time.Time `json:"from_date"`
 	ToDate        *time.Time `json:"to_date"`
-	Page          int64     `json:"page"`
-	PerPage       int64     `json:"per_page"`
+	Page          int64      `json:"page"`
+	PerPage       int64      `json:"per_page"`
 }

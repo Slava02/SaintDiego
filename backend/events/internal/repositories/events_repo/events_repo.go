@@ -31,10 +31,10 @@ func (r *EventRepository) GetEvents(ctx context.Context, params *GetEventsParams
 	query := r.db.Select(ctx, &models.Event{})
 
 	// Применяем фильтры к обоим запросам
-	if params.Location != nil {
+	if params.LocationID != nil {
 		joinClause := "JOIN time_slot_service ON e.time_slot_service_id = time_slot_service.id JOIN time_slot ON time_slot_service.time_slot_id = time_slot.id JOIN service_type ON e.service_type_id = service_type.id"
 		query = query.Join(joinClause)
-		query = query.Where("time_slot.location_id = ?", *params.Location)
+		query = query.Where("time_slot.location_id = ?", *params.LocationID)
 	}
 
 	if params.ParticipantID != nil {

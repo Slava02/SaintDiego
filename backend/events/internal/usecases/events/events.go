@@ -38,7 +38,7 @@ func New(opts Options) (*UseCase, error) {
 func (u *UseCase) GetEvents(ctx context.Context, params *GetEventsParams) ([]*models.Event, int64, error) {
 	getEventsParams := &events_repo.GetEventsParams{
 		ParticipantID: params.ParticipantID,
-		Location:      params.Location,
+		LocationID:    params.LocationID,
 		ServiceID:     params.ServiceID,
 		FromDate:      params.FromDate,
 		ToDate:        params.ToDate,

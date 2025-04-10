@@ -4,7 +4,7 @@ import "time"
 
 type GetEventsParams struct {
 	ParticipantID *int64     `json:"participant_id,omitempty"`
-	Location      *int64     `json:"location,omitempty"`
+	LocationID    *int64     `json:"location_id,omitempty"`
 	ServiceID     *int64     `json:"service_id,omitempty"`
 	FromDate      *time.Time `json:"from_date,omitempty"`
 	ToDate        *time.Time `json:"to_date,omitempty"`

@@ -35,11 +35,11 @@ func New(opts Options) (*UseCase, error) {
 	}, nil
 }
 
-func (u *UseCase) GetEvents(ctx context.Context, req *GetEventsParams) ([]*models.Event, error) {
+func (u *UseCase) GetEvents(ctx context.Context, req *GetEventsParams) ([]*models.Event, int32, error) {
 	pbReq := &pb.GetEventsRequest{
 		ParticipantId: req.ParticipantID,
 		Status:        req.Status,
-		Location:      req.Location,
+		LocationId:    req.LocationID,
 		ServiceId:     req.ServiceID,
 	}
 
@@ -53,7 +53,7 @@ func (u *UseCase) GetEvents(ctx context.Context, req *GetEventsParams) ([]*model
 
 	pbRes, err := u.eventsClient.GetEvents(ctx, pbReq)
 	if err != nil {
-		return nil, err
+		return nil, 0, fmt.Errorf("get events: %v", err)
 	}
 
 	events := make([]*models.Event, len(pbRes.Events))
@@ -67,7 +67,7 @@ func (u *UseCase) GetEvents(ctx context.Context, req *GetEventsParams) ([]*model
 		}
 	}
 
-	return events, nil
+	return events, int32(pbRes.Total), nil
 }
 
 func (u *UseCase) GetEvent(ctx context.Context, id int64) (*models.Event, error) {

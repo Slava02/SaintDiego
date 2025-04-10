@@ -3,9 +3,11 @@ package events
 import "time"
 
 type GetEventsParams struct {
+	Page          int32      `query:"page" json:"page" validate:"omitempty,min=1"`
+	PerPage       int32      `query:"per_page" json:"per_page" validate:"omitempty,min=1,max=100"`
 	ParticipantID *int64     `query:"participant_id" json:"participant_id" validate:"omitempty,min=1"`
 	Status        *string    `query:"status" json:"status" validate:"omitempty,oneof=upcoming past"`
-	Location      *int64     `query:"location" json:"location" validate:"omitempty,min=1"`
+	LocationID    *int64     `query:"location_id" json:"location_id" validate:"omitempty,min=1"`
 	ServiceID     *int64     `query:"service_id" json:"service_id" validate:"omitempty,min=1"`
 	FromDate      *time.Time `query:"from_date" json:"from_date" validate:"omitempty,datetime=2006-01-02T15:04:05Z|datetime=2006-01-02"`
 	ToDate        *time.Time `query:"to_date" json:"to_date" validate:"omitempty,datetime=2006-01-02T15:04:05Z|datetime=2006-01-02"`
