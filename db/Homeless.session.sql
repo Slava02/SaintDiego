@@ -23,6 +23,8 @@
 --     tsr.end_type,
 --     tsr.end_value
 -- ORDER BY ts.id;
-SELECT *
-FROM service_type
-WHERE id = 1;
+select *
+from event
+    left join time_slot_service on event.time_slot_service_id = time_slot_service.id
+    left join time_slot on time_slot_service.time_slot_id = time_slot.id
+where time_slot.location_id = 1;

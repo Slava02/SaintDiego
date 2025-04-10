@@ -10,7 +10,7 @@ import (
 )
 
 type IEventRepository interface {
-	GetEvents(ctx context.Context, params *events_repo.GetEventsParams) ([]*models.Event, error)
+	GetEvents(ctx context.Context, params *events_repo.GetEventsParams) ([]*models.Event, int64, error)
 	GetEvent(ctx context.Context, id int64) (*models.Event, error)
 	UpdateEvent(ctx context.Context, id int64, capacity int32, datetime time.Time) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id int64) error
@@ -35,15 +35,26 @@ func New(opts Options) (*UseCase, error) {
 	}, nil
 }
 
-func (u *UseCase) GetEvents(ctx context.Context, params *GetEventsParams) ([]*models.Event, error) {
-	return u.eventRepository.GetEvents(ctx, &events_repo.GetEventsParams{
+func (u *UseCase) GetEvents(ctx context.Context, params *GetEventsParams) ([]*models.Event, int64, error) {
+	getEventsParams := &events_repo.GetEventsParams{
 		ParticipantID: params.ParticipantID,
-		Status:        params.Status,
 		Location:      params.Location,
 		ServiceID:     params.ServiceID,
 		FromDate:      params.FromDate,
 		ToDate:        params.ToDate,
-	})
+	}
+
+	if params.Status != nil {
+		if *params.Status == "upcoming" {
+			getEventsParams.Upcoming = true
+		} else if *params.Status == "past" {
+			getEventsParams.Past = true
+		} else {
+			return nil, 0, fmt.Errorf("invalid status: %s", *params.Status)
+		}
+	}
+
+	return u.eventRepository.GetEvents(ctx, getEventsParams)
 }
 
 func (u *UseCase) GetEvent(ctx context.Context, id int64) (*models.Event, error) {

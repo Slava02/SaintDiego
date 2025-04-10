@@ -26,39 +26,61 @@ func NewEventRepository(opts Options) (*EventRepository, error) {
 	return &EventRepository{db: opts.DB}, nil
 }
 
-func (r *EventRepository) GetEvents(ctx context.Context, params *GetEventsParams) ([]*models.Event, error) {
+func (r *EventRepository) GetEvents(ctx context.Context, params *GetEventsParams) ([]*models.Event, int64, error) {
+	// Создаем основной запрос для получения данных
 	query := r.db.Select(ctx, &models.Event{})
 
-	if params.ParticipantID != nil {
-		query = query.Where("participant_id = ?", params.ParticipantID)
-	}
-
-	if params.Status != nil {
-		query = query.Where("status = ?", params.Status)
-	}
-
+	// Применяем фильтры к обоим запросам
 	if params.Location != nil {
-		query = query.Where("location = ?", params.Location)
+		joinClause := "JOIN time_slot_service ON e.time_slot_service_id = time_slot_service.id JOIN time_slot ON time_slot_service.time_slot_id = time_slot.id JOIN service_type ON e.service_type_id = service_type.id"
+		query = query.Join(joinClause)
+		query = query.Where("time_slot.location_id = ?", *params.Location)
+	}
+
+	if params.ParticipantID != nil {
+		query = query.Where("participant_id = ?", *params.ParticipantID)
+	}
+
+	if params.Upcoming {
+		query = query.Where("datetime > ?", time.Now())
+	}
+
+	if params.Past {
+		query = query.Where("datetime <= ?", time.Now())
 	}
 
 	if params.ServiceID != nil {
-		query = query.Where("service_type_id = ?", params.ServiceID)
+		query = query.Where("service_type_id = ?", *params.ServiceID)
 	}
 
 	if params.FromDate != nil {
-		query = query.Where("datetime >= ?", params.FromDate)
+		query = query.Where("datetime >= ?", *params.FromDate)
 	}
 
 	if params.ToDate != nil {
-		query = query.Where("datetime <= ?", params.ToDate)
+		query = query.Where("datetime <= ?", *params.ToDate)
 	}
 
-	var events []*models.Event
-	err := query.Scan(ctx, &events)
-	if err != nil {
-		return nil, fmt.Errorf("scan events: %w", err)
+	// Применяем пагинацию
+	if params.Page < 1 {
+		params.Page = 1
 	}
-	return events, nil
+	if params.PerPage < 1 {
+		params.PerPage = 20
+	} else if params.PerPage > 100 {
+		params.PerPage = 100
+	}
+
+	offset := (params.Page - 1) * params.PerPage
+	query = query.Limit(int(params.PerPage)).Offset(int(offset))
+
+	var events []*models.Event
+	total, err := query.ScanAndCount(ctx, &events)
+	if err != nil {
+		return nil, 0, fmt.Errorf("get events: %v", err)
+	}
+
+	return events, int64(total), nil
 }
 
 func (r *EventRepository) GetEvent(ctx context.Context, id int64) (*models.Event, error) {

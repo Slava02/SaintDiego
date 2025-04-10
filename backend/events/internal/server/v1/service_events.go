@@ -13,7 +13,7 @@ import (
 )
 
 type IEventsUC interface {
-	GetEvents(ctx context.Context, params *events.GetEventsParams) ([]*models.Event, error)
+	GetEvents(ctx context.Context, params *events.GetEventsParams) ([]*models.Event, int64, error)
 	GetEvent(ctx context.Context, eventID int64) (*models.Event, error)
 	UpdateEvent(ctx context.Context, req *events.UpdateEventRequest) (*models.Event, error)
 	DeleteEvent(ctx context.Context, eventID int64) error
@@ -28,6 +28,8 @@ func (s *Implementation) GetEvents(ctx context.Context, req *pb.GetEventsRequest
 		Status:        req.Status,
 		Location:      req.Location,
 		ServiceID:     req.ServiceId,
+		Page:          req.Page,
+		PerPage:       req.PerPage,
 	}
 
 	if req.FromDate != nil {
@@ -40,7 +42,7 @@ func (s *Implementation) GetEvents(ctx context.Context, req *pb.GetEventsRequest
 		eventParams.ToDate = &toDate
 	}
 
-	events, err := s.eventsUC.GetEvents(ctx, eventParams)
+	events, total, err := s.eventsUC.GetEvents(ctx, eventParams)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get events: %v", err)
 	}
@@ -51,7 +53,11 @@ func (s *Implementation) GetEvents(ctx context.Context, req *pb.GetEventsRequest
 	}
 
 	return &pb.GetEventsResponse{
-		Events: pbEvents,
+		Events:     pbEvents,
+		Total:      total,
+		Page:       req.Page,
+		PerPage:    req.PerPage,
+		TotalPages: total / req.PerPage,
 	}, nil
 }
 

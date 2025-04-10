@@ -42,14 +42,12 @@ required:
   - endDate
   - services
 examples:
-  recurring:
-    value:
-      title: Тест повторение
-      type: recurring
-      locationId: 1
-      capacity: 100
-      startDate: "2025-03-20T18:00:00Z"
-      endDate: "2025-03-20T19:00:00Z"
+  title: Тест повторение
+  type: recurring
+  locationId: 1
+  capacity: 100
+  startDate: "2025-03-20T18:00:00Z"
+  endDate: "2025-03-20T19:00:00Z"
   services:
     - serviceTypeId: 1
       capacity: 40
@@ -64,20 +62,3 @@ examples:
     interval: 1
     endType: date
     endValue: "2025-04-20T19:00:00Z"
-  single:
-    value:
-      title: Тест одиночный
-      type: single
-      locationId: 1
-      capacity: 100
-      startDate: "2025-03-20T18:00:00Z"
-      endDate: "2025-03-20T19:00:00Z"
-      services:
-        - serviceTypeId: 1
-          capacity: 40
-          bookingWindow: 30
-          time: "2025-03-20T18:00:00Z"
-        - serviceTypeId: 2
-          capacity: 60
-          bookingWindow: 30
-          time: "2025-03-20T18:30:00Z"

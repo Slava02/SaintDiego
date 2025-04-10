@@ -2,31 +2,81 @@ package v1
 
 import (
 	"context"
+	"math"
 	"net/http"
+	"time"
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/events"
+	"github.com/Slava02/SaintDiego/backend/common/pointer"
 	"github.com/labstack/echo/v4"
 )
 
 type IEventsUC interface {
-	GetEvents(ctx context.Context, req *events.GetEventsParams) ([]*models.Event, error)
+	GetEvents(ctx context.Context, req *events.GetEventsParams) ([]*models.Event, int, error)
 	GetEvent(ctx context.Context, id int64) (*models.Event, error)
 	UpdateEvent(ctx context.Context, req *events.UpdateEventRequest) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id int64) error
 }
 
 func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
-	var req events.GetEventsParams
+	var req struct {
+		ParticipantID *int64  `query:"participant_id" json:"participant_id" validate:"omitempty,min=1"`
+		Status        *string `query:"status" json:"status" validate:"omitempty,oneof=upcoming past"`
+		Location      *int64  `query:"location" json:"location" validate:"omitempty,min=1"`
+		ServiceID     *int64  `query:"service_id" json:"service_id" validate:"omitempty,min=1"`
+		FromDate      string  `query:"from_date" json:"from_date" validate:"omitempty"`
+		ToDate        string  `query:"to_date" json:"to_date" validate:"omitempty"`
+		Page          int32   `query:"page" json:"page" validate:"omitempty,min=1"`
+		PerPage       int32   `query:"per_page" json:"per_page" validate:"omitempty,min=1,max=100"`
+	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	events, err := h.eventsUC.GetEvents(c.Request().Context(), &req)
+
+	var (
+		fromDate, toDate time.Time
+		err              error
+	)
+
+	if req.FromDate != "" {
+		fromDate, err = time.Parse(time.DateOnly, req.FromDate)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+	}
+
+	if req.ToDate != "" {
+		toDate, err = time.Parse(time.DateOnly, req.ToDate)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+	}
+
+	events, total, err := h.eventsUC.GetEvents(c.Request().Context(), &events.GetEventsParams{
+		ParticipantID: req.ParticipantID,
+		Status:        req.Status,
+		Location:      req.Location,
+		ServiceID:     req.ServiceID,
+		FromDate:      pointer.PtrWithZeroAsNil(fromDate),
+		ToDate:        pointer.PtrWithZeroAsNil(toDate),
+		Page:          req.Page,
+		PerPage:       req.PerPage,
+	})
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, events)
+	// Рассчитываем общее количество страниц
+	totalPages := int32(math.Ceil(float64(total) / float64(req.PerPage)))
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"items":       events,
+		"total":       total,
+		"page":        req.Page,
+		"per_page":    req.PerPage,
+		"total_pages": totalPages,
+	})
 }
 
 func (h Handlers) GetEventsId(c echo.Context, id int64) error {
