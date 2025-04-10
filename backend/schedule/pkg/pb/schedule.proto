@@ -21,6 +21,8 @@ service ScheduleService {
   // Locations
   rpc GetLocations(GetLocationsRequest) returns (GetLocationsResponse) {}
   rpc CreateLocation(CreateLocationRequest) returns (Location) {}
+  rpc UpdateLocation(UpdateLocationRequest) returns (Location) {}
+  rpc DeleteLocation(DeleteLocationRequest) returns (DeleteLocationResponse) {}
 }
 
 // Request messages
@@ -62,6 +64,16 @@ message CreateLocationRequest {
   string address = 2;
 }
 
+message UpdateLocationRequest {
+  int64 id = 1;
+  string name = 2;
+  string address = 3;
+}
+
+message DeleteLocationRequest {
+  int64 id = 1;
+}
+
 message GetServicesRequest {}
 
 message GetServiceByIdRequest {
@@ -81,6 +93,10 @@ message GetLocationsRequest {}
 
 message GetLocationsResponse {
   repeated Location locations = 1;
+}
+
+message DeleteLocationResponse {
+  bool success = 1;
 }
 
 // Common messages

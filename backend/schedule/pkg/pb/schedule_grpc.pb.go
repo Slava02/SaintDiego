@@ -28,6 +28,8 @@ const (
 	ScheduleService_ActivateTimeSlot_FullMethodName = "/schedule.ScheduleService/ActivateTimeSlot"
 	ScheduleService_GetLocations_FullMethodName     = "/schedule.ScheduleService/GetLocations"
 	ScheduleService_CreateLocation_FullMethodName   = "/schedule.ScheduleService/CreateLocation"
+	ScheduleService_UpdateLocation_FullMethodName   = "/schedule.ScheduleService/UpdateLocation"
+	ScheduleService_DeleteLocation_FullMethodName   = "/schedule.ScheduleService/DeleteLocation"
 )
 
 // ScheduleServiceClient is the client API for ScheduleService service.
@@ -47,6 +49,8 @@ type ScheduleServiceClient interface {
 	// Locations
 	GetLocations(ctx context.Context, in *GetLocationsRequest, opts ...grpc.CallOption) (*GetLocationsResponse, error)
 	CreateLocation(ctx context.Context, in *CreateLocationRequest, opts ...grpc.CallOption) (*Location, error)
+	UpdateLocation(ctx context.Context, in *UpdateLocationRequest, opts ...grpc.CallOption) (*Location, error)
+	DeleteLocation(ctx context.Context, in *DeleteLocationRequest, opts ...grpc.CallOption) (*DeleteLocationResponse, error)
 }
 
 type scheduleServiceClient struct {
@@ -147,6 +151,26 @@ func (c *scheduleServiceClient) CreateLocation(ctx context.Context, in *CreateLo
 	return out, nil
 }
 
+func (c *scheduleServiceClient) UpdateLocation(ctx context.Context, in *UpdateLocationRequest, opts ...grpc.CallOption) (*Location, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Location)
+	err := c.cc.Invoke(ctx, ScheduleService_UpdateLocation_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scheduleServiceClient) DeleteLocation(ctx context.Context, in *DeleteLocationRequest, opts ...grpc.CallOption) (*DeleteLocationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteLocationResponse)
+	err := c.cc.Invoke(ctx, ScheduleService_DeleteLocation_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ScheduleServiceServer is the server API for ScheduleService service.
 // All implementations must embed UnimplementedScheduleServiceServer
 // for forward compatibility.
@@ -164,6 +188,8 @@ type ScheduleServiceServer interface {
 	// Locations
 	GetLocations(context.Context, *GetLocationsRequest) (*GetLocationsResponse, error)
 	CreateLocation(context.Context, *CreateLocationRequest) (*Location, error)
+	UpdateLocation(context.Context, *UpdateLocationRequest) (*Location, error)
+	DeleteLocation(context.Context, *DeleteLocationRequest) (*DeleteLocationResponse, error)
 	mustEmbedUnimplementedScheduleServiceServer()
 }
 
@@ -200,6 +226,12 @@ func (UnimplementedScheduleServiceServer) GetLocations(context.Context, *GetLoca
 }
 func (UnimplementedScheduleServiceServer) CreateLocation(context.Context, *CreateLocationRequest) (*Location, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateLocation not implemented")
+}
+func (UnimplementedScheduleServiceServer) UpdateLocation(context.Context, *UpdateLocationRequest) (*Location, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateLocation not implemented")
+}
+func (UnimplementedScheduleServiceServer) DeleteLocation(context.Context, *DeleteLocationRequest) (*DeleteLocationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteLocation not implemented")
 }
 func (UnimplementedScheduleServiceServer) mustEmbedUnimplementedScheduleServiceServer() {}
 func (UnimplementedScheduleServiceServer) testEmbeddedByValue()                         {}
@@ -384,6 +416,42 @@ func _ScheduleService_CreateLocation_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ScheduleService_UpdateLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateLocationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScheduleServiceServer).UpdateLocation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ScheduleService_UpdateLocation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScheduleServiceServer).UpdateLocation(ctx, req.(*UpdateLocationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScheduleService_DeleteLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteLocationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScheduleServiceServer).DeleteLocation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ScheduleService_DeleteLocation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScheduleServiceServer).DeleteLocation(ctx, req.(*DeleteLocationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ScheduleService_ServiceDesc is the grpc.ServiceDesc for ScheduleService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -426,6 +494,14 @@ var ScheduleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateLocation",
 			Handler:    _ScheduleService_CreateLocation_Handler,
+		},
+		{
+			MethodName: "UpdateLocation",
+			Handler:    _ScheduleService_UpdateLocation_Handler,
+		},
+		{
+			MethodName: "DeleteLocation",
+			Handler:    _ScheduleService_DeleteLocation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
