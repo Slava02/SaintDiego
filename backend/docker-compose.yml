@@ -3,8 +3,10 @@ version: '3.8'
 services:
   api_gateway:
     build:
-      context: ./api_gateway
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./api_gateway/Dockerfile
+      args:
+        CONFIG_PATH: configs/config.docker.toml
     ports:
       - "8080:8080"
     depends_on:
@@ -14,31 +16,40 @@ services:
 
   schedule:
     build:
-      context: ./schedule
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./schedule/Dockerfile
+      args:
+        CONFIG_PATH: configs/config.docker.toml
     ports:
       - "50051:50051"
     depends_on:
       - jaeger
     restart: on-failure
+
   services:
     build:
-      context: ./services
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./services/Dockerfile
+      args:
+        CONFIG_PATH: configs/config.docker.toml
     ports:
       - "50052:50052"
     depends_on:
       - jaeger
     restart: on-failure
+
   events:
     build:
-      context: ./events
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./events/Dockerfile
+      args:
+        CONFIG_PATH: configs/config.docker.toml
     ports:
       - "50053:50053"
     depends_on:
       - jaeger
     restart: on-failure
+
   jaeger:
     image: jaegertracing/all-in-one:1.48
     ports:

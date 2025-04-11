@@ -1,39 +1,36 @@
-FROM golang:1.24-alpine AS builder
+# Build stage
+FROM golang:1.24.2-alpine AS builder
 
 WORKDIR /app
 
 # Install build dependencies
 RUN apk add --no-cache git
 
-# Copy go mod and sum files
+# Copy only the files needed for dependency resolution
 COPY go.mod go.sum ./
 
 # Download dependencies
 RUN go mod download
 
-# Copy source code
+# Copy the rest of the source code
 COPY . .
 
 # Build the application
 RUN CGO_ENABLED=0 GOOS=linux go build -o main cmd/schedule/main.go
 
-# Final stage
-FROM alpine:latest
+# Production stage
+FROM alpine:latest AS production
+
+# Define build argument for config path
+ARG CONFIG_PATH=configs/config.docker.toml
+ENV CONFIG_PATH=${CONFIG_PATH}
 
 WORKDIR /app
 
-# Copy binary from builder
+# Copy binary and config from builder
 COPY --from=builder /app/main .
+COPY --from=builder /app/${CONFIG_PATH} ./configs/
 
-# Install Go and build dependencies
-RUN apk add --no-cache go git
-
-# Install CompileDaemon
-RUN go install github.com/githubnemo/CompileDaemon@latest && \
-    ln -s /root/go/bin/CompileDaemon /usr/local/bin/CompileDaemon
-
-# Copy source code for hot reload
-COPY . .
-
-# Use JSON format for ENTRYPOINT to handle signals properly
-ENTRYPOINT ["CompileDaemon", "--build=go build cmd/schedule/main.go", "--command=./main -config=configs/config.docker.toml"]
+# Runtime configuration
+ENTRYPOINT ["./main"]
+CMD ["-config=${CONFIG_PATH}"]
