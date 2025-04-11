@@ -3,7 +3,7 @@ module github.com/Slava02/SaintDiego/backend/services
 go 1.24.2
 
 require (
-	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250401122927-51b33ebb2271
+	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250411063008-4869bc3eb03d
 	github.com/go-sql-driver/mysql v1.9.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/kazhuravlev/options-gen v0.33.2
@@ -11,10 +11,7 @@ require (
 	github.com/pelletier/go-toml v1.9.5
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.10.0
-	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	github.com/uptrace/bun v1.2.11
-	github.com/uptrace/bun/dialect/mysqldialect v1.2.11
-	github.com/uptrace/bun/extra/bundebug v1.2.11
 	go.uber.org/zap v1.27.0
 	golang.org/x/sync v0.12.0
 	google.golang.org/grpc v1.71.1
@@ -36,7 +33,10 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/puzpuzpuz/xsync/v3 v3.5.1 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
+	github.com/uber/jaeger-client-go v2.30.0+incompatible // indirect
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
+	github.com/uptrace/bun/dialect/mysqldialect v1.2.11 // indirect
+	github.com/uptrace/bun/extra/bundebug v1.2.11 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect

@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Slava02/SaintDiego/backend/common/storage"
 	"github.com/Slava02/SaintDiego/backend/schedule/internal/models"
-	"github.com/Slava02/SaintDiego/backend/schedule/internal/storage"
 	"github.com/uptrace/bun"
 )
 

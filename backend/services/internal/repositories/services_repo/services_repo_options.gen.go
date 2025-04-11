@@ -4,7 +4,7 @@ package services_repo
 import (
 	fmt461e464ebed9 "fmt"
 
-	"github.com/Slava02/SaintDiego/backend/services/internal/storage"
+	"github.com/Slava02/SaintDiego/backend/common/storage"
 	errors461e464ebed9 "github.com/kazhuravlev/options-gen/pkg/errors"
 	validator461e464ebed9 "github.com/kazhuravlev/options-gen/pkg/validator"
 )

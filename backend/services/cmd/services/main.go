@@ -10,8 +10,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/Slava02/SaintDiego/backend/common/storage"
 	"github.com/Slava02/SaintDiego/backend/services/internal/repositories/services_repo"
-	"github.com/Slava02/SaintDiego/backend/services/internal/storage"
 	"github.com/Slava02/SaintDiego/backend/services/internal/usecases/services"
 
 	"github.com/Slava02/SaintDiego/backend/common/closer"

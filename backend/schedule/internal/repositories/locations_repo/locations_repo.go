@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Slava02/SaintDiego/backend/common/storage"
 	"github.com/Slava02/SaintDiego/backend/schedule/internal/models"
-	"github.com/Slava02/SaintDiego/backend/schedule/internal/storage"
 )
 
 //go:generate options-gen -out-filename=locations_repo_options.gen.go -from-struct=Options

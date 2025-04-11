@@ -10,9 +10,9 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/Slava02/SaintDiego/backend/common/storage"
 	"github.com/Slava02/SaintDiego/backend/schedule/internal/repositories/locations_repo"
 	timeslots_repo "github.com/Slava02/SaintDiego/backend/schedule/internal/repositories/timeSlots_repo"
-	"github.com/Slava02/SaintDiego/backend/schedule/internal/storage"
 	"github.com/Slava02/SaintDiego/backend/schedule/internal/usecases/locations"
 	"github.com/Slava02/SaintDiego/backend/schedule/internal/usecases/timeSlots"
 
