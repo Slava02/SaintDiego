@@ -1,6 +1,6 @@
 module github.com/Slava02/SaintDiego/backend/common
 
-go 1.23.3
+go 1.24.2
 
 require (
 	github.com/go-playground/validator/v10 v10.26.0

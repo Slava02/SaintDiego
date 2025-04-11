@@ -1,6 +1,6 @@
 module github.com/Slava02/SaintDiego/backend/schedule
 
-go 1.23.3
+go 1.24.2
 
 require (
 	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250401113959-7d0cb6c62a02

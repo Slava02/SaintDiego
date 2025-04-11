@@ -1,11 +1,9 @@
 module github.com/Slava02/SaintDiego/backend/events
 
-go 1.23.3
-
-toolchain go1.24.2
+go 1.24.2
 
 require (
-	github.com/Slava02/SaintDiego/backend/common v0.0.0-00010101000000-000000000000
+	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250410173021-d933f2dee5bb
 	github.com/go-sql-driver/mysql v1.9.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/kazhuravlev/options-gen v0.33.2
@@ -19,8 +17,6 @@ require (
 	google.golang.org/grpc v1.71.1
 	google.golang.org/protobuf v1.36.4
 )
-
-replace github.com/Slava02/SaintDiego/backend/common => ../common
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect

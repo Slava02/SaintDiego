@@ -10,6 +10,7 @@ services:
     depends_on:
       - jaeger
       - events
+    restart: on-failure
 
   schedule:
     build:
@@ -19,7 +20,7 @@ services:
       - "50051:50051"
     depends_on:
       - jaeger
-
+    restart: on-failure
   services:
     build:
       context: ./services
@@ -28,7 +29,7 @@ services:
       - "50052:50052"
     depends_on:
       - jaeger
-
+    restart: on-failure
   events:
     build:
       context: ./events
@@ -37,7 +38,7 @@ services:
       - "50053:50053"
     depends_on:
       - jaeger
-
+    restart: on-failure
   jaeger:
     image: jaegertracing/all-in-one:1.48
     ports:

@@ -1,10 +1,9 @@
 module github.com/Slava02/SaintDiego/backend/services
 
-go 1.23.3
+go 1.24.2
 
 require (
 	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250401122927-51b33ebb2271
-	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250401122927-51b33ebb2271
 	github.com/go-sql-driver/mysql v1.9.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/kazhuravlev/options-gen v0.33.2
