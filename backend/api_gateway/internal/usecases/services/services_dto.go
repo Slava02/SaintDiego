@@ -7,5 +7,5 @@ type UpdateServiceTypeReq struct {
 }
 
 type GetServicesParams struct {
-	RegistrationAvailable bool `json:"registration_available" validate:"required"`
+	RegistrationAvailable *bool `json:"registration_available" validate:"required"`
 }

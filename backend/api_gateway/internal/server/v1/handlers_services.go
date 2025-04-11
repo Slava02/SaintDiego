@@ -17,12 +17,11 @@ type IServicesUC interface {
 }
 
 func (h Handlers) GetServices(ctx echo.Context, params GetServicesParams) error {
-	var req services.GetServicesParams
-	if err := ctx.Bind(&req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	req := &services.GetServicesParams{
+		RegistrationAvailable: params.RegistrationAvailable,
 	}
 
-	services, err := h.servicesUC.GetServiceTypes(ctx.Request().Context(), &req)
+	services, err := h.servicesUC.GetServiceTypes(ctx.Request().Context(), req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
