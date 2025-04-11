@@ -43,6 +43,7 @@ message DeleteEventRequest {
 }
 
 // Response messages
+// TODO: тут не обязательно возвращать total, page, per_page, т.к. они уже есть в запросе (см. GetServicesResponse)
 message GetEventsResponse {
   repeated Event events = 1;
   int64 total = 2;

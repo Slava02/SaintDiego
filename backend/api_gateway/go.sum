@@ -7,8 +7,8 @@ github.com/Slava02/SaintDiego/backend/events v0.0.0-20250410143449-d3532d1636b9 
 github.com/Slava02/SaintDiego/backend/events v0.0.0-20250410143449-d3532d1636b9/go.mod h1:0nI0MvuedLcMJrMkUNmn31JxmikNL6vfRkdoKEkqNwU=
 github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250410090307-f718e533a784 h1:pqKhQMr7DZaF9i0ABZ/xWpAXj7RpCTp8mAfchkSVLjI=
 github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250410090307-f718e533a784/go.mod h1:gSkAV0301rDpg16riId20XyO1cHTiP8opoYar4MaLrs=
-github.com/Slava02/SaintDiego/backend/services v0.0.0-20250411114640-211f3a186b0b h1:M0cD4eo2VeMPvda4RFzsYeoU/TX+E30d5lNo5laC3bE=
-github.com/Slava02/SaintDiego/backend/services v0.0.0-20250411114640-211f3a186b0b/go.mod h1:bgsoxzYz+zbnVe/E5iCEdM4ulaYfab4eooO2B2rKwQE=
+github.com/Slava02/SaintDiego/backend/services v0.0.0-20250411120943-f1e106cd87ca h1:tV3TlWSjf8/Nu4LW2NFwBn+yBg8VIfPkt/MpBhf9d88=
+github.com/Slava02/SaintDiego/backend/services v0.0.0-20250411120943-f1e106cd87ca/go.mod h1:bgsoxzYz+zbnVe/E5iCEdM4ulaYfab4eooO2B2rKwQE=
 github.com/apapsch/go-jsonmerge/v2 v2.0.0 h1:axGnT1gRIfimI7gJifB699GoE/oq+F2MU7Dml6nw9rQ=
 github.com/apapsch/go-jsonmerge/v2 v2.0.0/go.mod h1:lvDnEdqiQrp0O42VQGgmlKpxL1AP2+08jFMw88y4klk=
 github.com/bmatcuk/doublestar v1.1.1/go.mod h1:UD6OnuiIn0yFxxA2le/rnRU1G4RaI4UvFv1sNto9p6w=

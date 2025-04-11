@@ -37,6 +37,8 @@ func New(opts Options) (*UseCase, error) {
 func (u UseCase) GetServiceTypes(ctx context.Context, req *GetServicesParams) ([]*models.ServiceType, error) {
 	resp, err := u.servicesClient.GetServiceTypes(ctx, &pb.GetServiceTypesRequest{
 		RegistrationAvailable: req.RegistrationAvailable,
+		Page:                  req.Page,
+		PerPage:               req.PerPage,
 	})
 	if err != nil {
 		return nil, err
