@@ -16,6 +16,8 @@ service ServicesService {
 // Request messages
 message GetServiceTypesRequest {
   optional bool registrationAvailable = 1;
+  int32 page = 2;
+  int32 perPage = 3;
 }
 
 message GetServiceTypeByIdRequest {

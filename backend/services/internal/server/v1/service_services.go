@@ -23,6 +23,8 @@ func (i *Implementation) GetServiceTypes(ctx context.Context, req *pb.GetService
 
 	services, err := i.servicesUC.GetServiceTypes(ctx, &services.GetServicesParams{
 		RegistrationAvailable: req.RegistrationAvailable,
+		Page:                  req.Page,
+		PerPage:               req.PerPage,
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get services: %v", err)

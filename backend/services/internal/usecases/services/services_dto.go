@@ -7,5 +7,7 @@ type UpdateServiceTypeReq struct {
 }
 
 type GetServicesParams struct {
-	RegistrationAvailable bool `query:"registration_available" json:"registration_available" validate:"omitempty"`
+	RegistrationAvailable *bool `query:"registration_available" json:"registration_available" validate:"omitempty"`
+	Page                  int32 `query:"page" json:"page" validate:"required"`
+	PerPage               int32 `query:"per_page" json:"per_page" validate:"required"`
 }

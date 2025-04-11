@@ -72,7 +72,7 @@ func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
 
 	return c.JSON(http.StatusOK, GetEventsResponse{
 		Items:      convertEventsToResponse(events),
-		Total:      int64(total),
+		Total:      int32(total),
 		Page:       req.Page,
 		PerPage:    req.PerPage,
 		TotalPages: totalPages,

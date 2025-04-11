@@ -21,14 +21,16 @@ func NewServiceRepository(opts Options) *ServiceRepository {
 	return &ServiceRepository{db: opts.DB}
 }
 
-func (r *ServiceRepository) GetServiceTypes(ctx context.Context, registrationAvailableFilter bool) ([]*models.ServiceType, error) {
+func (r *ServiceRepository) GetServiceTypes(ctx context.Context, registrationAvailableFilter *bool, page, perPage int32) ([]*models.ServiceType, error) {
 	var services []*models.ServiceType
 
 	query := r.db.Select(ctx, &services)
 
-	if registrationAvailableFilter {
+	if registrationAvailableFilter != nil {
 		query = query.Where("registration_available = ?", registrationAvailableFilter)
 	}
+
+	query = query.Offset(int((page - 1) * perPage)).Limit(int(perPage))
 
 	err := query.Scan(ctx)
 

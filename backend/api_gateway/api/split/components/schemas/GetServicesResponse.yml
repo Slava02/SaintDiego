@@ -1,0 +1,24 @@
+type: object
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./ServiceType.yml
+  total:
+    type: integer
+    format: int32
+  page:
+    type: integer
+    format: int32
+  per_page:
+    type: integer
+    format: int32
+  total_pages:
+    type: integer
+    format: int32
+required:
+  - items
+  - total
+  - page
+  - per_page
+  - total_pages

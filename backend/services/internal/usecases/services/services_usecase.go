@@ -8,7 +8,7 @@ import (
 )
 
 type IServiceRepository interface {
-	GetServiceTypes(ctx context.Context, registrationAvailableFilter bool) ([]*models.ServiceType, error)
+	GetServiceTypes(ctx context.Context, registrationAvailableFilter *bool, page, perPage int32) ([]*models.ServiceType, error)
 	GetServiceTypeById(ctx context.Context, id int64) (*models.ServiceType, error)
 	UpdateServiceType(ctx context.Context, id int64, minPeriodDays int64, registrationAvailable bool) (*models.ServiceType, error)
 }
@@ -33,7 +33,7 @@ func New(opts Options) (*UseCase, error) {
 }
 
 func (u UseCase) GetServiceTypes(ctx context.Context, req *GetServicesParams) ([]*models.ServiceType, error) {
-	return u.serviceRepository.GetServiceTypes(ctx, req.RegistrationAvailable)
+	return u.serviceRepository.GetServiceTypes(ctx, req.RegistrationAvailable, req.Page, req.PerPage)
 }
 
 func (u UseCase) GetServiceTypeById(ctx context.Context, id int64) (*models.ServiceType, error) {

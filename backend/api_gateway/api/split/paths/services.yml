@@ -3,10 +3,26 @@ get:
     - services
   summary: Получение списка услуг
   parameters:
+    - name: page
+      in: query
+      required: true
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+    - name: per_page
+      in: query
+      required: true
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
     - name: registration_available
       in: query
-      style: form
-      explode: true
+      required: false
       schema:
         type: boolean
   responses:
@@ -15,10 +31,7 @@ get:
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: ../components/schemas/ServiceType.yml
-            maxItems: 100
+            $ref: ../components/schemas/GetServicesResponse.yml
     '400':
       description: Ошибка валидации
       content:

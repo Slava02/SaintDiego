@@ -2,7 +2,7 @@ get:
   parameters:
     - name: page
       in: query
-      required: false
+      required: true
       schema:
         type: integer
         format: int32
@@ -10,7 +10,7 @@ get:
         default: 1
     - name: per_page
       in: query
-      required: false
+      required: true
       schema:
         type: integer
         format: int32
@@ -59,19 +59,19 @@ get:
     - events
   summary: Получение списка событий
   responses:
-    "200":
+    '200':
       description: Успешный ответ
       content:
         application/json:
           schema:
             $ref: ../components/schemas/GetEventsResponse.yml
-    "400":
+    '400':
       description: Ошибка валидации
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    "500":
+    '500':
       description: Internal server error
       content:
         application/json:

@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"math"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -19,6 +20,8 @@ type IServicesUC interface {
 func (h Handlers) GetServices(ctx echo.Context, params GetServicesParams) error {
 	req := &services.GetServicesParams{
 		RegistrationAvailable: params.RegistrationAvailable,
+		Page:                  params.Page,
+		PerPage:               params.PerPage,
 	}
 
 	services, err := h.servicesUC.GetServiceTypes(ctx.Request().Context(), req)
@@ -26,7 +29,16 @@ func (h Handlers) GetServices(ctx echo.Context, params GetServicesParams) error 
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return ctx.JSON(http.StatusOK, services)
+	total := len(services)
+	totalPages := int32(math.Ceil(float64(total) / float64(req.PerPage)))
+
+	return ctx.JSON(http.StatusOK, GetServicesResponse{
+		Items:      convertServicesToResponse(services),
+		Total:      int32(total),
+		Page:       req.Page,
+		PerPage:    req.PerPage,
+		TotalPages: totalPages,
+	})
 }
 
 func (h Handlers) GetServicesId(ctx echo.Context, id int64) error {
@@ -52,4 +64,17 @@ func (h Handlers) PutServicesId(ctx echo.Context, id int64) error {
 	}
 
 	return ctx.JSON(http.StatusOK, serviceTypeSettings)
+}
+
+func convertServicesToResponse(services []*models.ServiceType) []ServiceType {
+	response := make([]ServiceType, len(services))
+	for i, service := range services {
+		response[i] = ServiceType{
+			Id:                    service.ID,
+			Name:                  service.Name,
+			MinPeriodDays:         int32(service.MinPeriodDays),
+			RegistrationAvailable: service.RegistrationAvailable,
+		}
+	}
+	return response
 }
