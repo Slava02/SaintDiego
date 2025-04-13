@@ -4,7 +4,7 @@ go 1.24.2
 
 require (
 	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250411063008-4869bc3eb03d
-	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250410143449-d3532d1636b9
+	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250413082433-4b89619959ed
 	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250410090307-f718e533a784
 	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250411120943-f1e106cd87ca
 	github.com/getkin/kin-openapi v0.131.0

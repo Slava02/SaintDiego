@@ -17,7 +17,8 @@ type IEventsUC interface {
 	GetEvent(ctx context.Context, id int64) (*models.Event, error)
 	UpdateEvent(ctx context.Context, req *events.UpdateEventRequest) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id int64) error
-	AddParticipantToEvent(ctx context.Context, eventId int64, participantId int64) error
+	AddParticipantToEvent(ctx context.Context, req *events.AddParticipantToEventRequest) error
+	GetParticipantsByEventId(ctx context.Context, params *events.GetEventsIdParticipantsParams) ([]*models.Participant, error)
 }
 
 func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
@@ -114,12 +115,35 @@ func (h Handlers) DeleteEventsId(c echo.Context, id int64) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func (h Handlers) PutEventsIdParticipantId(c echo.Context, eventId int64, participantId int64) error {
-	err := h.eventsUC.AddParticipantToEvent(c.Request().Context(), eventId, participantId)
+func (h Handlers) PutEventsIdParticipants(c echo.Context, id int64) error {
+	var req events.AddParticipantToEventRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	req.EventID = id
+
+	err := h.eventsUC.AddParticipantToEvent(c.Request().Context(), &req)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+
 	return c.NoContent(http.StatusNoContent)
+}
+
+func (h Handlers) GetEventsIdParticipants(c echo.Context, id int64, params GetEventsIdParticipantsParams) error {
+	var req events.GetEventsIdParticipantsParams
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	req.EventID = id
+
+	participants, err := h.eventsUC.GetParticipantsByEventId(c.Request().Context(), &req)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, participants)
 }
 
 func convertEventsToResponse(events []*models.Event) []Event {

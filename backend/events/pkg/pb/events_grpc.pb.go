@@ -19,11 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	EventsService_GetEvents_FullMethodName             = "/events.EventsService/GetEvents"
-	EventsService_GetEventById_FullMethodName          = "/events.EventsService/GetEventById"
-	EventsService_UpdateEvent_FullMethodName           = "/events.EventsService/UpdateEvent"
-	EventsService_DeleteEvent_FullMethodName           = "/events.EventsService/DeleteEvent"
-	EventsService_AddParticipantToEvent_FullMethodName = "/events.EventsService/AddParticipantToEvent"
+	EventsService_GetEvents_FullMethodName                = "/events.EventsService/GetEvents"
+	EventsService_GetEventById_FullMethodName             = "/events.EventsService/GetEventById"
+	EventsService_UpdateEvent_FullMethodName              = "/events.EventsService/UpdateEvent"
+	EventsService_DeleteEvent_FullMethodName              = "/events.EventsService/DeleteEvent"
+	EventsService_AddParticipantToEvent_FullMethodName    = "/events.EventsService/AddParticipantToEvent"
+	EventsService_GetParticipantsByEventId_FullMethodName = "/events.EventsService/GetParticipantsByEventId"
 )
 
 // EventsServiceClient is the client API for EventsService service.
@@ -38,6 +39,7 @@ type EventsServiceClient interface {
 	UpdateEvent(ctx context.Context, in *UpdateEventRequest, opts ...grpc.CallOption) (*Event, error)
 	DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...grpc.CallOption) (*DeleteEventResponse, error)
 	AddParticipantToEvent(ctx context.Context, in *AddParticipantToEventRequest, opts ...grpc.CallOption) (*AddParticipantToEventResponse, error)
+	GetParticipantsByEventId(ctx context.Context, in *GetParticipantsByEventIdRequest, opts ...grpc.CallOption) (*GetParticipantsByEventIdResponse, error)
 }
 
 type eventsServiceClient struct {
@@ -98,6 +100,16 @@ func (c *eventsServiceClient) AddParticipantToEvent(ctx context.Context, in *Add
 	return out, nil
 }
 
+func (c *eventsServiceClient) GetParticipantsByEventId(ctx context.Context, in *GetParticipantsByEventIdRequest, opts ...grpc.CallOption) (*GetParticipantsByEventIdResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetParticipantsByEventIdResponse)
+	err := c.cc.Invoke(ctx, EventsService_GetParticipantsByEventId_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EventsServiceServer is the server API for EventsService service.
 // All implementations must embed UnimplementedEventsServiceServer
 // for forward compatibility.
@@ -110,6 +122,7 @@ type EventsServiceServer interface {
 	UpdateEvent(context.Context, *UpdateEventRequest) (*Event, error)
 	DeleteEvent(context.Context, *DeleteEventRequest) (*DeleteEventResponse, error)
 	AddParticipantToEvent(context.Context, *AddParticipantToEventRequest) (*AddParticipantToEventResponse, error)
+	GetParticipantsByEventId(context.Context, *GetParticipantsByEventIdRequest) (*GetParticipantsByEventIdResponse, error)
 	mustEmbedUnimplementedEventsServiceServer()
 }
 
@@ -134,6 +147,9 @@ func (UnimplementedEventsServiceServer) DeleteEvent(context.Context, *DeleteEven
 }
 func (UnimplementedEventsServiceServer) AddParticipantToEvent(context.Context, *AddParticipantToEventRequest) (*AddParticipantToEventResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddParticipantToEvent not implemented")
+}
+func (UnimplementedEventsServiceServer) GetParticipantsByEventId(context.Context, *GetParticipantsByEventIdRequest) (*GetParticipantsByEventIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetParticipantsByEventId not implemented")
 }
 func (UnimplementedEventsServiceServer) mustEmbedUnimplementedEventsServiceServer() {}
 func (UnimplementedEventsServiceServer) testEmbeddedByValue()                       {}
@@ -246,6 +262,24 @@ func _EventsService_AddParticipantToEvent_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EventsService_GetParticipantsByEventId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetParticipantsByEventIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventsServiceServer).GetParticipantsByEventId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EventsService_GetParticipantsByEventId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventsServiceServer).GetParticipantsByEventId(ctx, req.(*GetParticipantsByEventIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // EventsService_ServiceDesc is the grpc.ServiceDesc for EventsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -272,6 +306,10 @@ var EventsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddParticipantToEvent",
 			Handler:    _EventsService_AddParticipantToEvent_Handler,
+		},
+		{
+			MethodName: "GetParticipantsByEventId",
+			Handler:    _EventsService_GetParticipantsByEventId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

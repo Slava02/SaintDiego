@@ -17,6 +17,7 @@ type IEventsUC interface {
 	GetEvent(ctx context.Context, eventID int64) (*models.Event, error)
 	UpdateEvent(ctx context.Context, req *events.UpdateEventRequest) (*models.Event, error)
 	DeleteEvent(ctx context.Context, eventID int64) error
+	AddParticipantToEvent(ctx context.Context, eventID int64, participantID int64) error
 }
 
 func (s *Implementation) GetEvents(ctx context.Context, req *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
@@ -104,6 +105,23 @@ func (s *Implementation) DeleteEvent(ctx context.Context, req *pb.DeleteEventReq
 	}
 
 	return &pb.DeleteEventResponse{
+		Success: true,
+	}, nil
+}
+
+func (s *Implementation) AddParticipantToEvent(ctx context.Context, req *pb.AddParticipantToEventRequest) (*pb.AddParticipantToEventResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "AddParticipantToEvent")
+	defer span.Finish()
+
+	span.SetTag("event_id", req.EventId)
+	span.SetTag("participant_id", req.ParticipantId)
+
+	err := s.eventsUC.AddParticipantToEvent(ctx, req.EventId, req.ParticipantId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to add participant to event: %v", err)
+	}
+
+	return &pb.AddParticipantToEventResponse{
 		Success: true,
 	}, nil
 }

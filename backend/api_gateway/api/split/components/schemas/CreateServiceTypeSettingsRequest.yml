@@ -1,9 +1,0 @@
-type: object
-properties:
-  periodDays:
-    type: integer
-    format: int32
-required:
-  - periodDays
-example:
-  periodDays: 30

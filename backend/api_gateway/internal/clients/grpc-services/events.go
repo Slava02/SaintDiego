@@ -63,3 +63,7 @@ func (c *EventsClient) UpdateEvent(ctx context.Context, req *api.UpdateEventRequ
 func (c *EventsClient) DeleteEvent(ctx context.Context, req *api.DeleteEventRequest) (*api.DeleteEventResponse, error) {
 	return c.EventsServiceClient.DeleteEvent(ctx, req)
 }
+
+func (c *EventsClient) AddParticipantToEvent(ctx context.Context, req *api.AddParticipantToEventRequest) (*api.AddParticipantToEventResponse, error) {
+	return c.EventsServiceClient.AddParticipantToEvent(ctx, req)
+}

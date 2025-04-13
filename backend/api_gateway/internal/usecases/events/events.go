@@ -14,6 +14,8 @@ type IEventsClient interface {
 	GetEventById(ctx context.Context, req *pb.GetEventByIdRequest) (*pb.Event, error)
 	UpdateEvent(ctx context.Context, req *pb.UpdateEventRequest) (*pb.Event, error)
 	DeleteEvent(ctx context.Context, req *pb.DeleteEventRequest) (*pb.DeleteEventResponse, error)
+	AddParticipantToEvent(ctx context.Context, req *pb.AddParticipantToEventRequest) (*pb.AddParticipantToEventResponse, error)
+	GetParticipantsByEventId(ctx context.Context, req *pb.GetParticipantsByEventIdRequest) (*pb.GetParticipantsByEventIdResponse, error)
 }
 
 //go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options
@@ -136,4 +138,19 @@ func (u *UseCase) AddParticipantToEvent(ctx context.Context, eventId int64, part
 	}
 
 	return nil
+}
+
+func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEventsIdParticipantsParams) ([]*models.Participant, error) {
+	pbReq := &pb.GetParticipantsByEventIdRequest{
+		EventId: params.EventID,
+		Page:    params.Page,
+		PerPage: params.PerPage,
+	}
+
+	pbRes, err := u.eventsClient.GetParticipantsByEventId(ctx, pbReq)
+	if err != nil {
+		return nil, fmt.Errorf("get participants: %v", err)
+	}
+
+	return pbRes.Participants, nil
 }

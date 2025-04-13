@@ -15,6 +15,7 @@ service EventsService {
   rpc UpdateEvent(UpdateEventRequest) returns (Event) {}
   rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse) {}
   rpc AddParticipantToEvent(AddParticipantToEventRequest) returns (AddParticipantToEventResponse) {}
+  rpc GetParticipantsByEventId(GetParticipantsByEventIdRequest) returns (GetParticipantsByEventIdResponse) {}
 }
 
 // Request messages
@@ -48,6 +49,11 @@ message AddParticipantToEventRequest {
   int64 participant_id = 2;
 }
 
+message GetParticipantsByEventIdRequest {
+  int64 event_id = 1;
+  int64 page = 2;
+  int64 per_page = 3;
+}
 
 // Response messages
 // TODO: тут не обязательно возвращать total, page, per_page, т.к. они уже есть в запросе (см. GetServicesResponse)
@@ -62,6 +68,15 @@ message DeleteEventResponse {
   bool success = 1;
 }
 
+message AddParticipantToEventResponse {
+  bool success = 1;
+}
+
+message GetParticipantsByEventIdResponse {
+  repeated Participant participants = 1;
+}
+
+
 // Common messages
 message Event {
   int64 id = 1;
@@ -71,8 +86,13 @@ message Event {
   google.protobuf.Timestamp datetime = 5;
 }
 
-message AddParticipantToEventResponse {
-  bool success = 1;
+message Participant {
+  int64 id = 1;
+  string first_name = 2;
+  string middle_name = 3;
+  string last_name = 4;
+  optional string photo_name = 5;
+  optional google.protobuf.Timestamp birth_date = 6;
+  optional int64 gender = 7;
+  optional bool is_homeless = 8;
 }
-
-

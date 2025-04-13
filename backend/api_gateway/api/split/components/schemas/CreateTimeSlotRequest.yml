@@ -41,7 +41,7 @@ required:
   - startDate
   - endDate
   - services
-examples:
+example:
   title: Тест повторение
   type: recurring
   locationId: 1

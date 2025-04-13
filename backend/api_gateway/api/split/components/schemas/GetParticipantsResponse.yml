@@ -1,0 +1,19 @@
+type: object
+properties:
+  participants:
+    type: array
+    items:
+      $ref: ./Participant.yml
+required:
+  - participants
+example:
+  participants:
+    - id: 1
+      name: Иван Иванов
+      is_homeless: true
+      photo_name: photo.jpg
+      birth_date: '2024-03-20T09:00:00Z'
+      gender: 1
+      first_name: Иван
+      middle_name: Иванович
+      last_name: Иванов

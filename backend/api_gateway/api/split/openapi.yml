@@ -31,8 +31,8 @@ paths:
     $ref: paths/events.yml
   /events/{id}:
     $ref: paths/events_{id}.yml
-  /events/{event_id}/participant/{participant_id}:
-    $ref: paths/events_{event_id}_participant_{participant_id}.yml
+  /events/{id}/participants:
+    $ref: paths/events_{id}_participants.yml
 components:
   securitySchemes:
     BearerAuth:
