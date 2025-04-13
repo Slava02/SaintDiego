@@ -14,6 +14,7 @@ service EventsService {
   rpc GetEventById(GetEventByIdRequest) returns (Event) {}
   rpc UpdateEvent(UpdateEventRequest) returns (Event) {}
   rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse) {}
+  rpc AddParticipantToEvent(AddParticipantToEventRequest) returns (AddParticipantToEventResponse) {}
 }
 
 // Request messages
@@ -42,6 +43,12 @@ message DeleteEventRequest {
   int64 id = 1;
 }
 
+message AddParticipantToEventRequest {
+  int64 event_id = 1;
+  int64 participant_id = 2;
+}
+
+
 // Response messages
 // TODO: тут не обязательно возвращать total, page, per_page, т.к. они уже есть в запросе (см. GetServicesResponse)
 message GetEventsResponse {
@@ -64,5 +71,8 @@ message Event {
   google.protobuf.Timestamp datetime = 5;
 }
 
+message AddParticipantToEventResponse {
+  bool success = 1;
+}
 
 

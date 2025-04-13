@@ -122,3 +122,18 @@ func (u *UseCase) DeleteEvent(ctx context.Context, id int64) error {
 
 	return nil
 }
+
+// TODO: нужно проверить доступен ли event для пользователя, так как в момент записи что-то могло поменятсья
+func (u *UseCase) AddParticipantToEvent(ctx context.Context, eventId int64, participantId int64) error {
+	pbReq := &pb.AddParticipantToEventRequest{
+		EventId:       eventId,
+		ParticipantId: participantId,
+	}
+
+	_, err := u.eventsClient.AddParticipantToEvent(ctx, pbReq)
+	if err != nil {
+		return fmt.Errorf("add participant to event: %v", err)
+	}
+
+	return nil
+}

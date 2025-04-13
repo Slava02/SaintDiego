@@ -17,6 +17,7 @@ type IEventsUC interface {
 	GetEvent(ctx context.Context, id int64) (*models.Event, error)
 	UpdateEvent(ctx context.Context, req *events.UpdateEventRequest) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id int64) error
+	AddParticipantToEvent(ctx context.Context, eventId int64, participantId int64) error
 }
 
 func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
@@ -110,6 +111,14 @@ func (h Handlers) DeleteEventsId(c echo.Context, id int64) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
+	return c.NoContent(http.StatusNoContent)
+}
+
+func (h Handlers) PutEventsIdParticipantId(c echo.Context, eventId int64, participantId int64) error {
+	err := h.eventsUC.AddParticipantToEvent(c.Request().Context(), eventId, participantId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
 	return c.NoContent(http.StatusNoContent)
 }
 

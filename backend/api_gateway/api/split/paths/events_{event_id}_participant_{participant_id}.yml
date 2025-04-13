@@ -1,0 +1,38 @@
+put:
+  tags:
+    - events
+  summary: Добавление пользователя в событие
+  parameters:
+    - name: event_id
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+    - name: participant_id
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: Успешный ответ
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Event.yml
+    '400':
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
