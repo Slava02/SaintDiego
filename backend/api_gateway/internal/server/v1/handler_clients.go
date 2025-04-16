@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"context"
 	"math"
 	"net/http"
 
@@ -10,11 +11,11 @@ import (
 )
 
 type IClientUC interface {
-	GetClients(ctx echo.Context, params clients.GetClientParams) ([]*models.Client, int32, error)
-	PostClients(ctx echo.Context, req clients.CreateClientRequest) (*models.Client, error)
-	GetClientsId(ctx echo.Context, id int64) (*models.Client, error)
-	PutClientsId(ctx echo.Context, req clients.BlockClientRequest) (*models.Client, error)
-	GetClientsIdServices(ctx echo.Context, id int64, params clients.GetClientsIdServicesParams) ([]*models.ServiceType, int32, error)
+	GetClients(ctx context.Context, params *clients.GetClientParams) ([]*models.Client, int32, error)
+	PostClients(ctx context.Context, req *clients.CreateClientRequest) (*models.Client, error)
+	GetClientsId(ctx context.Context, id int64) (*models.Client, error)
+	PutClientsId(ctx context.Context, req *clients.BlockClientRequest) (*models.Client, error)
+	GetClientsIdServices(ctx context.Context, params *clients.GetClientsIdServicesParams) ([]*models.ServiceType, int32, error)
 }
 
 func (h Handlers) GetClients(ctx echo.Context, params GetClientsParams) error {
@@ -23,7 +24,7 @@ func (h Handlers) GetClients(ctx echo.Context, params GetClientsParams) error {
 		return ctx.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	clients, total, err := h.clientUC.GetClients(ctx, req)
+	clients, total, err := h.clientUC.GetClients(ctx.Request().Context(), &req)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -45,7 +46,7 @@ func (h Handlers) PostClients(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	client, err := h.clientUC.PostClients(ctx, req)
+	client, err := h.clientUC.PostClients(ctx.Request().Context(), &req)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -54,7 +55,7 @@ func (h Handlers) PostClients(ctx echo.Context) error {
 }
 
 func (h Handlers) GetClientsId(ctx echo.Context, id int64) error {
-	client, err := h.clientUC.GetClientsId(ctx, id)
+	client, err := h.clientUC.GetClientsId(ctx.Request().Context(), id)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -68,7 +69,7 @@ func (h Handlers) PutClientsId(ctx echo.Context, id int64) error {
 		return ctx.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	client, err := h.clientUC.PutClientsId(ctx, req)
+	client, err := h.clientUC.PutClientsId(ctx.Request().Context(), &req)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -82,7 +83,7 @@ func (h Handlers) GetClientsIdServices(ctx echo.Context, id int64, params GetCli
 		return ctx.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	services, total, err := h.clientUC.GetClientsIdServices(ctx, id, req)
+	services, total, err := h.clientUC.GetClientsIdServices(ctx.Request().Context(), &req)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}

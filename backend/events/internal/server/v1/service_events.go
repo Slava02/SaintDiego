@@ -17,8 +17,9 @@ type IEventsUC interface {
 	GetEvent(ctx context.Context, eventID int64) (*models.Event, error)
 	UpdateEvent(ctx context.Context, req *events.UpdateEventRequest) (*models.Event, error)
 	DeleteEvent(ctx context.Context, eventID int64) error
-	AddParticipantToEvent(ctx context.Context, eventID int64, participantID int64) error
-	GetParticipantsByEventId(ctx context.Context, params *events.GetEventsIdParticipantsParams) ([]*models.Participant, error)
+	AddParticipantToEvent(ctx context.Context, params *events.AddParticipantToEventRequest) error
+	GetParticipantsByEventId(ctx context.Context, params *events.GetEventsIdParticipantsParams) ([]*models.Participant, int64, error)
+	GetEventsByServiceId(ctx context.Context, params *events.GetEventsByServiceIdParams) ([]*models.Event, int64, error)
 }
 
 func (s *Implementation) GetEvents(ctx context.Context, req *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
@@ -55,10 +56,8 @@ func (s *Implementation) GetEvents(ctx context.Context, req *pb.GetEventsRequest
 	}
 
 	return &pb.GetEventsResponse{
-		Events:  pbEvents,
-		Total:   total,
-		Page:    req.Page,
-		PerPage: req.PerPage,
+		Events: pbEvents,
+		Total:  total,
 	}, nil
 }
 
@@ -117,7 +116,12 @@ func (s *Implementation) AddParticipantToEvent(ctx context.Context, req *pb.AddP
 	span.SetTag("event_id", req.EventId)
 	span.SetTag("participant_id", req.ParticipantId)
 
-	err := s.eventsUC.AddParticipantToEvent(ctx, req.EventId, req.ParticipantId)
+	addParticipantToEventParams := &events.AddParticipantToEventRequest{
+		EventID:       req.EventId,
+		ParticipantID: req.ParticipantId,
+	}
+
+	err := s.eventsUC.AddParticipantToEvent(ctx, addParticipantToEventParams)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to add participant to event: %v", err)
 	}
@@ -133,7 +137,7 @@ func (s *Implementation) GetParticipantsByEventId(ctx context.Context, req *pb.G
 
 	span.SetTag("event_id", req.EventId)
 
-	participants, err := s.eventsUC.GetParticipantsByEventId(ctx, &events.GetEventsIdParticipantsParams{
+	participants, total, err := s.eventsUC.GetParticipantsByEventId(ctx, &events.GetEventsIdParticipantsParams{
 		EventID: req.EventId,
 		Page:    req.Page,
 		PerPage: req.PerPage,
@@ -142,8 +146,40 @@ func (s *Implementation) GetParticipantsByEventId(ctx context.Context, req *pb.G
 		return nil, status.Errorf(codes.Internal, "failed to get participants by event id: %v", err)
 	}
 
+	pbParticipants := make([]*pb.Participant, len(participants))
+	for i, participant := range participants {
+		pbParticipants[i] = convertModelParticipantToPB(participant)
+	}
+
 	return &pb.GetParticipantsByEventIdResponse{
-		Participants: participants,
+		Participants: pbParticipants,
+		Total:        total,
+	}, nil
+}
+
+func (s *Implementation) GetEventsByServiceId(ctx context.Context, req *pb.GetEventsByServiceIdRequest) (*pb.GetEventsByServiceIdResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "GetEventsByServiceId")
+	defer span.Finish()
+
+	span.SetTag("service_id", req.ServiceId)
+
+	events, total, err := s.eventsUC.GetEventsByServiceId(ctx, &events.GetEventsByServiceIdParams{
+		ServiceID: req.ServiceId,
+		Page:      req.Page,
+		PerPage:   req.PerPage,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get events by service id: %v", err)
+	}
+
+	pbEvents := make([]*pb.Event, len(events))
+	for i, event := range events {
+		pbEvents[i] = convertModelEventToPB(event)
+	}
+
+	return &pb.GetEventsByServiceIdResponse{
+		Events: pbEvents,
+		Total:  total,
 	}, nil
 }
 
@@ -159,5 +195,23 @@ func convertModelEventToPB(event *models.Event) *pb.Event {
 		Capacity:          event.Capacity,
 		Datetime:          timestamppb.New(event.Datetime),
 		ServiceTypeId:     event.ServiceTypeID,
+	}
+}
+
+func convertModelParticipantToPB(participant *models.Participant) *pb.Participant {
+	if participant == nil {
+		return nil
+	}
+
+	return &pb.Participant{
+		Id:               participant.ID,
+		PhotoName:        participant.PhotoName,
+		BirthDate:        timestamppb.New(participant.BirthDate),
+		Gender:           participant.Gender,
+		FirstName:        participant.FirstName,
+		MiddleName:       participant.MiddleName,
+		LastName:         participant.LastName,
+		VolunteerTg:      participant.VolunteerTG,
+		VolunteerTgLogin: participant.VolunteerTgLogin,
 	}
 }

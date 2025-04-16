@@ -79,6 +79,7 @@ message AddParticipantToEventResponse {
 
 message GetParticipantsByEventIdResponse {
   repeated Participant participants = 1;
+  int64 total = 2;
 }
 
 message GetEventsByServiceIdResponse {
@@ -104,4 +105,6 @@ message Participant {
   google.protobuf.Timestamp birth_date = 6;
   int64 gender = 7;
   bool is_homeless = 8;
+  int64 volunteer_tg = 9;
+  string volunteer_tg_login = 10;
 }

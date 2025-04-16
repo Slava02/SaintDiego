@@ -14,6 +14,9 @@ type IEventRepository interface {
 	GetEvent(ctx context.Context, id int64) (*models.Event, error)
 	UpdateEvent(ctx context.Context, id int64, capacity int32, datetime time.Time) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id int64) error
+	AddParticipantToEvent(ctx context.Context, eventID int64, participantID int64) error
+	GetEventsByServiceId(ctx context.Context, serviceID int64, page int64, perPage int64) ([]*models.Event, int64, error)
+	GetParticipantsByEventId(ctx context.Context, eventID int64, page int64, perPage int64) ([]*models.Participant, int64, error)
 }
 
 //go:generate options-gen -out-filename=events_options.gen.go -from-struct=Options
@@ -67,4 +70,16 @@ func (u *UseCase) UpdateEvent(ctx context.Context, req *UpdateEventRequest) (*mo
 
 func (u *UseCase) DeleteEvent(ctx context.Context, id int64) error {
 	return u.eventRepository.DeleteEvent(ctx, id)
+}
+
+func (u *UseCase) AddParticipantToEvent(ctx context.Context, params *AddParticipantToEventRequest) error {
+	return u.eventRepository.AddParticipantToEvent(ctx, params.EventID, params.ParticipantID)
+}
+
+func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEventsIdParticipantsParams) ([]*models.Participant, int64, error) {
+	return u.eventRepository.GetParticipantsByEventId(ctx, params.EventID, params.Page, params.PerPage)
+}
+
+func (u *UseCase) GetEventsByServiceId(ctx context.Context, params *GetEventsByServiceIdParams) ([]*models.Event, int64, error) {
+	return u.eventRepository.GetEventsByServiceId(ctx, params.ServiceID, params.Page, params.PerPage)
 }

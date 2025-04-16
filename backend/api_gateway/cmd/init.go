@@ -10,10 +10,12 @@ import (
 	grpc_services "github.com/Slava02/SaintDiego/backend/api_gateway/internal/clients/grpc-services"
 	server "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server"
 	v1 "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1"
+	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/clients"
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/events"
 	locations "github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/locations"
 	services "github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/services"
 	timeSlots "github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/timeSlots"
+	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/volunteers"
 )
 
 const nameServer = "server-apigw"
@@ -25,11 +27,13 @@ func initServer(
 	scheduleAddr string,
 	servicesAddr string,
 	eventsAddr string,
+	volunteersAddr string,
+	clientsAddr string,
 ) (*server.Server, error) {
 	lg := zap.L().Named(nameServer)
 
 	// Create gRPC client manager
-	manager, err := grpc_services.NewManager(grpc_services.NewManagerOptions(scheduleAddr, servicesAddr, eventsAddr))
+	manager, err := grpc_services.NewManager(grpc_services.NewManagerOptions(scheduleAddr, servicesAddr, eventsAddr, volunteersAddr, clientsAddr))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create gRPC client manager: %v", err)
 	}
@@ -55,7 +59,17 @@ func initServer(
 		return nil, fmt.Errorf("create events usecase: %v", err)
 	}
 
-	v1Handlers, err := v1.NewHandlers(v1.NewOptions(timeSlotsUC, locationsUC, servicesUC, eventsUC))
+	volunteersUC, err := volunteers.New(volunteers.NewOptions(manager.Volunteers()))
+	if err != nil {
+		return nil, fmt.Errorf("create volunteers usecase: %v", err)
+	}
+
+	clientsUC, err := clients.New(clients.NewOptions(manager.Clients()))
+	if err != nil {
+		return nil, fmt.Errorf("create clients usecase: %v", err)
+	}
+
+	v1Handlers, err := v1.NewHandlers(v1.NewOptions(timeSlotsUC, locationsUC, servicesUC, eventsUC, volunteersUC, clientsUC))
 	if err != nil {
 		return nil, fmt.Errorf("create v1 handlers: %v", err)
 	}

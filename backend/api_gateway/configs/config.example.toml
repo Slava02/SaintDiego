@@ -17,3 +17,9 @@ addr = ":5002"
 
 [services.services]
 addr = ":5003"
+
+[services.volunteers]
+addr = ":50054"
+
+[services.clients]
+addr = ":50055"

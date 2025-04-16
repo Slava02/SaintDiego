@@ -15,6 +15,8 @@ func NewOptions(
 	locationsUC ILocationsUC,
 	servicesUC IServicesUC,
 	eventsUC IEventsUC,
+	volunteerUC IVolunteerUC,
+	clientUC IClientUC,
 	options ...OptOptionsSetter,
 ) Options {
 	o := Options{}
@@ -29,6 +31,10 @@ func NewOptions(
 
 	o.eventsUC = eventsUC
 
+	o.volunteerUC = volunteerUC
+
+	o.clientUC = clientUC
+
 	for _, opt := range options {
 		opt(&o)
 	}
@@ -41,6 +47,8 @@ func (o *Options) Validate() error {
 	errs.Add(errors461e464ebed9.NewValidationError("locationsUC", _validate_Options_locationsUC(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("servicesUC", _validate_Options_servicesUC(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("eventsUC", _validate_Options_eventsUC(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("volunteerUC", _validate_Options_volunteerUC(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("clientUC", _validate_Options_clientUC(o)))
 	return errs.AsError()
 }
 
@@ -68,6 +76,20 @@ func _validate_Options_servicesUC(o *Options) error {
 func _validate_Options_eventsUC(o *Options) error {
 	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.eventsUC, "required"); err != nil {
 		return fmt461e464ebed9.Errorf("field `eventsUC` did not pass the test: %w", err)
+	}
+	return nil
+}
+
+func _validate_Options_volunteerUC(o *Options) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.volunteerUC, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `volunteerUC` did not pass the test: %w", err)
+	}
+	return nil
+}
+
+func _validate_Options_clientUC(o *Options) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.clientUC, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `clientUC` did not pass the test: %w", err)
 	}
 	return nil
 }

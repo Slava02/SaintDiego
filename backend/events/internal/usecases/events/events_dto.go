@@ -18,3 +18,20 @@ type GetEventsParams struct {
 	Page          int64      `json:"page"`
 	PerPage       int64      `json:"per_page"`
 }
+
+type GetEventsByServiceIdParams struct {
+	ServiceID int64 `json:"service_id"`
+	Page      int64 `json:"page"`
+	PerPage   int64 `json:"per_page"`
+}
+
+type GetEventsIdParticipantsParams struct {
+	EventID int64 `json:"event_id"`
+	Page    int64 `json:"page"`
+	PerPage int64 `json:"per_page"`
+}
+
+type AddParticipantToEventRequest struct {
+	EventID       int64 `json:"event_id"`
+	ParticipantID int64 `json:"participant_id"`
+}

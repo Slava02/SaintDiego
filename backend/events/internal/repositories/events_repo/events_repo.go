@@ -65,16 +65,6 @@ func (r *EventRepository) GetEvents(ctx context.Context, params *GetEventsParams
 		query = query.Where("datetime <= ?", *params.ToDate)
 	}
 
-	// Применяем пагинацию
-	if params.Page < 1 {
-		params.Page = 1
-	}
-	if params.PerPage < 1 {
-		params.PerPage = 20
-	} else if params.PerPage > 100 {
-		params.PerPage = 100
-	}
-
 	offset := (params.Page - 1) * params.PerPage
 	query = query.Limit(int(params.PerPage)).Offset(int(offset))
 
@@ -133,4 +123,51 @@ func (r *EventRepository) DeleteEvent(ctx context.Context, id int64) error {
 		return fmt.Errorf("delete event: %w", err)
 	}
 	return nil
+}
+
+func (r *EventRepository) AddParticipantToEvent(ctx context.Context, eventID int64, clientID int64) error {
+	_, err := r.db.Insert(ctx, &models.EventClient{EventID: eventID, ClientID: clientID}).Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("add participant to event: %w", err)
+	}
+	return nil
+}
+
+func (r *EventRepository) GetParticipantsByEventId(ctx context.Context, eventID int64, page int64, perPage int64) ([]*models.Participant, int64, error) {
+	offset := (page - 1) * perPage
+
+	query := r.db.Select(ctx, &models.Client{}).
+		ColumnExpr("c.id AS client_id, c.photo_name, c.birth_date, c.gender, c.firstname AS first_name, c.middlename AS middle_name, c.lastname AS last_name, v.id AS volunteer_tg, v.tg_login AS volunteer_tg_login, v.name AS volounteer_name").
+		Join("JOIN event_client ec ON ec.client_id = c.id").
+		Join("JOIN volounteer v ON ec.volounteer_id = v.id").
+		Where("ec.event_id = ?", eventID).
+		Limit(int(perPage)).
+		Offset(int(offset))
+
+	var participants []*models.Participant
+
+	total, err := query.ScanAndCount(ctx, &participants)
+	if err != nil {
+		return nil, 0, fmt.Errorf("get participants: %w", err)
+	}
+
+	return participants, int64(total), nil
+}
+
+func (r *EventRepository) GetEventsByServiceId(ctx context.Context, serviceID int64, page int64, perPage int64) ([]*models.Event, int64, error) {
+	var events []*models.Event
+
+	offset := (page - 1) * perPage
+
+	total, err := r.db.Select(ctx, &events).
+		Where("service_type_id = ?", serviceID).
+		Limit(int(perPage)).
+		Offset(int(offset)).
+		ScanAndCount(ctx, &events)
+
+	if err != nil {
+		return nil, 0, fmt.Errorf("get events by service id: %w", err)
+	}
+
+	return events, int64(total), nil
 }

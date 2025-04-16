@@ -66,14 +66,11 @@ func (u *UseCase) GetVolunteersTgId(ctx context.Context, tgId int64) (*models.Vo
 	}
 
 	return &models.Volunteer{
-		Id:         pbRes.Id,
 		TgId:       pbRes.TgId,
+		TgLogin:    pbRes.TgLogin,
 		FirstName:  pbRes.FirstName,
 		MiddleName: pbRes.MiddleName,
 		LastName:   pbRes.LastName,
-		PhotoName:  pbRes.PhotoName,
-		IsBlocked:  pbRes.IsBlocked,
-		IsNew:      pbRes.IsNew,
 	}, nil
 }
 
@@ -83,7 +80,6 @@ func (u *UseCase) PutVolunteersTgId(ctx context.Context, tgId int64, req *Update
 		FirstName:  req.FirstName,
 		MiddleName: req.MiddleName,
 		LastName:   req.LastName,
-		PhotoName:  req.PhotoName,
 	}
 
 	pbRes, err := u.volunteersClient.UpdateVolunteer(ctx, pbReq)
@@ -92,13 +88,10 @@ func (u *UseCase) PutVolunteersTgId(ctx context.Context, tgId int64, req *Update
 	}
 
 	return &models.Volunteer{
-		Id:         pbRes.Id,
 		TgId:       pbRes.TgId,
+		TgLogin:    pbRes.TgLogin,
 		FirstName:  pbRes.FirstName,
 		MiddleName: pbRes.MiddleName,
 		LastName:   pbRes.LastName,
-		PhotoName:  pbRes.PhotoName,
-		IsBlocked:  pbRes.IsBlocked,
-		IsNew:      pbRes.IsNew,
 	}, nil
 }

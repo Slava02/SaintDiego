@@ -11,15 +11,19 @@ const (
 
 //go:generate options-gen -out-filename=manager_options.gen.go -from-struct=ManagerOptions
 type ManagerOptions struct {
-	ScheduleAddr string `option:"mandatory" validate:"required"`
-	ServicesAddr string `option:"mandatory" validate:"required"`
-	EventsAddr   string `option:"mandatory" validate:"required"`
+	ScheduleAddr   string `option:"mandatory" validate:"required"`
+	ServicesAddr   string `option:"mandatory" validate:"required"`
+	EventsAddr     string `option:"mandatory" validate:"required"`
+	VolunteersAddr string `option:"mandatory" validate:"required"`
+	ClientsAddr    string `option:"mandatory" validate:"required"`
 }
 
 type Manager struct {
-	scheduleClient *ScheduleClient
-	servicesClient *ServicesClient
-	eventsClient   *EventsClient
+	scheduleClient   *ScheduleClient
+	servicesClient   *ServicesClient
+	eventsClient     *EventsClient
+	volunteersClient *VolunteersClient
+	clientsClient    *ClientsClient
 }
 
 func NewManager(opts ManagerOptions) (*Manager, error) {
@@ -44,10 +48,26 @@ func NewManager(opts ManagerOptions) (*Manager, error) {
 		return nil, fmt.Errorf("failed to create events client: %w", err)
 	}
 
+	volunteersClient, err := NewVolunteersClient(VolunteersClientOptions{
+		VolunteersServerAddr: opts.VolunteersAddr,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create volunteers client: %w", err)
+	}
+
+	clientsClient, err := NewClientsClient(ClientsClientOptions{
+		ClientsServerAddr: opts.ClientsAddr,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create clients client: %w", err)
+	}
+
 	return &Manager{
-		scheduleClient: scheduleClient,
-		servicesClient: servicesClient,
-		eventsClient:   eventsClient,
+		scheduleClient:   scheduleClient,
+		servicesClient:   servicesClient,
+		eventsClient:     eventsClient,
+		volunteersClient: volunteersClient,
+		clientsClient:    clientsClient,
 	}, nil
 }
 
@@ -61,6 +81,12 @@ func (m *Manager) Close() error {
 	}
 	if err := m.eventsClient.Close(); err != nil {
 		return fmt.Errorf("failed to close events client: %w", err)
+	}
+	if err := m.volunteersClient.Close(); err != nil {
+		return fmt.Errorf("failed to close volunteers client: %w", err)
+	}
+	if err := m.clientsClient.Close(); err != nil {
+		return fmt.Errorf("failed to close clients client: %w", err)
 	}
 	return nil
 }
@@ -78,4 +104,14 @@ func (m *Manager) Services() *ServicesClient {
 // Events returns the events service client
 func (m *Manager) Events() *EventsClient {
 	return m.eventsClient
+}
+
+// Volunteers returns the volunteers service client
+func (m *Manager) Volunteers() *VolunteersClient {
+	return m.volunteersClient
+}
+
+// Clients returns the clients service client
+func (m *Manager) Clients() *ClientsClient {
+	return m.clientsClient
 }

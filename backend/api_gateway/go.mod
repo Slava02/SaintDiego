@@ -23,7 +23,7 @@ require (
 )
 
 require (
-	github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250416104015-63328e47c3e0 // indirect
+	github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250416104328-e935f3ac04e6 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect

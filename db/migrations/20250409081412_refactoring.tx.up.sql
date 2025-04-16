@@ -1,8 +1,10 @@
 CREATE TABLE IF NOT EXISTS `volounteer` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
+    `tg_id` int(11) NOT NULL,
+    `first_name` varchar(255) NOT NULL,
+    `last_name` varchar(255) NOT NULL,
+    `middle_name` varchar(255) NOT NULL,
     `tg_login` varchar(255) NOT NULL,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`tg_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 --bun:split
 CREATE TABLE IF NOT EXISTS `client` (
@@ -173,5 +175,5 @@ CREATE TABLE IF NOT EXISTS `event_client` (
     KEY `IDX_event_client_volounteer_id` (`volounteer_id`),
     CONSTRAINT `FK_event_client_event` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`) ON DELETE CASCADE,
     CONSTRAINT `FK_event_client_client` FOREIGN KEY (`client_id`) REFERENCES `client` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `FK_event_volounteer` FOREIGN KEY (`volounteer_id`) REFERENCES `volounteer` (`id`) ON DELETE CASCADE
+    CONSTRAINT `FK_event_volounteer` FOREIGN KEY (`volounteer_id`) REFERENCES `volounteer` (`tg_id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
