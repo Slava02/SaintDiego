@@ -1481,6 +1481,8 @@ components:
         - timeSlotServiceId
         - capacity
         - datetime
+        - serviceTypeId
+        - id
       example:
         id: 1
         timeSlotServiceId: 1
@@ -1582,8 +1584,24 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Participant'
+        total:
+          type: integer
+          format: int32
+        page:
+          type: integer
+          format: int32
+        per_page:
+          type: integer
+          format: int32
+        total_pages:
+          type: integer
+          format: int32
       required:
         - participants
+        - total
+        - page
+        - per_page
+        - total_pages
     AddParticipantToEventRequest:
       type: object
       properties:

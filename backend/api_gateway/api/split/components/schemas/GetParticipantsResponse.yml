@@ -4,5 +4,21 @@ properties:
     type: array
     items:
       $ref: ./Participant.yml
+  total:
+    type: integer
+    format: int32
+  page:
+    type: integer
+    format: int32
+  per_page:
+    type: integer
+    format: int32
+  total_pages:
+    type: integer
+    format: int32
 required:
   - participants
+  - total
+  - page
+  - per_page
+  - total_pages

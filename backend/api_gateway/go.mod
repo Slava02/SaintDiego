@@ -5,9 +5,10 @@ go 1.24.2
 require (
 	github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250416100253-3548a7f6f82b
 	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250416101532-01831f40d320
-	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250416095957-24ac856d67e6
+	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250416132444-5f7569032549
 	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250416101532-01831f40d320
 	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250416101532-01831f40d320
+	github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250416104328-e935f3ac04e6
 	github.com/getkin/kin-openapi v0.131.0
 	github.com/kazhuravlev/options-gen v0.42.1
 	github.com/labstack/echo/v4 v4.13.3
@@ -23,7 +24,6 @@ require (
 )
 
 require (
-	github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250416104328-e935f3ac04e6 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect

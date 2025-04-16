@@ -19,8 +19,10 @@ required:
   - timeSlotServiceId
   - capacity
   - datetime
+  - serviceTypeId
+  - id
 example:
   id: 1
   timeSlotServiceId: 1
   capacity: 20
-  datetime: '2024-03-20T09:00:00Z'
+  datetime: "2024-03-20T09:00:00Z"

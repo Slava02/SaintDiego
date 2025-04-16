@@ -12,15 +12,13 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// TODO: нужно возвращать ответы сгенерированными модельками
-
 type IEventsUC interface {
 	GetEvents(ctx context.Context, req *events.GetEventsParams) ([]*models.Event, int32, error)
 	GetEvent(ctx context.Context, id int64) (*models.Event, error)
 	UpdateEvent(ctx context.Context, req *events.UpdateEventRequest) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id int64) error
 	AddParticipantToEvent(ctx context.Context, req *events.AddParticipantToEventRequest) error
-	GetParticipantsByEventId(ctx context.Context, params *events.GetEventsIdParticipantsParams) ([]*models.Participant, error)
+	GetParticipantsByEventId(ctx context.Context, params *events.GetEventsIdParticipantsParams) ([]*models.Participant, int32, error)
 	GetEventsByServiceId(ctx context.Context, params *events.GetEventsServicesIdParams) ([]*models.Event, int32, error)
 }
 
@@ -90,7 +88,13 @@ func (h Handlers) GetEventsId(c echo.Context, id int64) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, event)
+	return c.JSON(http.StatusOK, Event{
+		Id:                event.ID,
+		TimeSlotServiceId: event.TimeSlotServiceID,
+		Capacity:          event.Capacity,
+		Datetime:          event.Datetime,
+		ServiceTypeId:     event.ServiceTypeID,
+	})
 }
 
 func (h Handlers) PutEventsId(c echo.Context, id int64) error {
@@ -106,7 +110,7 @@ func (h Handlers) PutEventsId(c echo.Context, id int64) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, event)
+	return c.JSON(http.StatusOK, convertEventToResponse(event))
 }
 
 func (h Handlers) DeleteEventsId(c echo.Context, id int64) error {
@@ -141,13 +145,17 @@ func (h Handlers) GetEventsIdParticipants(c echo.Context, id int64, params GetEv
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	participants, err := h.eventsUC.GetParticipantsByEventId(c.Request().Context(), &req)
+	participants, total, err := h.eventsUC.GetParticipantsByEventId(c.Request().Context(), &req)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, GetParticipantsResponse{
 		Participants: convertParticipantsToResponse(participants),
+		Total:        total,
+		Page:         req.Page,
+		PerPage:      req.PerPage,
+		TotalPages:   int32(math.Ceil(float64(total) / float64(req.PerPage))),
 	})
 }
 
@@ -191,12 +199,22 @@ func convertEventsToResponse(events []*models.Event) []Event {
 	response := make([]Event, len(events))
 	for i, event := range events {
 		response[i] = Event{
-			Id:                pointer.Ptr(event.ID),
+			Id:                event.ID,
 			TimeSlotServiceId: event.TimeSlotServiceID,
 			Capacity:          event.Capacity,
 			Datetime:          event.Datetime,
-			ServiceTypeId:     pointer.Ptr(event.ServiceTypeID),
+			ServiceTypeId:     event.ServiceTypeID,
 		}
 	}
 	return response
+}
+
+func convertEventToResponse(event *models.Event) Event {
+	return Event{
+		Id:                event.ID,
+		TimeSlotServiceId: event.TimeSlotServiceID,
+		Capacity:          event.Capacity,
+		Datetime:          event.Datetime,
+		ServiceTypeId:     event.ServiceTypeID,
+	}
 }

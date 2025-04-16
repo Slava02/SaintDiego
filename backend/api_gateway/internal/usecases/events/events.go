@@ -143,7 +143,7 @@ func (u *UseCase) AddParticipantToEvent(ctx context.Context, req *AddParticipant
 }
 
 // TODO: тут может вернуться пользователь, у которого только ФИО, это тот, который еще не прошел собеседование
-func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEventsIdParticipantsParams) ([]*models.Participant, error) {
+func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEventsIdParticipantsParams) ([]*models.Participant, int32, error) {
 	pbReq := &pb.GetParticipantsByEventIdRequest{
 		EventId: params.EventID,
 		Page:    int64(params.Page),
@@ -152,7 +152,7 @@ func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEvent
 
 	pbRes, err := u.eventsClient.GetParticipantsByEventId(ctx, pbReq)
 	if err != nil {
-		return nil, fmt.Errorf("get participants: %v", err)
+		return nil, 0, fmt.Errorf("get participants: %v", err)
 	}
 
 	participants := make([]*models.Participant, len(pbRes.Participants))
@@ -168,10 +168,9 @@ func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEvent
 		}
 	}
 
-	return participants, nil
+	return participants, int32(pbRes.Total), nil
 }
 
-// TODO: implement
 func (u *UseCase) GetEventsByServiceId(ctx context.Context, params *GetEventsServicesIdParams) ([]*models.Event, int32, error) {
 	pbReq := &pb.GetEventsByServiceIdRequest{
 		ServiceId: params.ServiceID,
