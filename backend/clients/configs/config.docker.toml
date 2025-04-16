@@ -1,0 +1,20 @@
+[global]
+name = "events"
+env = "dev"
+
+[log]
+level = "debug"
+
+[server]
+addr = ":50052"
+max_connection_idle = 10
+timeout = 10
+max_connection_age = 10
+time = 10
+
+[database]
+host = "host.docker.internal"
+db_name = "homeless"
+password = "12345ghJkbn"
+user = "homeless"
+port = "39410"

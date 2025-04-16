@@ -10,8 +10,8 @@ import (
 
 	"github.com/Slava02/SaintDiego/backend/common/closer"
 	"github.com/Slava02/SaintDiego/backend/common/interceptors"
-	"github.com/Slava02/SaintDiego/backend/volunteers/internal/config"
-	"github.com/Slava02/SaintDiego/backend/volunteers/pkg/pb"
+	"github.com/Slava02/SaintDiego/clients/internal/config"
+	"github.com/Slava02/SaintDiego/clients/pkg/pb"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -23,18 +23,18 @@ import (
 
 //go:generate options-gen -out-filename=server_options.gen.go -from-struct=Options
 type Options struct {
-	Lg                *zap.Logger                `option:"mandatory" validate:"required"`
-	ServerConfig      *config.ServerConfig       `option:"mandatory" validate:"required"`
-	Production        bool                       `option:"optional" default:"false"`
-	VolunteersService pb.VolunteersServiceServer `option:"mandatory" validate:"required"`
+	Lg             *zap.Logger             `option:"mandatory" validate:"required"`
+	ServerConfig   *config.ServerConfig    `option:"mandatory" validate:"required"`
+	Production     bool                    `option:"optional" default:"false"`
+	ClientsService pb.ClientsServiceServer `option:"mandatory" validate:"required"`
 }
 
 type Server struct {
-	lg                *zap.Logger
-	srv               *grpc.Server
-	production        bool
-	addr              string
-	VolunteersService pb.VolunteersServiceServer
+	lg             *zap.Logger
+	srv            *grpc.Server
+	production     bool
+	addr           string
+	ClientsService pb.ClientsServiceServer
 }
 
 func New(opts Options) (*Server, error) {
@@ -58,18 +58,18 @@ func New(opts Options) (*Server, error) {
 	)
 
 	return &Server{
-		lg:                opts.Lg,
-		srv:               srv,
-		production:        opts.Production,
-		addr:              opts.ServerConfig.Addr,
-		VolunteersService: opts.VolunteersService,
+		lg:             opts.Lg,
+		srv:            srv,
+		production:     opts.Production,
+		addr:           opts.ServerConfig.Addr,
+		ClientsService: opts.ClientsService,
 	}, nil
 }
 
 func (s *Server) Run(ctx context.Context) error {
 	defer closer.CloseAll()
 
-	pb.RegisterVolunteersServiceServer(s.srv, s.VolunteersService)
+	pb.RegisterClientsServiceServer(s.srv, s.ClientsService)
 
 	l, err := net.Listen("tcp", s.addr)
 	if err != nil {

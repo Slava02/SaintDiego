@@ -6,7 +6,7 @@ require (
 	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250416132444-5f7569032549
 	github.com/go-sql-driver/mysql v1.9.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
-	github.com/opentracing/opentracing-go v1.2.0
+	github.com/kazhuravlev/options-gen v0.33.2
 	github.com/pelletier/go-toml v1.9.5
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.10.0
@@ -26,10 +26,10 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.26.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/kazhuravlev/options-gen v0.33.2 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/puzpuzpuz/xsync/v3 v3.5.1 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect

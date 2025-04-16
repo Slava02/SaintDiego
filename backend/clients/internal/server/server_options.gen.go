@@ -4,8 +4,8 @@ package server
 import (
 	fmt461e464ebed9 "fmt"
 
-	"github.com/Slava02/SaintDiego/backend/volunteers/internal/config"
-	"github.com/Slava02/SaintDiego/backend/volunteers/pkg/pb"
+	"github.com/Slava02/SaintDiego/clients/internal/config"
+	"github.com/Slava02/SaintDiego/clients/pkg/pb"
 	errors461e464ebed9 "github.com/kazhuravlev/options-gen/pkg/errors"
 	validator461e464ebed9 "github.com/kazhuravlev/options-gen/pkg/validator"
 	"go.uber.org/zap"
@@ -16,7 +16,7 @@ type OptOptionsSetter func(o *Options)
 func NewOptions(
 	Lg *zap.Logger,
 	ServerConfig *config.ServerConfig,
-	VolunteersService pb.VolunteersServiceServer,
+	ClientsService pb.ClientsServiceServer,
 	options ...OptOptionsSetter,
 ) Options {
 	o := Options{}
@@ -28,7 +28,7 @@ func NewOptions(
 
 	o.ServerConfig = ServerConfig
 
-	o.VolunteersService = VolunteersService
+	o.ClientsService = ClientsService
 
 	for _, opt := range options {
 		opt(&o)
@@ -47,7 +47,7 @@ func (o *Options) Validate() error {
 	errs := new(errors461e464ebed9.ValidationErrors)
 	errs.Add(errors461e464ebed9.NewValidationError("Lg", _validate_Options_Lg(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("ServerConfig", _validate_Options_ServerConfig(o)))
-	errs.Add(errors461e464ebed9.NewValidationError("VolunteersService", _validate_Options_VolunteersService(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("ClientsService", _validate_Options_ClientsService(o)))
 	return errs.AsError()
 }
 
@@ -65,9 +65,9 @@ func _validate_Options_ServerConfig(o *Options) error {
 	return nil
 }
 
-func _validate_Options_VolunteersService(o *Options) error {
-	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.VolunteersService, "required"); err != nil {
-		return fmt461e464ebed9.Errorf("field `VolunteersService` did not pass the test: %w", err)
+func _validate_Options_ClientsService(o *Options) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.ClientsService, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `ClientsService` did not pass the test: %w", err)
 	}
 	return nil
 }
