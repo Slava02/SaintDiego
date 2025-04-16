@@ -62,7 +62,7 @@ message Client {
   optional string photo_name = 5;
   optional google.protobuf.Timestamp birth_date = 6;
   optional int32 gender = 7;
-  optional bool is_new = 8;
+  bool is_new = 8;
   optional bool is_blocked = 9;
   optional bool is_homeless = 10;
 }
