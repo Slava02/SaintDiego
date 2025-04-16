@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package volunteers;
+
+option go_package = "github.com/Slava02/SaintDiego/backend/volunteers/pkg/pb";
+
+// Service definition
+service VolunteersService {
+  rpc CreateVolunteer(CreateVolunteerRequest) returns (Volunteer) {}
+  rpc GetVolunteerByTgId(GetVolunteerByTgIdRequest) returns (Volunteer) {}
+  rpc UpdateVolunteer(UpdateVolunteerRequest) returns (Volunteer) {}
+}
+
+// Request messages
+message CreateVolunteerRequest {
+  int64 tg_id = 1;
+  string first_name = 2;
+  string middle_name = 3;
+  string last_name = 4;
+  optional string photo_name = 5;
+}
+
+message GetVolunteerByTgIdRequest {
+    int64 tg_id = 1;
+  }
+
+message UpdateVolunteerRequest {
+    int64 tg_id = 1;
+    string first_name = 2;
+    string middle_name = 3;
+    string last_name = 4;
+    optional string photo_name = 5;
+}
+
+// Response messages
+
+
+// Common messages
+message Volunteer {
+    int64 id = 1;
+    int64 tg_id = 2;
+    int64 tg_login = 3;
+    string first_name = 4;
+    string middle_name = 5;
+    string last_name = 6;
+}
