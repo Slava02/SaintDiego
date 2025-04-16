@@ -16,9 +16,16 @@ service EventsService {
   rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse) {}
   rpc AddParticipantToEvent(AddParticipantToEventRequest) returns (AddParticipantToEventResponse) {}
   rpc GetParticipantsByEventId(GetParticipantsByEventIdRequest) returns (GetParticipantsByEventIdResponse) {}
+  rpc GetEventsByServiceId(GetEventsByServiceIdRequest) returns (GetEventsByServiceIdResponse) {}
 }
 
 // Request messages
+message GetEventsByServiceIdRequest {
+  int64 service_id = 1;
+  int64 page = 2;
+  int64 per_page = 3;
+}
+
 message GetEventsRequest {
   optional int64 participant_id = 1;
   optional string status = 2;
@@ -56,12 +63,10 @@ message GetParticipantsByEventIdRequest {
 }
 
 // Response messages
-// TODO: тут не обязательно возвращать total, page, per_page, т.к. они уже есть в запросе (см. GetServicesResponse)
+// TODO: тут не обязательно возвращать page, per_page, т.к. они уже есть в запросе (см. GetServicesResponse)
 message GetEventsResponse {
   repeated Event events = 1;
   int64 total = 2;
-  int64 page = 3;
-  int64 per_page = 4;
 }
 
 message DeleteEventResponse {
@@ -76,6 +81,10 @@ message GetParticipantsByEventIdResponse {
   repeated Participant participants = 1;
 }
 
+message GetEventsByServiceIdResponse {
+  repeated Event events = 1;
+  int64 total = 2;
+}
 
 // Common messages
 message Event {
@@ -91,8 +100,8 @@ message Participant {
   string first_name = 2;
   string middle_name = 3;
   string last_name = 4;
-  optional string photo_name = 5;
-  optional google.protobuf.Timestamp birth_date = 6;
-  optional int64 gender = 7;
-  optional bool is_homeless = 8;
+  string photo_name = 5;
+  google.protobuf.Timestamp birth_date = 6;
+  int64 gender = 7;
+  bool is_homeless = 8;
 }
