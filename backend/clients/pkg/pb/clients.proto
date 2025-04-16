@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package clients;
+
+option go_package = "github.com/Slava02/SaintDiego/backend/clients/pkg/pb";
+
+import "google/protobuf/timestamp.proto";
+
+// Service definition
+service ClientsService {
+  rpc GetClients(GetClientsRequest) returns (GetClientsResponse) {}
+  rpc GetClientById(GetClientByIdRequest) returns (Client) {}
+  rpc CreateClient(CreateClientRequest) returns (Client) {}
+  rpc BlockClient(BlockClientRequest) returns (Client) {}
+  rpc GetClientServices(GetClientServicesRequest) returns (GetClientServicesResponse) {}
+}
+
+// Request messages
+message GetClientsRequest {
+  int64 page = 1;
+  int64 per_page = 2;
+}
+
+message GetClientByIdRequest {
+    int64 id = 1;
+  }
+
+message CreateClientRequest {
+    string first_name = 1;
+    string middle_name = 2;
+    string last_name = 3;
+}
+
+message BlockClientRequest {
+    int64 id = 1;
+    bool is_blocked = 2;
+}
+
+message GetClientServicesRequest {
+    int64 id = 1;
+    int64 page = 2;
+    int64 per_page = 3;
+}
+
+// Response messages
+message GetClientsResponse {
+  repeated Client clients = 1;
+  int64 total = 2;
+}
+
+message GetClientServicesResponse {
+  repeated ServiceType services = 1;
+  int64 total = 2;
+}
+
+// Common messages
+message Client {
+  int64 id = 1;
+  string first_name = 2;
+  string middle_name = 3;
+  string last_name = 4;
+  optional string photo_name = 5;
+  optional google.protobuf.Timestamp birth_date = 6;
+  optional int32 gender = 7;
+  optional bool is_new = 8;
+  optional bool is_blocked = 9;
+  optional bool is_homeless = 10;
+}
+
+message ServiceType {
+    int64 id = 1;  
+    string name = 2;
+    int64 minPeriodDays = 3;
+    bool registrationAvailable = 4;
+  }
