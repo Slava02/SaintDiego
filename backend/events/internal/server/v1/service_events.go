@@ -18,6 +18,7 @@ type IEventsUC interface {
 	UpdateEvent(ctx context.Context, req *events.UpdateEventRequest) (*models.Event, error)
 	DeleteEvent(ctx context.Context, eventID int64) error
 	AddParticipantToEvent(ctx context.Context, eventID int64, participantID int64) error
+	GetParticipantsByEventId(ctx context.Context, params *events.GetEventsIdParticipantsParams) ([]*models.Participant, error)
 }
 
 func (s *Implementation) GetEvents(ctx context.Context, req *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
@@ -123,6 +124,26 @@ func (s *Implementation) AddParticipantToEvent(ctx context.Context, req *pb.AddP
 
 	return &pb.AddParticipantToEventResponse{
 		Success: true,
+	}, nil
+}
+
+func (s *Implementation) GetParticipantsByEventId(ctx context.Context, req *pb.GetParticipantsByEventIdRequest) (*pb.GetParticipantsByEventIdResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "GetParticipantsByEventId")
+	defer span.Finish()
+
+	span.SetTag("event_id", req.EventId)
+
+	participants, err := s.eventsUC.GetParticipantsByEventId(ctx, &events.GetEventsIdParticipantsParams{
+		EventID: req.EventId,
+		Page:    req.Page,
+		PerPage: req.PerPage,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get participants by event id: %v", err)
+	}
+
+	return &pb.GetParticipantsByEventIdResponse{
+		Participants: participants,
 	}, nil
 }
 

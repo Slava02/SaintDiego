@@ -29,3 +29,9 @@ type GetEventsIdParticipantsParams struct {
 	PerPage int32 `query:"per_page" json:"per_page" validate:"required,min=1,max=100"`
 	EventID int64 `query:"event_id" json:"event_id" validate:"required,min=1"`
 }
+
+type GetEventsServicesIdParams struct {
+	Page      int32 `query:"page" json:"page" validate:"required,min=1"`
+	PerPage   int32 `query:"per_page" json:"per_page" validate:"required,min=1,max=100"`
+	ServiceID int64 `query:"service_id" json:"service_id" validate:"required,min=1"`
+}

@@ -1,0 +1,28 @@
+post:
+  tags:
+    - volunteers
+  summary: Создание нового волонтера
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/Volunteer.yml
+  responses:
+    '201':
+      description: Успешный ответ
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Volunteer.yml
+    '400':
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml

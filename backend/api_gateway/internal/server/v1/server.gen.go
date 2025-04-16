@@ -71,6 +71,32 @@ type AddParticipantToEventRequest struct {
 	ParticipantId int64 `json:"participant_id"`
 }
 
+// BlockClientRequest defines model for BlockClientRequest.
+type BlockClientRequest struct {
+	IsBlocked bool `json:"is_blocked"`
+}
+
+// Client defines model for Client.
+type Client struct {
+	BirthDate  *time.Time `json:"birth_date,omitempty"`
+	FirstName  string     `json:"first_name"`
+	Gender     *int32     `json:"gender,omitempty"`
+	Id         int64      `json:"id"`
+	IsBlocked  *bool      `json:"is_blocked,omitempty"`
+	IsHomeless *bool      `json:"is_homeless,omitempty"`
+	IsNew      bool       `json:"is_new"`
+	LastName   string     `json:"last_name"`
+	MiddleName string     `json:"middle_name"`
+	PhotoName  *string    `json:"photo_name,omitempty"`
+}
+
+// CreateClientRequest defines model for CreateClientRequest.
+type CreateClientRequest struct {
+	FirstName  string `json:"first_name"`
+	LastName   string `json:"last_name"`
+	MiddleName string `json:"middle_name"`
+}
+
 // CreateLocationRequest defines model for CreateLocationRequest.
 type CreateLocationRequest struct {
 	Address string `json:"address"`
@@ -108,6 +134,20 @@ type Event struct {
 	TimeSlotServiceId int64     `json:"timeSlotServiceId"`
 }
 
+// GetAvailableServicesResponse defines model for GetAvailableServicesResponse.
+type GetAvailableServicesResponse struct {
+	Services []ServiceType `json:"services"`
+}
+
+// GetClientsResponse defines model for GetClientsResponse.
+type GetClientsResponse struct {
+	Clients    []Client `json:"clients"`
+	Page       int32    `json:"page"`
+	PerPage    int32    `json:"per_page"`
+	Total      int32    `json:"total"`
+	TotalPages int32    `json:"total_pages"`
+}
+
 // GetEventsResponse defines model for GetEventsResponse.
 type GetEventsResponse struct {
 	Items      []Event `json:"items"`
@@ -140,15 +180,13 @@ type Location struct {
 
 // Participant defines model for Participant.
 type Participant struct {
-	BirthDate  *time.Time `json:"birth_date,omitempty"`
-	FirstName  *string    `json:"first_name,omitempty"`
-	Gender     *int32     `json:"gender,omitempty"`
-	Id         int64      `json:"id"`
-	IsHomeless *bool      `json:"is_homeless,omitempty"`
-	LastName   string     `json:"last_name"`
-	MiddleName string     `json:"middle_name"`
-	Name       string     `json:"name"`
-	PhotoName  *string    `json:"photo_name,omitempty"`
+	BirthDate     *time.Time `json:"birth_date,omitempty"`
+	FirstName     string     `json:"first_name"`
+	Id            int64      `json:"id"`
+	LastName      string     `json:"last_name"`
+	MiddleName    string     `json:"middle_name"`
+	VolunteerName string     `json:"volunteer_name"`
+	VolunteerTg   int64      `json:"volunteer_tg"`
 }
 
 // Recurrence defines model for Recurrence.
@@ -220,6 +258,34 @@ type UpdateServiceRegistrationRequest struct {
 	RegistrationAvailable bool  `json:"registration_available"`
 }
 
+// UpdateVolunteerRequest defines model for UpdateVolunteerRequest.
+type UpdateVolunteerRequest struct {
+	FirstName  string `json:"first_name"`
+	LastName   string `json:"last_name"`
+	MiddleName string `json:"middle_name"`
+}
+
+// Volunteer defines model for Volunteer.
+type Volunteer struct {
+	FirstName  string `json:"first_name"`
+	LastName   string `json:"last_name"`
+	MiddleName string `json:"middle_name"`
+	TgId       int64  `json:"tg_id"`
+	TgLogin    string `json:"tg_login"`
+}
+
+// GetClientsParams defines parameters for GetClients.
+type GetClientsParams struct {
+	Page    int32 `form:"page" json:"page"`
+	PerPage int   `form:"per_page" json:"per_page"`
+}
+
+// GetClientsIdServicesParams defines parameters for GetClientsIdServices.
+type GetClientsIdServicesParams struct {
+	Page    int32 `form:"page" json:"page"`
+	PerPage int32 `form:"per_page" json:"per_page"`
+}
+
 // GetEventsParams defines parameters for GetEvents.
 type GetEventsParams struct {
 	Page          int32                  `form:"page" json:"page"`
@@ -234,6 +300,12 @@ type GetEventsParams struct {
 
 // GetEventsParamsStatus defines parameters for GetEvents.
 type GetEventsParamsStatus string
+
+// GetEventsServicesIdParams defines parameters for GetEventsServicesId.
+type GetEventsServicesIdParams struct {
+	Page    int32 `form:"page" json:"page"`
+	PerPage int32 `form:"per_page" json:"per_page"`
+}
 
 // GetEventsIdParticipantsParams defines parameters for GetEventsIdParticipants.
 type GetEventsIdParticipantsParams struct {
@@ -258,6 +330,12 @@ type GetTimeSlotsParams struct {
 // GetTimeSlotsParamsStatus defines parameters for GetTimeSlots.
 type GetTimeSlotsParamsStatus string
 
+// PostClientsJSONRequestBody defines body for PostClients for application/json ContentType.
+type PostClientsJSONRequestBody = CreateClientRequest
+
+// PutClientsIdJSONRequestBody defines body for PutClientsId for application/json ContentType.
+type PutClientsIdJSONRequestBody = BlockClientRequest
+
 // PutEventsIdJSONRequestBody defines body for PutEventsId for application/json ContentType.
 type PutEventsIdJSONRequestBody = UpdateEventRequest
 
@@ -279,11 +357,35 @@ type PostTimeSlotsJSONRequestBody = CreateTimeSlotRequest
 // PutTimeSlotsIdJSONRequestBody defines body for PutTimeSlotsId for application/json ContentType.
 type PutTimeSlotsIdJSONRequestBody = TimeSlot
 
+// PostVolunteersJSONRequestBody defines body for PostVolunteers for application/json ContentType.
+type PostVolunteersJSONRequestBody = Volunteer
+
+// PutVolunteersTgIdJSONRequestBody defines body for PutVolunteersTgId for application/json ContentType.
+type PutVolunteersTgIdJSONRequestBody = UpdateVolunteerRequest
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Получение списка живых клиентов
+	// (GET /clients)
+	GetClients(ctx echo.Context, params GetClientsParams) error
+	// Создание нового клиента
+	// (POST /clients)
+	PostClients(ctx echo.Context) error
+	// Получение клиента по идентификатору
+	// (GET /clients/{id})
+	GetClientsId(ctx echo.Context, id int64) error
+	// Блокировка/Разблокировка клиента
+	// (PUT /clients/{id})
+	PutClientsId(ctx echo.Context, id int64) error
+	// Получение списка услуг доступных клиенту
+	// (GET /clients/{id}/services)
+	GetClientsIdServices(ctx echo.Context, id int64, params GetClientsIdServicesParams) error
 	// Получение списка событий
 	// (GET /events)
 	GetEvents(ctx echo.Context, params GetEventsParams) error
+	// Получение списка событий по типу услуги
+	// (GET /events/services/{id})
+	GetEventsServicesId(ctx echo.Context, id int64, params GetEventsServicesIdParams) error
 	// Удаление события по идентификатору
 	// (DELETE /events/{id})
 	DeleteEventsId(ctx echo.Context, id int64) error
@@ -341,11 +443,128 @@ type ServerInterface interface {
 	// Архивация временного слота
 	// (PATCH /timeSlots/{id}/archive)
 	PatchTimeSlotsIdArchive(ctx echo.Context, id int64) error
+	// Создание нового волонтера
+	// (POST /volunteers)
+	PostVolunteers(ctx echo.Context) error
+	// Получение волонтера по идентификатору
+	// (GET /volunteers/{tg_id})
+	GetVolunteersTgId(ctx echo.Context, tgId int64) error
+	// Обновление волонтера
+	// (PUT /volunteers/{tg_id})
+	PutVolunteersTgId(ctx echo.Context, tgId int64) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler ServerInterface
+}
+
+// GetClients converts echo context to params.
+func (w *ServerInterfaceWrapper) GetClients(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetClientsParams
+	// ------------- Required query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "page", ctx.QueryParams(), &params.Page)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
+	}
+
+	// ------------- Required query parameter "per_page" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "per_page", ctx.QueryParams(), &params.PerPage)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter per_page: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetClients(ctx, params)
+	return err
+}
+
+// PostClients converts echo context to params.
+func (w *ServerInterfaceWrapper) PostClients(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.PostClients(ctx)
+	return err
+}
+
+// GetClientsId converts echo context to params.
+func (w *ServerInterfaceWrapper) GetClientsId(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetClientsId(ctx, id)
+	return err
+}
+
+// PutClientsId converts echo context to params.
+func (w *ServerInterfaceWrapper) PutClientsId(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.PutClientsId(ctx, id)
+	return err
+}
+
+// GetClientsIdServices converts echo context to params.
+func (w *ServerInterfaceWrapper) GetClientsIdServices(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetClientsIdServicesParams
+	// ------------- Required query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "page", ctx.QueryParams(), &params.Page)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
+	}
+
+	// ------------- Required query parameter "per_page" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "per_page", ctx.QueryParams(), &params.PerPage)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter per_page: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetClientsIdServices(ctx, id, params)
+	return err
 }
 
 // GetEvents converts echo context to params.
@@ -414,6 +633,40 @@ func (w *ServerInterfaceWrapper) GetEvents(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetEvents(ctx, params)
+	return err
+}
+
+// GetEventsServicesId converts echo context to params.
+func (w *ServerInterfaceWrapper) GetEventsServicesId(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetEventsServicesIdParams
+	// ------------- Required query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "page", ctx.QueryParams(), &params.Page)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
+	}
+
+	// ------------- Required query parameter "per_page" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "per_page", ctx.QueryParams(), &params.PerPage)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter per_page: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetEventsServicesId(ctx, id, params)
 	return err
 }
 
@@ -786,6 +1039,53 @@ func (w *ServerInterfaceWrapper) PatchTimeSlotsIdArchive(ctx echo.Context) error
 	return err
 }
 
+// PostVolunteers converts echo context to params.
+func (w *ServerInterfaceWrapper) PostVolunteers(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.PostVolunteers(ctx)
+	return err
+}
+
+// GetVolunteersTgId converts echo context to params.
+func (w *ServerInterfaceWrapper) GetVolunteersTgId(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "tg_id" -------------
+	var tgId int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "tg_id", ctx.Param("tg_id"), &tgId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter tg_id: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetVolunteersTgId(ctx, tgId)
+	return err
+}
+
+// PutVolunteersTgId converts echo context to params.
+func (w *ServerInterfaceWrapper) PutVolunteersTgId(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "tg_id" -------------
+	var tgId int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "tg_id", ctx.Param("tg_id"), &tgId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter tg_id: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.PutVolunteersTgId(ctx, tgId)
+	return err
+}
+
 // This is a simple interface which specifies echo.Route addition functions which
 // are present on both echo.Echo and echo.Group, since we want to allow using
 // either of them for path registration
@@ -814,7 +1114,13 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
+	router.GET(baseURL+"/clients", wrapper.GetClients)
+	router.POST(baseURL+"/clients", wrapper.PostClients)
+	router.GET(baseURL+"/clients/:id", wrapper.GetClientsId)
+	router.PUT(baseURL+"/clients/:id", wrapper.PutClientsId)
+	router.GET(baseURL+"/clients/:id/services", wrapper.GetClientsIdServices)
 	router.GET(baseURL+"/events", wrapper.GetEvents)
+	router.GET(baseURL+"/events/services/:id", wrapper.GetEventsServicesId)
 	router.DELETE(baseURL+"/events/:id", wrapper.DeleteEventsId)
 	router.GET(baseURL+"/events/:id", wrapper.GetEventsId)
 	router.PUT(baseURL+"/events/:id", wrapper.PutEventsId)
@@ -834,63 +1140,76 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.PUT(baseURL+"/timeSlots/:id", wrapper.PutTimeSlotsId)
 	router.PATCH(baseURL+"/timeSlots/:id/activate", wrapper.PatchTimeSlotsIdActivate)
 	router.PATCH(baseURL+"/timeSlots/:id/archive", wrapper.PatchTimeSlotsIdArchive)
+	router.POST(baseURL+"/volunteers", wrapper.PostVolunteers)
+	router.GET(baseURL+"/volunteers/:tg_id", wrapper.GetVolunteersTgId)
+	router.PUT(baseURL+"/volunteers/:tg_id", wrapper.PutVolunteersTgId)
 
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"5WiEAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

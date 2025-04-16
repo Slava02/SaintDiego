@@ -33,6 +33,18 @@ paths:
     $ref: paths/events_{id}.yml
   /events/{id}/participants:
     $ref: paths/events_{id}_participants.yml
+  /events/services/{id}:
+    $ref: paths/events_services_{id}.yml
+  /clients:
+    $ref: paths/clients.yml
+  /clients/{id}:
+    $ref: paths/clients_{id}.yml
+  /clients/{id}/services:
+    $ref: paths/clients_{id}_services.yml
+  /volunteers:
+    $ref: paths/volunteers.yml
+  /volunteers/{tg_id}:
+    $ref: paths/volunteers_{tg_id}.yml
 components:
   securitySchemes:
     BearerAuth:

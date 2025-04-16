@@ -10,6 +10,8 @@ import (
 	timeSlots "github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/timeSlots"
 )
 
+// TODO: нужно возвращать ответы сгенерированными модельками
+
 type ITimeSlotsUC interface {
 	CreateTimeSlot(ctx context.Context, req *timeSlots.CreateTimeSlotReq) (*models.TimeSlot, error)
 	GetTimeSlots(ctx context.Context, req *timeSlots.GetTimeSlotsReq) ([]*models.TimeSlot, error)

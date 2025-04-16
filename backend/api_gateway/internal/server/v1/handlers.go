@@ -10,6 +10,8 @@ type Options struct {
 	locationsUC ILocationsUC `option:"mandatory" validate:"required"`
 	servicesUC  IServicesUC  `option:"mandatory" validate:"required"`
 	eventsUC    IEventsUC    `option:"mandatory" validate:"required"`
+	volunteerUC IVolunteerUC `option:"mandatory" validate:"required"`
+	clientUC    IClientUC    `option:"mandatory" validate:"required"`
 }
 
 type Handlers struct {
@@ -17,7 +19,11 @@ type Handlers struct {
 	locationsUC ILocationsUC
 	servicesUC  IServicesUC
 	eventsUC    IEventsUC
+	volunteerUC IVolunteerUC
+	clientUC    IClientUC
 }
+
+var _ ServerInterface = (*Handlers)(nil)
 
 func NewHandlers(opts Options) (Handlers, error) {
 	if err := opts.Validate(); err != nil {
@@ -29,5 +35,7 @@ func NewHandlers(opts Options) (Handlers, error) {
 		locationsUC: opts.locationsUC,
 		servicesUC:  opts.servicesUC,
 		eventsUC:    opts.eventsUC,
+		volunteerUC: opts.volunteerUC,
+		clientUC:    opts.clientUC,
 	}, nil
 }

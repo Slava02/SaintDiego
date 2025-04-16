@@ -12,6 +12,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// TODO: нужно возвращать ответы сгенерированными модельками
+
 type IEventsUC interface {
 	GetEvents(ctx context.Context, req *events.GetEventsParams) ([]*models.Event, int32, error)
 	GetEvent(ctx context.Context, id int64) (*models.Event, error)
@@ -19,6 +21,7 @@ type IEventsUC interface {
 	DeleteEvent(ctx context.Context, id int64) error
 	AddParticipantToEvent(ctx context.Context, req *events.AddParticipantToEventRequest) error
 	GetParticipantsByEventId(ctx context.Context, params *events.GetEventsIdParticipantsParams) ([]*models.Participant, error)
+	GetEventsByServiceId(ctx context.Context, params *events.GetEventsServicesIdParams) ([]*models.Event, int32, error)
 }
 
 func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
@@ -133,17 +136,55 @@ func (h Handlers) PutEventsIdParticipants(c echo.Context, id int64) error {
 
 func (h Handlers) GetEventsIdParticipants(c echo.Context, id int64, params GetEventsIdParticipantsParams) error {
 	var req events.GetEventsIdParticipantsParams
+	// TODO: проверить как работает
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-
-	req.EventID = id
 
 	participants, err := h.eventsUC.GetParticipantsByEventId(c.Request().Context(), &req)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, participants)
+
+	return c.JSON(http.StatusOK, GetParticipantsResponse{
+		Participants: convertParticipantsToResponse(participants),
+	})
+}
+
+func (h Handlers) GetEventsServicesId(c echo.Context, id int64, params GetEventsServicesIdParams) error {
+	var req events.GetEventsServicesIdParams
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	events, total, err := h.eventsUC.GetEventsByServiceId(c.Request().Context(), &req)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, GetEventsResponse{
+		Items:      convertEventsToResponse(events),
+		Total:      int32(total),
+		Page:       req.Page,
+		PerPage:    req.PerPage,
+		TotalPages: int32(math.Ceil(float64(total) / float64(req.PerPage))),
+	})
+}
+
+func convertParticipantsToResponse(participants []*models.Participant) []Participant {
+	response := make([]Participant, len(participants))
+	for i, participant := range participants {
+		response[i] = Participant{
+			Id:            participant.ID,
+			FirstName:     participant.FirstName,
+			MiddleName:    participant.MiddleName,
+			LastName:      participant.LastName,
+			BirthDate:     participant.BirthDate,
+			VolunteerTg:   participant.VolunteerTG,
+			VolunteerName: participant.VolunteerName,
+		}
+	}
+	return response
 }
 
 func convertEventsToResponse(events []*models.Event) []Event {

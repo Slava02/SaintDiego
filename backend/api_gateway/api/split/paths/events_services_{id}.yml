@@ -1,0 +1,49 @@
+get:
+  tags:
+    - events
+  summary: Получение списка событий по типу услуги
+  parameters:
+    - name: id
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+    - name: page
+      in: query
+      required: true
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+    - name: per_page
+      in: query
+      required: true
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
+  responses:
+    '200':
+      description: Успешный ответ
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/GetEventsResponse.yml
+    '400':
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml

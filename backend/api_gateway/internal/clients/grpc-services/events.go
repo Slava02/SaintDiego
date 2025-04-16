@@ -67,3 +67,11 @@ func (c *EventsClient) DeleteEvent(ctx context.Context, req *api.DeleteEventRequ
 func (c *EventsClient) AddParticipantToEvent(ctx context.Context, req *api.AddParticipantToEventRequest) (*api.AddParticipantToEventResponse, error) {
 	return c.EventsServiceClient.AddParticipantToEvent(ctx, req)
 }
+
+func (c *EventsClient) GetParticipantsByEventId(ctx context.Context, req *api.GetParticipantsByEventIdRequest) (*api.GetParticipantsByEventIdResponse, error) {
+	return c.EventsServiceClient.GetParticipantsByEventId(ctx, req)
+}
+
+func (c *EventsClient) GetEventsByServiceId(ctx context.Context, req *api.GetEventsByServiceIdRequest) (*api.GetEventsByServiceIdResponse, error) {
+	return c.EventsServiceClient.GetEventsByServiceId(ctx, req)
+}

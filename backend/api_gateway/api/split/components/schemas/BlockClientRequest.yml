@@ -1,0 +1,8 @@
+type: object
+properties:
+  is_blocked:
+    type: boolean
+required:
+  - is_blocked
+example:
+  is_blocked: true

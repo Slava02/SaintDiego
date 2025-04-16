@@ -1,16 +1,5 @@
 get:
-  tags:
-    - events
-  summary: Получение списка участников события
   parameters:
-    - name: id
-      in: path
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: integer
-        format: int64
     - name: page
       in: query
       required: true
@@ -24,17 +13,18 @@ get:
       required: true
       schema:
         type: integer
-        format: int32
-        minimum: 1
-        maximum: 100
-        default: 20
+  tags:
+    - clients
+  summary: Получение списка живых клиентов
   responses:
     '200':
       description: Успешный ответ
       content:
         application/json:
           schema:
-            $ref: ../components/schemas/GetParticipantsResponse.yml
+            type: array
+            items:
+              $ref: ../components/schemas/GetClientsResponse.yml
     '400':
       description: Ошибка валидации
       content:
@@ -47,43 +37,24 @@ get:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-put:
+post:
   tags:
-    - events
-  summary: Добавление участника к событию
-  parameters:
-    - name: id
-      in: path
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: integer
-        format: int64
+    - clients
+  summary: Создание нового клиента
   requestBody:
     content:
       application/json:
         schema:
-          $ref: ../components/schemas/AddParticipantToEventRequest.yml
+          $ref: ../components/schemas/CreateClientRequest.yml
   responses:
-    '204':
+    '201':
       description: Успешный ответ
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              success:
-                type: boolean
-                example: true
+            $ref: ../components/schemas/Client.yml
     '400':
       description: Ошибка валидации
-      content:
-        application/json:
-          schema:
-            $ref: ../components/schemas/Error.yml
-    '403':
-      description: Forbidden
       content:
         application/json:
           schema:

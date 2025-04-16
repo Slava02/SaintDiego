@@ -1,0 +1,8 @@
+type: object
+properties:
+  services:
+    type: array
+    items:
+      $ref: ./ServiceType.yml
+required:
+  - services

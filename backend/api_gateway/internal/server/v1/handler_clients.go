@@ -1,0 +1,132 @@
+package v1
+
+import (
+	"math"
+	"net/http"
+
+	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
+	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/clients"
+	"github.com/labstack/echo/v4"
+)
+
+type IClientUC interface {
+	GetClients(ctx echo.Context, params clients.GetClientParams) ([]*models.Client, int32, error)
+	PostClients(ctx echo.Context, req clients.CreateClientRequest) (*models.Client, error)
+	GetClientsId(ctx echo.Context, id int64) (*models.Client, error)
+	PutClientsId(ctx echo.Context, req clients.BlockClientRequest) (*models.Client, error)
+	GetClientsIdServices(ctx echo.Context, id int64, params clients.GetClientsIdServicesParams) ([]*models.ServiceType, int32, error)
+}
+
+func (h Handlers) GetClients(ctx echo.Context, params GetClientsParams) error {
+	var req clients.GetClientParams
+	if err := ctx.Bind(&req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	clients, total, err := h.clientUC.GetClients(ctx, req)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	totalPages := int32(math.Ceil(float64(total) / float64(req.PerPage)))
+
+	return ctx.JSON(http.StatusOK, GetClientsResponse{
+		Clients:    convertClientsToResponse(clients),
+		Total:      int32(total),
+		Page:       req.Page,
+		PerPage:    req.PerPage,
+		TotalPages: totalPages,
+	})
+}
+
+func (h Handlers) PostClients(ctx echo.Context) error {
+	var req clients.CreateClientRequest
+	if err := ctx.Bind(&req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	client, err := h.clientUC.PostClients(ctx, req)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusCreated, convertClientToResponse(client))
+}
+
+func (h Handlers) GetClientsId(ctx echo.Context, id int64) error {
+	client, err := h.clientUC.GetClientsId(ctx, id)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusOK, convertClientToResponse(client))
+}
+
+func (h Handlers) PutClientsId(ctx echo.Context, id int64) error {
+	var req clients.BlockClientRequest
+	if err := ctx.Bind(&req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	client, err := h.clientUC.PutClientsId(ctx, req)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusOK, convertClientToResponse(client))
+}
+
+func (h Handlers) GetClientsIdServices(ctx echo.Context, id int64, params GetClientsIdServicesParams) error {
+	var req clients.GetClientsIdServicesParams
+	if err := ctx.Bind(&req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	services, total, err := h.clientUC.GetClientsIdServices(ctx, id, req)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusOK, GetServicesResponse{
+		Items:      convertServicesToResponse(services),
+		Total:      int32(total),
+		Page:       req.Page,
+		PerPage:    req.PerPage,
+		TotalPages: int32(math.Ceil(float64(total) / float64(req.PerPage))),
+	})
+}
+
+func convertClientsToResponse(clients []*models.Client) []Client {
+	response := make([]Client, len(clients))
+	for i, client := range clients {
+		response[i] = Client{
+			Id:         client.Id,
+			FirstName:  client.FirstName,
+			LastName:   client.LastName,
+			MiddleName: client.MiddleName,
+			BirthDate:  client.BirthDate,
+			Gender:     client.Gender,
+			PhotoName:  client.PhotoName,
+			IsBlocked:  client.IsBlocked,
+			IsNew:      client.IsNew,
+			IsHomeless: client.IsHomeless,
+		}
+	}
+
+	return response
+}
+
+func convertClientToResponse(client *models.Client) Client {
+	return Client{
+		Id:         client.Id,
+		FirstName:  client.FirstName,
+		LastName:   client.LastName,
+		MiddleName: client.MiddleName,
+		BirthDate:  client.BirthDate,
+		Gender:     client.Gender,
+		PhotoName:  client.PhotoName,
+		IsBlocked:  client.IsBlocked,
+		IsNew:      client.IsNew,
+		IsHomeless: client.IsHomeless,
+	}
+}
