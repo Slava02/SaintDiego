@@ -41,8 +41,10 @@ func (r *EventRepository) GetEvents(ctx context.Context, params *GetEventsParams
 		query = query.Where("time_slot.location_id = ?", *params.LocationID)
 	}
 
+	// TODO: потестить
 	if params.ParticipantID != nil {
-		query = query.Where("participant_id = ?", *params.ParticipantID)
+		query = query.Join("JOIN event_client ec ON e.id = ec.event_id").
+			Where("ec.client_id = ?", *params.ParticipantID)
 	}
 
 	if params.Upcoming {

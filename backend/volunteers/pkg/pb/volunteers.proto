@@ -18,6 +18,7 @@ message CreateVolunteerRequest {
   string middle_name = 3;
   string last_name = 4;
   optional string photo_name = 5;
+  string tg_login = 6;
 }
 
 message GetVolunteerByTgIdRequest {

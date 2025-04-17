@@ -78,7 +78,10 @@ func run() error {
 
 	// Repositories
 
-	volunteersRepo := volunteers_repo.NewVolunteerRepository(volunteers_repo.NewOptions(db))
+	volunteersRepo, err := volunteers_repo.NewVolunteerRepository(volunteers_repo.NewOptions(db))
+	if err != nil {
+		return fmt.Errorf("init volunteers repo: %v", err)
+	}
 
 	// Usecases
 
