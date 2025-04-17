@@ -22,6 +22,7 @@ type UpdateEventRequest struct {
 type AddParticipantToEventRequest struct {
 	EventID       int64 `json:"event_id" validate:"required,min=1"`
 	ParticipantID int64 `json:"participant_id" validate:"required,min=1"`
+	VolunteerID   int64 `json:"volunteer_id" validate:"required,min=1"`
 }
 
 type GetEventsIdParticipantsParams struct {

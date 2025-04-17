@@ -3,7 +3,12 @@ properties:
   participant_id:
     type: integer
     format: int64
+  volunteer_id:
+    type: integer
+    format: int64
 required:
   - participant_id
+  - volunteer_id
 example:
   participant_id: 1
+  volunteer_id: 2

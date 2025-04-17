@@ -11,6 +11,7 @@ import (
 	"syscall"
 
 	"github.com/Slava02/SaintDiego/backend/common/storage"
+	"github.com/Slava02/SaintDiego/backend/events/internal/models"
 	"github.com/Slava02/SaintDiego/backend/events/internal/repositories/events_repo"
 	"github.com/Slava02/SaintDiego/backend/events/internal/usecases/events"
 
@@ -71,7 +72,13 @@ func run() error {
 	}
 	closer.Add(sqldb.Close)
 
-	db, err := storage.New(storage.NewOptions(sqldb, storage.WithProd(cfg.Global.IsProduction())))
+	db, err := storage.New(
+		storage.NewOptions(
+			sqldb,
+			storage.WithProd(cfg.Global.IsProduction()),
+			storage.WithModels([]any{(*models.EventClient)(nil)}),
+		),
+	)
 	if err != nil {
 		return fmt.Errorf("init storage: %v", err)
 	}

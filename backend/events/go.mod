@@ -3,7 +3,7 @@ module github.com/Slava02/SaintDiego/backend/events
 go 1.24.2
 
 require (
-	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250410173021-d933f2dee5bb
+	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250417054842-cb97ca719f45
 	github.com/go-sql-driver/mysql v1.9.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/kazhuravlev/options-gen v0.33.2
