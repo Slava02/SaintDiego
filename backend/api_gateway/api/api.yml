@@ -1560,7 +1560,11 @@ components:
         volunteer_tg:
           type: integer
           format: int64
-        volunteer_name:
+        volounteer_first_name:
+          type: string
+        volounteer_middle_name:
+          type: string
+        volounteer_last_name:
           type: string
       required:
         - id
@@ -1568,7 +1572,9 @@ components:
         - middle_name
         - last_name
         - volunteer_tg
-        - volunteer_name
+        - volounteer_first_name
+        - volounteer_middle_name
+        - volounteer_last_name
       example:
         id: 1
         first_name: Иван
@@ -1576,7 +1582,9 @@ components:
         last_name: Иванов
         birth_date: '2024-03-20T09:00:00Z'
         volunteer_tg: 1
-        volunteer_name: Иван Иванов
+        volounteer_first_name: Иван
+        volounteer_middle_name: Иванович
+        volounteer_last_name: Иванов
     GetParticipantsResponse:
       type: object
       properties:

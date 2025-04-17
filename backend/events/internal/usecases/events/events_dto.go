@@ -34,4 +34,5 @@ type GetEventsIdParticipantsParams struct {
 type AddParticipantToEventRequest struct {
 	EventID       int64 `json:"event_id"`
 	ParticipantID int64 `json:"participant_id"`
+	VolunteerID   int64 `json:"volunteer_id"`
 }

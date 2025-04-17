@@ -69,6 +69,8 @@ func (h Handlers) PutClientsId(ctx echo.Context, id int64) error {
 		return ctx.JSON(http.StatusBadRequest, err.Error())
 	}
 
+	req.ID = id
+
 	client, err := h.clientUC.PutClientsId(ctx.Request().Context(), &req)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
@@ -82,6 +84,8 @@ func (h Handlers) GetClientsIdServices(ctx echo.Context, id int64, params GetCli
 	if err := ctx.Bind(&req); err != nil {
 		return ctx.JSON(http.StatusBadRequest, err.Error())
 	}
+
+	req.ID = id
 
 	services, total, err := h.clientUC.GetClientsIdServices(ctx.Request().Context(), &req)
 	if err != nil {

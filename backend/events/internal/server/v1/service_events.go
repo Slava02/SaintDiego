@@ -119,6 +119,7 @@ func (s *Implementation) AddParticipantToEvent(ctx context.Context, req *pb.AddP
 	addParticipantToEventParams := &events.AddParticipantToEventRequest{
 		EventID:       req.EventId,
 		ParticipantID: req.ParticipantId,
+		VolunteerID:   req.VolunteerId,
 	}
 
 	err := s.eventsUC.AddParticipantToEvent(ctx, addParticipantToEventParams)

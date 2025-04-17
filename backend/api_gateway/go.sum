@@ -3,10 +3,10 @@ github.com/HdrHistogram/hdrhistogram-go v1.1.2/go.mod h1:yDgFjdqOqDEKOvasDdhWNXY
 github.com/RaveNoX/go-jsoncommentstrip v1.0.0/go.mod h1:78ihd09MekBnJnxpICcwzCMzGrKSKYe4AqU6PDYYpjk=
 github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250416100253-3548a7f6f82b h1:+vruis5eUZI1zSUKtkFYAsuUgO/fny0VrIIPBDPXhOk=
 github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250416100253-3548a7f6f82b/go.mod h1:4fr++Ta+KI2/6/9XEzo1Y31KaJ6EVCzsp3TXoI/JvYM=
-github.com/Slava02/SaintDiego/backend/common v0.0.0-20250416101532-01831f40d320 h1:EYUOM9vHOFo3YpNLf0bX8H6/TKywPw05/1acbfMq238=
-github.com/Slava02/SaintDiego/backend/common v0.0.0-20250416101532-01831f40d320/go.mod h1:8oSaCQ4JmfnNdyIJNgdFICVGcN86zsrkqv2mHbELzhY=
-github.com/Slava02/SaintDiego/backend/events v0.0.0-20250416132444-5f7569032549 h1:Gu3yKwMirHS6razJx+MuiMFcadbKVI07yziXTIidC+w=
-github.com/Slava02/SaintDiego/backend/events v0.0.0-20250416132444-5f7569032549/go.mod h1:mFdtqnPn9/lfA2lNHUmpqJVBaDbJITl5Nsl7o8LSA7I=
+github.com/Slava02/SaintDiego/backend/common v0.0.0-20250417054842-cb97ca719f45 h1:e81H1cphvlK0u8gFf4FAt9vCSqJVAj8UUmTvpJyNrB4=
+github.com/Slava02/SaintDiego/backend/common v0.0.0-20250417054842-cb97ca719f45/go.mod h1:8oSaCQ4JmfnNdyIJNgdFICVGcN86zsrkqv2mHbELzhY=
+github.com/Slava02/SaintDiego/backend/events v0.0.0-20250417060132-09a6174e3928 h1:YmZIyYDlOwxCwoFFO3VOvtvU1n03bB4U7UYeXjIYiyw=
+github.com/Slava02/SaintDiego/backend/events v0.0.0-20250417060132-09a6174e3928/go.mod h1:ZlIpIbJGpDROjFhGHkpA32o8M3f+y1n1rJIGOkDZEBI=
 github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250416101532-01831f40d320 h1:lZHWhkWWoCKfFvCiqJBdK1uWplAN5tjkQMokYBjxWyE=
 github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250416101532-01831f40d320/go.mod h1:NEGc5wYFowEs4IvzpyAwwaGbP9mdmaC3gUS50jq1D5g=
 github.com/Slava02/SaintDiego/backend/services v0.0.0-20250416101532-01831f40d320 h1:LBcb5g+/s9V4/jSOul3eX+iOAzs7y8zz4Cq8b1JeKuc=

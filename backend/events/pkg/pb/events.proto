@@ -108,4 +108,7 @@ message Participant {
   bool is_homeless = 8;
   int64 volunteer_tg = 9;
   string volunteer_tg_login = 10;
+  string volounteer_first_name = 11;
+  string volounteer_middle_name = 12;
+  string volounteer_last_name = 13;
 }

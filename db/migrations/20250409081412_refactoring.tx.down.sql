@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS `event_client`;
 --bun:split
 DROP TABLE IF EXISTS `event`;
 --bun:split
-DROP TABLE IF EXISTS `volounteer`;
+DROP TABLE IF EXISTS `volunteer`;
 --bun:split
 ALTER TABLE `client` DROP COLUMN IF EXISTS `is_blocked`;
 --bun:split

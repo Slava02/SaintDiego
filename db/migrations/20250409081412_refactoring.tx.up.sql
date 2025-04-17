@@ -166,14 +166,66 @@ CREATE TABLE IF NOT EXISTS `event_client` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `event_id` int(11) NOT NULL,
     `client_id` int(11) NOT NULL,
-    `volounteer_id` int(11) NOT NULL,
-    `status` enum('attend', 'absent') NOT NULL DEFAULT 'absent',
+    `volunteer_id` int(11) NOT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `UK_event_client_unique` (`event_id`, `client_id`, `volounteer_id`),
+    UNIQUE KEY `UK_event_client_unique` (`event_id`, `client_id`, `volunteer_id`),
     KEY `IDX_event_client_event_id` (`event_id`),
     KEY `IDX_event_client_client_id` (`client_id`),
-    KEY `IDX_event_client_volounteer_id` (`volounteer_id`),
+    KEY `IDX_event_client_volunteer_id` (`volunteer_id`),
     CONSTRAINT `FK_event_client_event` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`) ON DELETE CASCADE,
     CONSTRAINT `FK_event_client_client` FOREIGN KEY (`client_id`) REFERENCES `client` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `FK_event_volounteer` FOREIGN KEY (`volounteer_id`) REFERENCES `volunteer` (`tg_id`) ON DELETE CASCADE
+    CONSTRAINT `FK_event_volunteer` FOREIGN KEY (`volunteer_id`) REFERENCES `volunteer` (`tg_id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+--bun:split
+INSERT INTO `location` (`name`, `address`)
+VALUES ('Центр социальной помощи', 'ул. Ленина, 10'),
+    ('Социальный центр "Забота"', 'пр. Победы, 25'),
+    ('Центр помощи бездомным', 'ул. Мира, 15'),
+    ('Социальная служба "Добро"', 'ул. Советская, 8'),
+    (
+        'Центр социальной адаптации',
+        'пр. Строителей, 42'
+    );
+--bun:split
+INSERT INTO `volunteer` (
+        `tg_id`,
+        `first_name`,
+        `last_name`,
+        `middle_name`,
+        `tg_login`
+    )
+VALUES (
+        123456789,
+        'Иван',
+        'Иванов',
+        'Иванович',
+        'ivanov'
+    ),
+    (
+        987654321,
+        'Петр',
+        'Петров',
+        'Петрович',
+        'petrov'
+    ),
+    (
+        456789123,
+        'Анна',
+        'Сидорова',
+        'Алексеевна',
+        'sidorova'
+    ),
+    (
+        789123456,
+        'Мария',
+        'Козлова',
+        'Сергеевна',
+        'kozlova'
+    ),
+    (
+        321654987,
+        'Алексей',
+        'Смирнов',
+        'Дмитриевич',
+        'smirnov'
+    );

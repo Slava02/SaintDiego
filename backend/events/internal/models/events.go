@@ -22,16 +22,15 @@ type Event struct {
 type EventClient struct {
 	bun.BaseModel `bun:"table:event_client,alias:ec"`
 
-	ID          int64  `bun:"id,pk,autoincrement" json:"id"`
-	EventID     int64  `bun:"event_id" json:"event_id"`
-	ClientID    int64  `bun:"client_id" json:"client_id"`
-	VolunteerID int64  `bun:"volounteer_id" json:"volounteer_id"`
-	Status      string `bun:"status" json:"status"`
+	ID          int64 `bun:"id,pk,autoincrement" json:"id"`
+	EventID     int64 `bun:"event_id" json:"event_id"`
+	ClientID    int64 `bun:"client_id" json:"client_id"`
+	VolunteerID int64 `bun:"volunteer_id" json:"volunteer_id"`
 
 	// Relations
 	Event     *Event     `bun:"rel:belongs-to,join:event_id=id"`
 	Client    *Client    `bun:"rel:belongs-to,join:client_id=id"`
-	Volunteer *Volunteer `bun:"rel:belongs-to,join:volounteer_id=tg_id"`
+	Volunteer *Volunteer `bun:"rel:belongs-to,join:volunteer_id=tg_id"`
 }
 
 type Client struct {
@@ -64,13 +63,16 @@ type Volunteer struct {
 }
 
 type Participant struct {
-	ID               int64     `json:"id" validate:"required,min=1"`
-	PhotoName        string    `json:"photo_name" validate:"omitempty"`
-	BirthDate        time.Time `json:"birth_date" validate:"omitempty,datetime=2006-01-02T15:04:05Z"`
-	Gender           int64     `json:"gender" validate:"omitempty"`
-	FirstName        string    `json:"first_name" validate:"required,min=1"`
-	MiddleName       string    `json:"middle_name" validate:"required,min=1"`
-	LastName         string    `json:"last_name" validate:"required,min=1"`
-	VolunteerTG      int64     `json:"volunteer_tg" validate:"omitempty"`
-	VolunteerTgLogin string    `json:"volunteer_tg_login" validate:"omitempty"`
+	ID                   int64     `json:"id" validate:"required,min=1"`
+	PhotoName            string    `json:"photo_name" validate:"omitempty"`
+	BirthDate            time.Time `json:"birth_date" validate:"omitempty,datetime=2006-01-02T15:04:05Z"`
+	Gender               int64     `json:"gender" validate:"omitempty"`
+	FirstName            string    `json:"first_name" validate:"required,min=1"`
+	MiddleName           string    `json:"middle_name" validate:"required,min=1"`
+	LastName             string    `json:"last_name" validate:"required,min=1"`
+	VolunteerTG          int64     `json:"volunteer_tg" validate:"omitempty"`
+	VolunteerTgLogin     string    `json:"volunteer_tg_login" validate:"omitempty"`
+	VolounteerFirstName  string    `json:"volounteer_first_name" validate:"omitempty"`
+	VolounteerMiddleName string    `json:"volounteer_middle_name" validate:"omitempty"`
+	VolounteerLastName   string    `json:"volounteer_last_name" validate:"omitempty"`
 }

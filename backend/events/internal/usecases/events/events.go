@@ -14,7 +14,7 @@ type IEventRepository interface {
 	GetEvent(ctx context.Context, id int64) (*models.Event, error)
 	UpdateEvent(ctx context.Context, id int64, capacity int32, datetime time.Time) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id int64) error
-	AddParticipantToEvent(ctx context.Context, eventID int64, participantID int64) error
+	AddParticipantToEvent(ctx context.Context, eventID, participantID, volunteerID int64) error
 	GetEventsByServiceId(ctx context.Context, serviceID int64, page int64, perPage int64) ([]*models.Event, int64, error)
 	GetParticipantsByEventId(ctx context.Context, eventID int64, page int64, perPage int64) ([]*models.Participant, int64, error)
 }
@@ -73,7 +73,7 @@ func (u *UseCase) DeleteEvent(ctx context.Context, id int64) error {
 }
 
 func (u *UseCase) AddParticipantToEvent(ctx context.Context, params *AddParticipantToEventRequest) error {
-	return u.eventRepository.AddParticipantToEvent(ctx, params.EventID, params.ParticipantID)
+	return u.eventRepository.AddParticipantToEvent(ctx, params.EventID, params.ParticipantID, params.VolunteerID)
 }
 
 func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEventsIdParticipantsParams) ([]*models.Participant, int64, error) {

@@ -125,8 +125,12 @@ func (r *EventRepository) DeleteEvent(ctx context.Context, id int64) error {
 	return nil
 }
 
-func (r *EventRepository) AddParticipantToEvent(ctx context.Context, eventID int64, clientID int64) error {
-	_, err := r.db.Insert(ctx, &models.EventClient{EventID: eventID, ClientID: clientID}).Exec(ctx)
+func (r *EventRepository) AddParticipantToEvent(ctx context.Context, eventID, clientID, volunteerID int64) error {
+	_, err := r.db.Insert(ctx, &models.EventClient{
+		EventID:     eventID,
+		ClientID:    clientID,
+		VolunteerID: volunteerID,
+	}).Exec(ctx)
 	if err != nil {
 		return fmt.Errorf("add participant to event: %w", err)
 	}
@@ -137,9 +141,19 @@ func (r *EventRepository) GetParticipantsByEventId(ctx context.Context, eventID 
 	offset := (page - 1) * perPage
 
 	query := r.db.Select(ctx, &models.Client{}).
-		ColumnExpr("c.id AS client_id, c.photo_name, c.birth_date, c.gender, c.firstname AS first_name, c.middlename AS middle_name, c.lastname AS last_name, v.id AS volunteer_tg, v.tg_login AS volunteer_tg_login, v.name AS volounteer_name").
+		ColumnExpr(`
+			c.id, 
+			c.photo_name, 
+			c.birth_date, 
+			c.gender, 
+			c.firstname AS first_name, 
+			c.middlename AS middle_name, 
+			c.lastname AS last_name, 
+			v.tg_id, 
+			v.tg_login, 
+			v.first_name AS volounteer_name`).
 		Join("JOIN event_client ec ON ec.client_id = c.id").
-		Join("JOIN volounteer v ON ec.volounteer_id = v.id").
+		Join("JOIN volunteer v ON ec.volunteer_id = v.tg_id").
 		Where("ec.event_id = ?", eventID).
 		Limit(int(perPage)).
 		Offset(int(offset))

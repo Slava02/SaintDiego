@@ -132,6 +132,7 @@ func (u *UseCase) AddParticipantToEvent(ctx context.Context, req *AddParticipant
 	pbReq := &pb.AddParticipantToEventRequest{
 		EventId:       req.EventID,
 		ParticipantId: req.ParticipantID,
+		VolunteerId:   req.VolunteerID,
 	}
 
 	_, err := u.eventsClient.AddParticipantToEvent(ctx, pbReq)

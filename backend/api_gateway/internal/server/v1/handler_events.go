@@ -140,10 +140,11 @@ func (h Handlers) PutEventsIdParticipants(c echo.Context, id int64) error {
 
 func (h Handlers) GetEventsIdParticipants(c echo.Context, id int64, params GetEventsIdParticipantsParams) error {
 	var req events.GetEventsIdParticipantsParams
-	// TODO: проверить как работает
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
+
+	req.EventID = id
 
 	participants, total, err := h.eventsUC.GetParticipantsByEventId(c.Request().Context(), &req)
 	if err != nil {
@@ -165,6 +166,8 @@ func (h Handlers) GetEventsServicesId(c echo.Context, id int64, params GetEvents
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
+	req.ServiceID = id
+
 	events, total, err := h.eventsUC.GetEventsByServiceId(c.Request().Context(), &req)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -183,13 +186,15 @@ func convertParticipantsToResponse(participants []*models.Participant) []Partici
 	response := make([]Participant, len(participants))
 	for i, participant := range participants {
 		response[i] = Participant{
-			Id:            participant.ID,
-			FirstName:     participant.FirstName,
-			MiddleName:    participant.MiddleName,
-			LastName:      participant.LastName,
-			BirthDate:     participant.BirthDate,
-			VolunteerTg:   participant.VolunteerTG,
-			VolunteerName: participant.VolunteerName,
+			Id:                   participant.ID,
+			FirstName:            participant.FirstName,
+			MiddleName:           participant.MiddleName,
+			LastName:             participant.LastName,
+			BirthDate:            participant.BirthDate,
+			VolunteerTg:          participant.VolunteerTG,
+			VolounteerFirstName:  participant.VolounteerFirstName,
+			VolounteerMiddleName: participant.VolounteerMiddleName,
+			VolounteerLastName:   participant.VolounteerLastName,
 		}
 	}
 	return response
