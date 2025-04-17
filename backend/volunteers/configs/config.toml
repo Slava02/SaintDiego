@@ -6,7 +6,7 @@ env = "dev"
 level = "debug"
 
 [server]
-addr = ":50052"
+addr = ":50054"
 max_connection_idle = 10
 timeout = 10
 max_connection_age = 10

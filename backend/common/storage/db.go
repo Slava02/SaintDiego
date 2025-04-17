@@ -19,8 +19,9 @@ type Transactor interface {
 
 //go:generate options-gen -out-filename=db_options.gen.go -from-struct=Options
 type Options struct {
-	SqlDB *sql.DB `option:"mandatory" validate:"required"`
-	Prod  bool    `validate:"omitempty"`
+	SqlDB  *sql.DB `option:"mandatory" validate:"required"`
+	Prod   bool    `validate:"omitempty"`
+	Models []any   `validate:"omitempty"`
 }
 
 // Database implements Transactor interface
@@ -40,6 +41,10 @@ func New(opts Options) (*Database, error) {
 		db.AddQueryHook(bundebug.NewQueryHook(
 			bundebug.WithVerbose(true),
 		))
+	}
+
+	if len(opts.Models) > 0 {
+		db.RegisterModel(opts.Models...)
 	}
 
 	return &Database{db}, nil

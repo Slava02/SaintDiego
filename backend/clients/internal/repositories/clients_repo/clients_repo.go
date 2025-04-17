@@ -4,15 +4,15 @@ import (
 	"github.com/Slava02/SaintDiego/backend/common/storage"
 )
 
-//go:generate options-gen -out-filename=services_repo_options.gen.go -from-struct=Options
+//go:generate options-gen -out-filename=repo_options.gen.go -from-struct=Options
 type Options struct {
 	DB *storage.Database `option:"mandatory" validate:"required"`
 }
 
-type VolunteerRepository struct {
+type ClientsRepository struct {
 	db *storage.Database
 }
 
-func NewVolunteerRepository(opts Options) *VolunteerRepository {
-	return &VolunteerRepository{db: opts.DB}
+func NewClientsRepository(opts Options) *ClientsRepository {
+	return &ClientsRepository{db: opts.DB}
 }

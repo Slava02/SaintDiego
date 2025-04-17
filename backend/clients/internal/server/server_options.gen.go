@@ -4,8 +4,8 @@ package server
 import (
 	fmt461e464ebed9 "fmt"
 
-	"github.com/Slava02/SaintDiego/clients/internal/config"
-	"github.com/Slava02/SaintDiego/clients/pkg/pb"
+	"github.com/Slava02/SaintDiego/backend/clients/internal/config"
+	"github.com/Slava02/SaintDiego/backend/clients/pkg/pb"
 	errors461e464ebed9 "github.com/kazhuravlev/options-gen/pkg/errors"
 	validator461e464ebed9 "github.com/kazhuravlev/options-gen/pkg/validator"
 	"go.uber.org/zap"

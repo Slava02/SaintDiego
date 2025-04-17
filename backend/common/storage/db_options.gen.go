@@ -34,10 +34,18 @@ func WithProd(opt bool) OptOptionsSetter {
 	}
 }
 
+func WithModels(opt []any) OptOptionsSetter {
+	return func(o *Options) {
+		o.Models = opt
+
+	}
+}
+
 func (o *Options) Validate() error {
 	errs := new(errors461e464ebed9.ValidationErrors)
 	errs.Add(errors461e464ebed9.NewValidationError("SqlDB", _validate_Options_SqlDB(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("Prod", _validate_Options_Prod(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("Models", _validate_Options_Models(o)))
 	return errs.AsError()
 }
 
@@ -51,6 +59,13 @@ func _validate_Options_SqlDB(o *Options) error {
 func _validate_Options_Prod(o *Options) error {
 	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.Prod, "omitempty"); err != nil {
 		return fmt461e464ebed9.Errorf("field `Prod` did not pass the test: %w", err)
+	}
+	return nil
+}
+
+func _validate_Options_Models(o *Options) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.Models, "omitempty"); err != nil {
+		return fmt461e464ebed9.Errorf("field `Models` did not pass the test: %w", err)
 	}
 	return nil
 }

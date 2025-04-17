@@ -5,7 +5,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/Slava02/SaintDiego/clients/internal/config"
+	"github.com/Slava02/SaintDiego/backend/clients/internal/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

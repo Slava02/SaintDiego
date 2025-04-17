@@ -14,42 +14,53 @@ type Event struct {
 	Capacity          int32     `bun:"capacity" json:"capacity"`
 	Datetime          time.Time `bun:"datetime" json:"datetime"`
 	ServiceTypeID     int64     `bun:"service_type_id" json:"service_type_id"`
+
+	// Many-to-many relationship with Client through EventClient
+	Clients []*Client `bun:"m2m:event_client,join:Event=Client"`
 }
 
 type EventClient struct {
 	bun.BaseModel `bun:"table:event_client,alias:ec"`
 
-	ID          int64 `bun:"id,pk,autoincrement" json:"id"`
-	EventID     int64 `bun:"event_id" json:"event_id"`
-	ClientID    int64 `bun:"client_id" json:"client_id"`
-	VolunteerID int64 `bun:"volunteer_id" json:"volunteer_id"`
+	ID          int64  `bun:"id,pk,autoincrement" json:"id"`
+	EventID     int64  `bun:"event_id" json:"event_id"`
+	ClientID    int64  `bun:"client_id" json:"client_id"`
+	VolunteerID int64  `bun:"volounteer_id" json:"volounteer_id"`
+	Status      string `bun:"status" json:"status"`
 
-	Event     *Event     `bun:"rel:belongs_to,join:event_id=id"`
-	Client    *Client    `bun:"rel:belongs_to,join:client_id=id"`
-	Volunteer *Volunteer `bun:"rel:belongs_to,join:volunteer_id=id"`
+	// Relations
+	Event     *Event     `bun:"rel:belongs-to,join:event_id=id"`
+	Client    *Client    `bun:"rel:belongs-to,join:client_id=id"`
+	Volunteer *Volunteer `bun:"rel:belongs-to,join:volounteer_id=tg_id"`
 }
 
 type Client struct {
 	bun.BaseModel `bun:"table:client,alias:c"`
 
-	ID         int64     `bun:"id,pk,autoincrement" json:"id"`
-	FirstName  string    `bun:"first_name" json:"first_name"`
-	LastName   string    `bun:"last_name" json:"last_name"`
-	PhotoName  string    `bun:"photo_name" json:"photo_name"`
-	BirthDate  time.Time `bun:"birth_date" json:"birth_date"`
-	Gender     int64     `bun:"gender" json:"gender"`
-	MiddleName string    `bun:"middle_name" json:"middle_name"`
+	ID            int64     `bun:"id,pk,autoincrement" json:"id"`
+	FirstName     string    `bun:"firstname" json:"first_name"`
+	LastName      string    `bun:"lastname" json:"last_name"`
+	PhotoName     string    `bun:"photo_name" json:"photo_name"`
+	BirthDate     time.Time `bun:"birth_date" json:"birth_date"`
+	Gender        int64     `bun:"gender" json:"gender"`
+	MiddleName    string    `bun:"middlename" json:"middle_name"`
+	IsBlocked     bool      `bun:"is_blocked" json:"is_blocked"`
+	BlockedReason string    `bun:"blocked_reason" json:"blocked_reason"`
+	BlockedAt     time.Time `bun:"blocked_at" json:"blocked_at"`
+
+	// Many-to-many relationship with Event through EventClient
+	Events []*Event `bun:"m2m:event_client,join:Client=Event"`
 }
 
 type Volunteer struct {
 	bun.BaseModel `bun:"table:volunteer,alias:v"`
 
-	ID               int64  `bun:"id,pk,autoincrement" json:"id"`
-	FirstName        string `bun:"first_name" json:"first_name"`
-	LastName         string `bun:"last_name" json:"last_name"`
-	VolunteerTG      int64  `bun:"volunteer_tg" json:"volunteer_tg"`
-	VolunteerTgLogin string `bun:"volunteer_tg_login" json:"volunteer_tg_login"`
-	MiddleName       string `bun:"middle_name" json:"middle_name"`
+	ID         int64  `bun:"id,pk,autoincrement" json:"id"`
+	FirstName  string `bun:"first_name" json:"first_name"`
+	LastName   string `bun:"last_name" json:"last_name"`
+	TGID       int64  `bun:"tg_id" json:"tg_id"`
+	TGLogin    string `bun:"tg_login" json:"tg_login"`
+	MiddleName string `bun:"middle_name" json:"middle_name"`
 }
 
 type Participant struct {

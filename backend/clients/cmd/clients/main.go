@@ -12,18 +12,18 @@ import (
 
 	"github.com/Slava02/SaintDiego/backend/common/storage"
 
+	"github.com/Slava02/SaintDiego/backend/clients/internal/config"
+	"github.com/Slava02/SaintDiego/backend/clients/internal/repositories/clients_repo"
+	"github.com/Slava02/SaintDiego/backend/clients/internal/server"
+	"github.com/Slava02/SaintDiego/backend/clients/internal/usecases/clients"
 	"github.com/Slava02/SaintDiego/backend/common/closer"
 	"github.com/Slava02/SaintDiego/backend/common/logger"
 	"github.com/Slava02/SaintDiego/backend/common/tracing"
-	"github.com/Slava02/SaintDiego/clients/internal/config"
-	"github.com/Slava02/SaintDiego/clients/internal/repositories/clients_repo"
-	"github.com/Slava02/SaintDiego/clients/internal/server"
-	"github.com/Slava02/SaintDiego/clients/internal/usecases/clients"
 	_ "github.com/go-sql-driver/mysql"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
-	v1 "github.com/Slava02/SaintDiego/clients/internal/server/v1"
+	v1 "github.com/Slava02/SaintDiego/backend/clients/internal/server/v1"
 )
 
 const (
@@ -78,7 +78,7 @@ func run() error {
 
 	// Repositories
 
-	clientsRepo := clients_repo.NewVolunteerRepository(clients_repo.NewOptions(db))
+	clientsRepo := clients_repo.NewClientsRepository(clients_repo.NewOptions(db))
 
 	// Usecases
 

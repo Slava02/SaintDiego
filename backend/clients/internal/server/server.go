@@ -8,10 +8,10 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/Slava02/SaintDiego/backend/clients/internal/config"
+	"github.com/Slava02/SaintDiego/backend/clients/pkg/pb"
 	"github.com/Slava02/SaintDiego/backend/common/closer"
 	"github.com/Slava02/SaintDiego/backend/common/interceptors"
-	"github.com/Slava02/SaintDiego/clients/internal/config"
-	"github.com/Slava02/SaintDiego/clients/pkg/pb"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"

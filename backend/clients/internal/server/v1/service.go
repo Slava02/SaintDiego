@@ -3,7 +3,7 @@ package v1
 import (
 	"fmt"
 
-	"github.com/Slava02/SaintDiego/clients/pkg/pb"
+	"github.com/Slava02/SaintDiego/backend/clients/pkg/pb"
 )
 
 //go:generate options-gen -out-filename=service_options.gen.go -from-struct=Options
