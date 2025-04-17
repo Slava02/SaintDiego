@@ -47,7 +47,6 @@ func (r *VolunteerRepository) UpdateVolunteer(ctx context.Context, req *UpdateVo
 		MiddleName: req.MiddleName,
 	}
 	_, err := r.db.Update(ctx, volunteer).
-		Model(volunteer).
 		Set("first_name = ?", volunteer.FirstName).
 		Set("last_name = ?", volunteer.LastName).
 		Set("middle_name = ?", volunteer.MiddleName).
@@ -56,6 +55,11 @@ func (r *VolunteerRepository) UpdateVolunteer(ctx context.Context, req *UpdateVo
 
 	if err != nil {
 		return nil, fmt.Errorf("update volunteer: %w", err)
+	}
+
+	volunteer, err = r.GetVolunteerByTgId(ctx, volunteer.TGID)
+	if err != nil {
+		return nil, fmt.Errorf("get volunteer by tg id: %w", err)
 	}
 
 	return volunteer, nil

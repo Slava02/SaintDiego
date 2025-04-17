@@ -8,7 +8,7 @@ require (
 	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250417064809-e1c3fc9a545d
 	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250416101532-01831f40d320
 	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250416101532-01831f40d320
-	github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250416104328-e935f3ac04e6
+	github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250417070317-6ae844d2caae
 	github.com/getkin/kin-openapi v0.131.0
 	github.com/kazhuravlev/options-gen v0.42.1
 	github.com/labstack/echo/v4 v4.13.3

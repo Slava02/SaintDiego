@@ -36,6 +36,7 @@ func New(opts Options) (*UseCase, error) {
 func (u *UseCase) PostVolunteers(ctx context.Context, req *CreateVolunteerRequest) (*models.Volunteer, error) {
 	pbReq := &pb.CreateVolunteerRequest{
 		TgId:       req.TgId,
+		TgLogin:    req.TgLogin,
 		FirstName:  req.FirstName,
 		MiddleName: req.MiddleName,
 		LastName:   req.LastName,
@@ -74,9 +75,9 @@ func (u *UseCase) GetVolunteersTgId(ctx context.Context, tgId int64) (*models.Vo
 	}, nil
 }
 
-func (u *UseCase) PutVolunteersTgId(ctx context.Context, tgId int64, req *UpdateVolunteerRequest) (*models.Volunteer, error) {
+func (u *UseCase) PutVolunteersTgId(ctx context.Context, req *UpdateVolunteerRequest) (*models.Volunteer, error) {
 	pbReq := &pb.UpdateVolunteerRequest{
-		TgId:       tgId,
+		TgId:       req.TgId,
 		FirstName:  req.FirstName,
 		MiddleName: req.MiddleName,
 		LastName:   req.LastName,
