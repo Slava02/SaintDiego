@@ -19,8 +19,9 @@ type Participant struct {
 	FirstName            string     `json:"first_name" validate:"required,min=1"`
 	MiddleName           string     `json:"middle_name" validate:"required,min=1"`
 	LastName             string     `json:"last_name" validate:"required,min=1"`
-	VolunteerTG          int64      `json:"volunteer_tg" validate:"omitempty"`
-	VolounteerFirstName  string     `json:"volounteer_first_name" validate:"omitempty"`
-	VolounteerMiddleName string     `json:"volounteer_middle_name" validate:"omitempty"`
-	VolounteerLastName   string     `json:"volounteer_last_name" validate:"omitempty"`
+	VolunteerTG          int64      `json:"volunteer_tg" validate:"required,min=1"`
+	VolunteerTgLogin     string     `json:"volunteer_tg_login" validate:"required,min=1"`
+	VolounteerFirstName  string     `json:"volounteer_first_name" validate:"required,min=1"`
+	VolounteerMiddleName string     `json:"volounteer_middle_name" validate:"required,min=1"`
+	VolounteerLastName   string     `json:"volounteer_last_name" validate:"required,min=1"`
 }

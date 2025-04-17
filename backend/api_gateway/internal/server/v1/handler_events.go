@@ -187,11 +187,13 @@ func convertParticipantsToResponse(participants []*models.Participant) []Partici
 	for i, participant := range participants {
 		response[i] = Participant{
 			Id:                   participant.ID,
+			PhotoName:            participant.PhotoName,
 			FirstName:            participant.FirstName,
 			MiddleName:           participant.MiddleName,
 			LastName:             participant.LastName,
 			BirthDate:            participant.BirthDate,
 			VolunteerTg:          participant.VolunteerTG,
+			VolunteerTgLogin:     participant.VolunteerTgLogin,
 			VolounteerFirstName:  participant.VolounteerFirstName,
 			VolounteerMiddleName: participant.VolounteerMiddleName,
 			VolounteerLastName:   participant.VolounteerLastName,

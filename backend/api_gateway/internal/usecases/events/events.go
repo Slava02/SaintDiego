@@ -143,7 +143,6 @@ func (u *UseCase) AddParticipantToEvent(ctx context.Context, req *AddParticipant
 	return nil
 }
 
-// TODO: тут может вернуться пользователь, у которого только ФИО, это тот, который еще не прошел собеседование
 func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEventsIdParticipantsParams) ([]*models.Participant, int32, error) {
 	pbReq := &pb.GetParticipantsByEventIdRequest{
 		EventId: params.EventID,
@@ -159,13 +158,18 @@ func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEvent
 	participants := make([]*models.Participant, len(pbRes.Participants))
 	for i, participant := range pbRes.Participants {
 		participants[i] = &models.Participant{
-			ID:         participant.Id,
-			PhotoName:  pointer.Ptr(participant.PhotoName),
-			BirthDate:  pointer.PtrWithZeroAsNil(participant.BirthDate.AsTime()),
-			Gender:     pointer.Ptr(participant.Gender),
-			FirstName:  participant.FirstName,
-			MiddleName: participant.MiddleName,
-			LastName:   participant.LastName,
+			ID:                   participant.Id,
+			PhotoName:            pointer.Ptr(participant.PhotoName),
+			BirthDate:            pointer.PtrWithZeroAsNil(participant.BirthDate.AsTime()),
+			Gender:               pointer.Ptr(participant.Gender),
+			FirstName:            participant.FirstName,
+			MiddleName:           participant.MiddleName,
+			LastName:             participant.LastName,
+			VolunteerTG:          participant.VolunteerTg,
+			VolunteerTgLogin:     participant.VolunteerTgLogin,
+			VolounteerFirstName:  participant.VolounteerFirstName,
+			VolounteerMiddleName: participant.VolounteerMiddleName,
+			VolounteerLastName:   participant.VolounteerLastName,
 		}
 	}
 

@@ -15,11 +15,15 @@ properties:
   volunteer_tg:
     type: integer
     format: int64
+  volunteer_tg_login:
+    type: string
   volounteer_first_name:
     type: string
   volounteer_middle_name:
     type: string
   volounteer_last_name:
+    type: string
+  photo_name:
     type: string
 required:
   - id
@@ -27,6 +31,7 @@ required:
   - middle_name
   - last_name
   - volunteer_tg
+  - volunteer_tg_login
   - volounteer_first_name
   - volounteer_middle_name
   - volounteer_last_name
@@ -37,6 +42,8 @@ example:
   last_name: Иванов
   birth_date: "2024-03-20T09:00:00Z"
   volunteer_tg: 1
+  volunteer_tg_login: ivan_ivanov
   volounteer_first_name: Иван
   volounteer_middle_name: Иванович
   volounteer_last_name: Иванов
+  photo_name: photo.jpg

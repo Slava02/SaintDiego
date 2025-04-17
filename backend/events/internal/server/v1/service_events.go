@@ -205,14 +205,17 @@ func convertModelParticipantToPB(participant *models.Participant) *pb.Participan
 	}
 
 	return &pb.Participant{
-		Id:               participant.ID,
-		PhotoName:        participant.PhotoName,
-		BirthDate:        timestamppb.New(participant.BirthDate),
-		Gender:           participant.Gender,
-		FirstName:        participant.FirstName,
-		MiddleName:       participant.MiddleName,
-		LastName:         participant.LastName,
-		VolunteerTg:      participant.VolunteerTG,
-		VolunteerTgLogin: participant.VolunteerTgLogin,
+		Id:                   participant.ID,
+		PhotoName:            participant.PhotoName,
+		BirthDate:            timestamppb.New(participant.BirthDate),
+		Gender:               participant.Gender,
+		FirstName:            participant.FirstName,
+		MiddleName:           participant.MiddleName,
+		LastName:             participant.LastName,
+		VolunteerTg:          participant.VolunteerTG,
+		VolunteerTgLogin:     participant.VolunteerTgLogin,
+		VolounteerFirstName:  participant.VolounteerFirstName,
+		VolounteerMiddleName: participant.VolounteerMiddleName,
+		VolounteerLastName:   participant.VolounteerLastName,
 	}
 }

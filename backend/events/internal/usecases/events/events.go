@@ -72,6 +72,7 @@ func (u *UseCase) DeleteEvent(ctx context.Context, id int64) error {
 	return u.eventRepository.DeleteEvent(ctx, id)
 }
 
+// TODO: возвращать нормальную ошибку, если он уже записан и проверить можно ли записаться на это событие
 func (u *UseCase) AddParticipantToEvent(ctx context.Context, params *AddParticipantToEventRequest) error {
 	return u.eventRepository.AddParticipantToEvent(ctx, params.EventID, params.ParticipantID, params.VolunteerID)
 }

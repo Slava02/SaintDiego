@@ -149,9 +149,11 @@ func (r *EventRepository) GetParticipantsByEventId(ctx context.Context, eventID 
 			c.firstname AS first_name, 
 			c.middlename AS middle_name, 
 			c.lastname AS last_name, 
-			v.tg_id, 
-			v.tg_login, 
-			v.first_name AS volounteer_name`).
+			v.tg_id AS volunteer_tg, 
+			v.tg_login AS volunteer_tg_login, 
+			v.first_name AS volounteer_first_name,
+			v.middle_name AS volounteer_middle_name,
+			v.last_name AS volounteer_last_name`).
 		Join("JOIN event_client ec ON ec.client_id = c.id").
 		Join("JOIN volunteer v ON ec.volunteer_id = v.tg_id").
 		Where("ec.event_id = ?", eventID).
