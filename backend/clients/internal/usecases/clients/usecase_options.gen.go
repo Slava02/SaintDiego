@@ -12,6 +12,7 @@ type OptOptionsSetter func(o *Options)
 
 func NewOptions(
 	ClientsRepository IClientsRepository,
+	ServicesClient IServicesClient,
 	options ...OptOptionsSetter,
 ) Options {
 	o := Options{}
@@ -19,6 +20,8 @@ func NewOptions(
 	// Setting defaults from field tag (if present)
 
 	o.ClientsRepository = ClientsRepository
+
+	o.ServicesClient = ServicesClient
 
 	for _, opt := range options {
 		opt(&o)
@@ -29,12 +32,20 @@ func NewOptions(
 func (o *Options) Validate() error {
 	errs := new(errors461e464ebed9.ValidationErrors)
 	errs.Add(errors461e464ebed9.NewValidationError("ClientsRepository", _validate_Options_ClientsRepository(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("ServicesClient", _validate_Options_ServicesClient(o)))
 	return errs.AsError()
 }
 
 func _validate_Options_ClientsRepository(o *Options) error {
 	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.ClientsRepository, "required"); err != nil {
 		return fmt461e464ebed9.Errorf("field `ClientsRepository` did not pass the test: %w", err)
+	}
+	return nil
+}
+
+func _validate_Options_ServicesClient(o *Options) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.ServicesClient, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `ServicesClient` did not pass the test: %w", err)
 	}
 	return nil
 }

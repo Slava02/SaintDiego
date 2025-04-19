@@ -128,11 +128,6 @@ func convertModelClientToPB(client *models.Client) *pb.Client {
 		birthDate = timestamppb.New(client.BirthDate)
 	}
 
-	var blockedAt *timestamppb.Timestamp
-	if client.BlockedAt != nil {
-		blockedAt = timestamppb.New(*client.BlockedAt)
-	}
-
 	return &pb.Client{
 		Id:            client.Id,
 		FirstName:     client.FirstName,
@@ -144,7 +139,6 @@ func convertModelClientToPB(client *models.Client) *pb.Client {
 		IsHomeless:    client.IsHomeless,
 		IsNew:         client.IsNew,
 		PhotoName:     client.PhotoName,
-		BlockedAt:     blockedAt,
 		BlockedReason: client.BlockedReason,
 	}
 }

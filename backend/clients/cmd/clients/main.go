@@ -23,6 +23,7 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
+	grpc_services "github.com/Slava02/SaintDiego/backend/clients/internal/clients/grpc-services"
 	v1 "github.com/Slava02/SaintDiego/backend/clients/internal/server/v1"
 )
 
@@ -80,9 +81,18 @@ func run() error {
 
 	clientsRepo := clients_repo.NewClientsRepository(clients_repo.NewOptions(db))
 
+	// clients grpc client
+
+	servicesClient, err := grpc_services.NewManager(grpc_services.ManagerOptions{
+		ServicesAddr: cfg.GRPCClient.ClientServices.Addr,
+	})
+	if err != nil {
+		return fmt.Errorf("init services client: %v", err)
+	}
+
 	// Usecases
 
-	usecase, err := clients.New(clients.NewOptions(clientsRepo))
+	usecase, err := clients.New(clients.NewOptions(clientsRepo, servicesClient.Services()))
 	if err != nil {
 		lg.Error("init clients usecase", zap.Error(err))
 		return fmt.Errorf("init clients usecase: %v", err)

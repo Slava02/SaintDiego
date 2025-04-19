@@ -104,18 +104,7 @@ func (h Handlers) GetClientsIdServices(ctx echo.Context, id int64, params GetCli
 func convertClientsToResponse(clients []*models.Client) []Client {
 	response := make([]Client, len(clients))
 	for i, client := range clients {
-		response[i] = Client{
-			Id:         client.Id,
-			FirstName:  client.FirstName,
-			LastName:   client.LastName,
-			MiddleName: client.MiddleName,
-			BirthDate:  client.BirthDate,
-			Gender:     client.Gender,
-			PhotoName:  client.PhotoName,
-			IsBlocked:  client.IsBlocked,
-			IsNew:      client.IsNew,
-			IsHomeless: client.IsHomeless,
-		}
+		response[i] = convertClientToResponse(client)
 	}
 
 	return response
@@ -123,15 +112,16 @@ func convertClientsToResponse(clients []*models.Client) []Client {
 
 func convertClientToResponse(client *models.Client) Client {
 	return Client{
-		Id:         client.Id,
-		FirstName:  client.FirstName,
-		LastName:   client.LastName,
-		MiddleName: client.MiddleName,
-		BirthDate:  client.BirthDate,
-		Gender:     client.Gender,
-		PhotoName:  client.PhotoName,
-		IsBlocked:  client.IsBlocked,
-		IsNew:      client.IsNew,
-		IsHomeless: client.IsHomeless,
+		Id:            client.Id,
+		FirstName:     client.FirstName,
+		LastName:      client.LastName,
+		MiddleName:    client.MiddleName,
+		BirthDate:     client.BirthDate,
+		Gender:        client.Gender,
+		PhotoName:     client.PhotoName,
+		IsBlocked:     client.IsBlocked,
+		IsNew:         client.IsNew,
+		IsHomeless:    client.IsHomeless,
+		BlockedReason: client.BlockedReason,
 	}
 }

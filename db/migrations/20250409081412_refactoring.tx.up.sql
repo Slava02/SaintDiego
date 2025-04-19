@@ -45,6 +45,35 @@ ADD COLUMN IF NOT EXISTS `blocked_reason` text;
 ALTER TABLE `client`
 ADD COLUMN IF NOT EXISTS `blocked_at` datetime;
 --bun:split
+CREATE TABLE IF NOT EXISTS `client_field_value` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `field_id` int(11) DEFAULT NULL,
+    `client_id` int(11) DEFAULT NULL,
+    `option_id` int(11) DEFAULT NULL,
+    -- died = 949
+    `created_by_id` int(11) DEFAULT NULL,
+    `updated_by_id` int(11) DEFAULT NULL,
+    `text` longtext COLLATE utf8_unicode_ci DEFAULT NULL,
+    `datetime` datetime DEFAULT NULL,
+    `filename` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+    `sync_id` int(11) DEFAULT NULL,
+    `sort` int(11) DEFAULT NULL,
+    `created_at` datetime DEFAULT NULL,
+    `updated_at` datetime DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `value_unique` (`field_id`, `client_id`),
+    KEY `IDX_379BEBF4443707B0` (`field_id`),
+    KEY `IDX_379BEBF419EB6921` (`client_id`),
+    KEY `IDX_379BEBF4A7C41D6F` (`option_id`),
+    KEY `IDX_379BEBF4B03A8386` (`created_by_id`),
+    KEY `IDX_379BEBF4896DBBDE` (`updated_by_id`),
+    CONSTRAINT `FK_379BEBF419EB6921` FOREIGN KEY (`client_id`) REFERENCES `client` (`id`),
+    CONSTRAINT `FK_379BEBF4443707B0` FOREIGN KEY (`field_id`) REFERENCES `client_field` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `FK_379BEBF4896DBBDE` FOREIGN KEY (`updated_by_id`) REFERENCES `fos_user_user` (`id`),
+    CONSTRAINT `FK_379BEBF4A7C41D6F` FOREIGN KEY (`option_id`) REFERENCES `client_field_option` (`id`),
+    CONSTRAINT `FK_379BEBF4B03A8386` FOREIGN KEY (`created_by_id`) REFERENCES `fos_user_user` (`id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 23842 DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;
+--bun:split
 CREATE TABLE IF NOT EXISTS `service_type` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `created_by_id` int(11) DEFAULT NULL,
@@ -66,8 +95,20 @@ CREATE TABLE IF NOT EXISTS `service_type` (
 ALTER TABLE `service_type`
 ADD COLUMN IF NOT EXISTS `registration_available` boolean NOT NULL DEFAULT false;
 --bun:split
+UPDATE `service_type`
+SET `registration_available` = true
+WHERE `id` IN (2, 3, 15, 20, 25, 30);
+--bun:split
 ALTER TABLE `service_type`
 ADD COLUMN IF NOT EXISTS `min_period_days` int NOT NULL DEFAULT 0;
+--bun:split
+UPDATE `service_type`
+SET `min_period_days` = CASE
+        WHEN `id` = 2 THEN 14 -- продукты
+        WHEN `id` = 25 THEN 14 -- стирка
+        WHEN `id` = 30 THEN 30 -- стрижка
+    END
+WHERE `id` IN (2, 25, 30);
 --bun:split
 CREATE TABLE IF NOT EXISTS `location` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -166,7 +207,7 @@ CREATE TABLE IF NOT EXISTS `event_client` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `event_id` int(11) NOT NULL,
     `client_id` int(11) NOT NULL,
-    `volunteer_id` int(11) NOT NULL,
+    `volunteer_id` BIGINT NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_event_client_unique` (`event_id`, `client_id`, `volunteer_id`),
     KEY `IDX_event_client_event_id` (`event_id`),

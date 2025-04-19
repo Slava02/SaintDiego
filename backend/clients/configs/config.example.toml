@@ -3,19 +3,22 @@ name = "api-gateway"
 env = "dev"
 
 [log]
-level = "info"
+level = "debug"
 
 [server]
-addr = ":50054"
+addr = ":50055"
 max_connection_idle = 10
 timeout = 10
 max_connection_age = 10
 time = 10
 
-
 [database]
-host = "33"
-db_name = "33"
-password = "33"
-user = "33"
-port = "33"
+host = "localhost"
+db_name = "homeless"
+password = "12345ghJkbn"
+user = "homeless"
+port = "39410"
+
+[grpc_client]
+[grpc_client.client_services]
+addr = ":50052"

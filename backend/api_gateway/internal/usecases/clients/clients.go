@@ -49,18 +49,7 @@ func (u *UseCase) GetClients(ctx context.Context, params *GetClientParams) ([]*m
 
 	clients := make([]*models.Client, len(pbRes.Clients))
 	for i, client := range pbRes.Clients {
-		clients[i] = &models.Client{
-			Id:         client.Id,
-			FirstName:  client.FirstName,
-			MiddleName: client.MiddleName,
-			LastName:   client.LastName,
-			BirthDate:  pointer.PtrWithZeroAsNil(client.BirthDate.AsTime()),
-			Gender:     client.Gender,
-			PhotoName:  client.PhotoName,
-			IsHomeless: client.IsHomeless,
-			IsNew:      client.IsNew,
-			IsBlocked:  client.IsBlocked,
-		}
+		clients[i] = convertClientToResponse(client)
 	}
 
 	return clients, int32(pbRes.Total), nil
@@ -76,18 +65,7 @@ func (u *UseCase) GetClientsId(ctx context.Context, id int64) (*models.Client, e
 		return nil, fmt.Errorf("get client by id: %v", err)
 	}
 
-	return &models.Client{
-		Id:         pbRes.Id,
-		FirstName:  pbRes.FirstName,
-		MiddleName: pbRes.MiddleName,
-		LastName:   pbRes.LastName,
-		BirthDate:  pointer.PtrWithZeroAsNil(pbRes.BirthDate.AsTime()),
-		Gender:     pbRes.Gender,
-		PhotoName:  pbRes.PhotoName,
-		IsHomeless: pbRes.IsHomeless,
-		IsNew:      pbRes.IsNew,
-		IsBlocked:  pbRes.IsBlocked,
-	}, nil
+	return convertClientToResponse(pbRes), nil
 }
 
 func (u *UseCase) PostClients(ctx context.Context, req *CreateClientRequest) (*models.Client, error) {
@@ -102,24 +80,14 @@ func (u *UseCase) PostClients(ctx context.Context, req *CreateClientRequest) (*m
 		return nil, fmt.Errorf("create client: %v", err)
 	}
 
-	return &models.Client{
-		Id:         pbRes.Id,
-		FirstName:  pbRes.FirstName,
-		MiddleName: pbRes.MiddleName,
-		LastName:   pbRes.LastName,
-		BirthDate:  pointer.PtrWithZeroAsNil(pbRes.BirthDate.AsTime()),
-		Gender:     pbRes.Gender,
-		PhotoName:  pbRes.PhotoName,
-		IsHomeless: pbRes.IsHomeless,
-		IsNew:      pbRes.IsNew,
-		IsBlocked:  pbRes.IsBlocked,
-	}, nil
+	return convertClientToResponse(pbRes), nil
 }
 
 func (u *UseCase) PutClientsId(ctx context.Context, req *BlockClientRequest) (*models.Client, error) {
 	pbReq := &pb.BlockClientRequest{
-		Id:        req.ID,
-		IsBlocked: req.IsBlocked,
+		Id:          req.ID,
+		IsBlocked:   req.IsBlocked,
+		BlockReason: req.BlockReason,
 	}
 
 	pbRes, err := u.clientsClient.BlockClient(ctx, pbReq)
@@ -127,18 +95,7 @@ func (u *UseCase) PutClientsId(ctx context.Context, req *BlockClientRequest) (*m
 		return nil, fmt.Errorf("block client: %v", err)
 	}
 
-	return &models.Client{
-		Id:         pbRes.Id,
-		FirstName:  pbRes.FirstName,
-		MiddleName: pbRes.MiddleName,
-		LastName:   pbRes.LastName,
-		BirthDate:  pointer.PtrWithZeroAsNil(pbRes.BirthDate.AsTime()),
-		Gender:     pbRes.Gender,
-		PhotoName:  pbRes.PhotoName,
-		IsHomeless: pbRes.IsHomeless,
-		IsNew:      pbRes.IsNew,
-		IsBlocked:  pbRes.IsBlocked,
-	}, nil
+	return convertClientToResponse(pbRes), nil
 }
 
 func (u *UseCase) GetClientsIdServices(ctx context.Context, params *GetClientsIdServicesParams) ([]*models.ServiceType, int32, error) {
@@ -164,4 +121,20 @@ func (u *UseCase) GetClientsIdServices(ctx context.Context, params *GetClientsId
 	}
 
 	return services, int32(pbRes.Total), nil
+}
+
+func convertClientToResponse(client *pb.Client) *models.Client {
+	return &models.Client{
+		Id:            client.Id,
+		FirstName:     client.FirstName,
+		MiddleName:    client.MiddleName,
+		LastName:      client.LastName,
+		BirthDate:     pointer.PtrWithZeroAsNil(client.BirthDate.AsTime()),
+		Gender:        client.Gender,
+		PhotoName:     client.PhotoName,
+		IsHomeless:    client.IsHomeless,
+		IsNew:         client.IsNew,
+		IsBlocked:     client.IsBlocked,
+		BlockedReason: client.BlockedReason,
+	}
 }
