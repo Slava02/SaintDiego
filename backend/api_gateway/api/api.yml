@@ -1658,6 +1658,11 @@ components:
           type: boolean
         is_blocked:
           type: boolean
+        blocked_at:
+          type: string
+          format: date-time
+        blocked_reason:
+          type: string
       required:
         - id
         - first_name
@@ -1728,10 +1733,13 @@ components:
       properties:
         is_blocked:
           type: boolean
+        block_reason:
+          type: string
       required:
         - is_blocked
       example:
         is_blocked: true
+        block_reason: test
     GetAvailableServicesResponse:
       type: object
       properties:

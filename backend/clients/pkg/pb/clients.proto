@@ -34,6 +34,7 @@ message CreateClientRequest {
 message BlockClientRequest {
     int64 id = 1;
     bool is_blocked = 2;
+    optional string block_reason = 3;
 }
 
 message GetClientServicesRequest {
@@ -65,6 +66,8 @@ message Client {
   bool is_new = 8;
   optional bool is_blocked = 9;
   optional bool is_homeless = 10;
+  optional google.protobuf.Timestamp blocked_at = 11;
+  optional string blocked_reason = 12;
 }
 
 message ServiceType {

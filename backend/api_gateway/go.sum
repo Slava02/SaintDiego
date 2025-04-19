@@ -11,10 +11,8 @@ github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250416101532-01831f40d32
 github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250416101532-01831f40d320/go.mod h1:NEGc5wYFowEs4IvzpyAwwaGbP9mdmaC3gUS50jq1D5g=
 github.com/Slava02/SaintDiego/backend/services v0.0.0-20250416101532-01831f40d320 h1:LBcb5g+/s9V4/jSOul3eX+iOAzs7y8zz4Cq8b1JeKuc=
 github.com/Slava02/SaintDiego/backend/services v0.0.0-20250416101532-01831f40d320/go.mod h1:bgsoxzYz+zbnVe/E5iCEdM4ulaYfab4eooO2B2rKwQE=
-github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250416104328-e935f3ac04e6 h1:HmID4SZM6Det6GiTaOUn3kXgUnOo6Hp7X//KIO1EpOo=
-github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250416104328-e935f3ac04e6/go.mod h1:SNamBnXILQY2EW1myPOBT440CX7JheA+r7QKBrpYP3Y=
-github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250417070317-6ae844d2caae h1:ouEac9GMW75j8kJEXVF3OauhxwgHn0CWIc1+r2IrZuw=
-github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250417070317-6ae844d2caae/go.mod h1:uXJmCS1mRmmAs34qayiSuUlQFeEglVordR7mNCG9sMw=
+github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250417082830-2c52583760c7 h1:VLF09ZnJvT13mohne1klQeH422dOLcptXOfkF8Oz0g4=
+github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250417082830-2c52583760c7/go.mod h1:7sqEATpeVBN4We3QK/Bc+Huaxm9yUuwkwJuQ3XUGreM=
 github.com/apapsch/go-jsonmerge/v2 v2.0.0 h1:axGnT1gRIfimI7gJifB699GoE/oq+F2MU7Dml6nw9rQ=
 github.com/apapsch/go-jsonmerge/v2 v2.0.0/go.mod h1:lvDnEdqiQrp0O42VQGgmlKpxL1AP2+08jFMw88y4klk=
 github.com/bmatcuk/doublestar v1.1.1/go.mod h1:UD6OnuiIn0yFxxA2le/rnRU1G4RaI4UvFv1sNto9p6w=

@@ -18,8 +18,9 @@ type CreateClientRequest struct {
 }
 
 type BlockClientRequest struct {
-	ID        int64 `json:"id" validate:"required"`
-	IsBlocked bool  `json:"is_blocked" validate:"required"`
+	ID          int64   `json:"id" validate:"required"`
+	IsBlocked   bool    `json:"is_blocked" validate:"required"`
+	BlockReason *string `json:"block_reason" validate:"required"`
 }
 
 type GetClientsIdServicesParams struct {

@@ -2,7 +2,10 @@ type: object
 properties:
   is_blocked:
     type: boolean
+  block_reason:
+    type: string
 required:
   - is_blocked
 example:
   is_blocked: true
+  block_reason: "test"
