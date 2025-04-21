@@ -186,5 +186,6 @@ func convertEventToResponse(event *pb.Event) *models.Event {
 		Datetime:          event.Datetime.AsTime(),
 		ServiceTypeID:     event.ServiceTypeId,
 		ParticipantsCount: event.ParticipantsCount,
+		ServiceName:       event.ServiceName,
 	}
 }

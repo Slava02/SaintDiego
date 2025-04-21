@@ -10,6 +10,7 @@ type Event struct {
 	Datetime          time.Time `json:"datetime" validate:"required"`
 	ServiceTypeID     int64     `json:"serviceTypeId" validate:"required"`
 	ParticipantsCount int32     `json:"participantsCount" validate:"required,min=0"`
+	ServiceName       string    `json:"serviceName" validate:"required,min=1"`
 }
 
 type Participant struct {

@@ -18,11 +18,16 @@ type ITimeSlotsRepository interface {
 	ActivateTimeSlot(ctx context.Context, id int64) error
 	ArchiveTimeSlot(ctx context.Context, id int64) error
 	DeleteTimeSlotServicesByIds(ctx context.Context, serviceIds []int64) error
-	InsertUpdateEvents(ctx context.Context, events []*models.Event) error
 	DeleteTimeSlotRecurrence(ctx context.Context, timeSlotID int64) error
 	CreateTimeSlotServices(ctx context.Context, id int64, req []*models.TimeSlotService) ([]*models.TimeSlotService, error)
+	// TODO: move to events to events service
 	DeleteEventsByServiceIds(ctx context.Context, serviceIds []int64) error
 	GetEventsByServiceIds(ctx context.Context, serviceIds []int64) ([]*models.Event, error)
+	InsertUpdateEvents(ctx context.Context, events []*models.Event) error
+}
+
+type IServicesClient interface {
+	GetServiceTypeById(ctx context.Context, id int64) (*models.ServiceType, error)
 }
 
 type Transactor interface {
@@ -33,11 +38,13 @@ type Transactor interface {
 type Options struct {
 	TimeSlotsRepository ITimeSlotsRepository `option:"mandatory" validate:"required"`
 	Transactor          Transactor           `option:"mandatory" validate:"required"`
+	ServicesClient      IServicesClient      `option:"mandatory" validate:"required"`
 }
 
 type UseCase struct {
 	timeSlotsRepository ITimeSlotsRepository
 	transactor          Transactor
+	servicesClient      IServicesClient
 }
 
 func New(opts Options) (*UseCase, error) {
@@ -48,6 +55,7 @@ func New(opts Options) (*UseCase, error) {
 	return &UseCase{
 		timeSlotsRepository: opts.TimeSlotsRepository,
 		transactor:          opts.Transactor,
+		servicesClient:      opts.ServicesClient,
 	}, nil
 }
 
@@ -70,7 +78,7 @@ func (u UseCase) CreateTimeSlot(ctx context.Context, req *CreateTimeSlotReq) (*m
 			return fmt.Errorf("create time slot: %v", err)
 		}
 
-		events, err := generateEvents(timeSlot, timeSlot.Services)
+		events, err := u.generateEvents(timeSlot, timeSlot.Services)
 		if err != nil {
 			return fmt.Errorf("generate events: %v", err)
 		}
@@ -194,7 +202,7 @@ func (u UseCase) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*mod
 		}
 
 		// Генерируем новые события для добавленных сервисов
-		newEvents, err := generateEvents(req, newServices)
+		newEvents, err := u.generateEvents(req, newServices)
 		if err != nil {
 			return fmt.Errorf("generate events: %v", err)
 		}
@@ -231,6 +239,83 @@ func (u UseCase) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*mod
 	}
 
 	return newTimeSlot, nil
+}
+
+func (u UseCase) generateEvents(timeSlot *models.TimeSlot, services []*models.TimeSlotService) ([]*models.Event, error) {
+	var events []*models.Event
+
+	// If no services, no events needed
+	if len(services) == 0 {
+		return events, nil
+	}
+
+	serviceTypes := make(map[int64]*models.ServiceType)
+
+	for _, service := range services {
+		serviceType, err := u.servicesClient.GetServiceTypeById(context.Background(), service.ServiceTypeID)
+		if err != nil {
+			return nil, fmt.Errorf("get service type: %v", err)
+		}
+		serviceTypes[service.ServiceTypeID] = serviceType
+	}
+
+	// For single events, create one event per service
+	if timeSlot.Type == "single" {
+		for _, service := range services {
+			event := &models.Event{
+				TimeSlotServiceID: service.ID,
+				Capacity:          service.Capacity,
+				DateTime:          timeSlot.StartDate,
+				ServiceTypeID:     service.ServiceTypeID,
+				ServiceName:       serviceTypes[service.ServiceTypeID].Name,
+			}
+			events = append(events, event)
+		}
+		return events, nil
+	}
+
+	// For recurring events
+	if timeSlot.Recurrence == nil {
+		return nil, fmt.Errorf("recurrence settings required for recurring time slots")
+	}
+
+	// Calculate end date for recurring events
+	endDate := timeSlot.Recurrence.EndValue
+	if timeSlot.Recurrence.EndType == "date" {
+		endDate = timeSlot.Recurrence.EndValue
+	} else if timeSlot.Recurrence.EndType == "never" {
+		// For never-ending events, create events for next 10 years
+		endDate = time.Now().AddDate(10, 0, 0)
+	}
+
+	// Generate events based on recurrence settings
+	currentDate := timeSlot.StartDate
+	for currentDate.Before(endDate) {
+		for _, service := range services {
+			event := &models.Event{
+				TimeSlotServiceID: service.ID,
+				Capacity:          service.Capacity,
+				DateTime:          currentDate,
+				ServiceTypeID:     service.ServiceTypeID,
+				ServiceName:       serviceTypes[service.ServiceTypeID].Name,
+			}
+			events = append(events, event)
+		}
+
+		// Calculate next occurrence based on frequency and interval
+		switch timeSlot.Recurrence.Frequency {
+		case "daily":
+			currentDate = currentDate.AddDate(0, 0, int(timeSlot.Recurrence.Interval))
+		case "weekly":
+			currentDate = currentDate.AddDate(0, 0, int(timeSlot.Recurrence.Interval)*7)
+		case "monthly":
+			currentDate = currentDate.AddDate(0, int(timeSlot.Recurrence.Interval), 0)
+		default:
+			return nil, fmt.Errorf("unsupported recurrence frequency: %s", timeSlot.Recurrence.Frequency)
+		}
+	}
+
+	return events, nil
 }
 
 func recurrenceChanged(existingTimeSlot *models.TimeSlot, newTimeSlot *models.TimeSlot) bool {
@@ -281,69 +366,4 @@ func getRemovedServices(existingTimeSlot *models.TimeSlot, newTimeSlot *models.T
 	}
 
 	return removedServices
-}
-
-func generateEvents(timeSlot *models.TimeSlot, services []*models.TimeSlotService) ([]*models.Event, error) {
-	var events []*models.Event
-
-	// If no services, no events needed
-	if len(services) == 0 {
-		return events, nil
-	}
-
-	// For single events, create one event per service
-	if timeSlot.Type == "single" {
-		for _, service := range services {
-			event := &models.Event{
-				TimeSlotServiceID: service.ID,
-				Capacity:          service.Capacity,
-				DateTime:          timeSlot.StartDate,
-				ServiceTypeID:     service.ServiceTypeID,
-			}
-			events = append(events, event)
-		}
-		return events, nil
-	}
-
-	// For recurring events
-	if timeSlot.Recurrence == nil {
-		return nil, fmt.Errorf("recurrence settings required for recurring time slots")
-	}
-
-	// Calculate end date for recurring events
-	endDate := timeSlot.Recurrence.EndValue
-	if timeSlot.Recurrence.EndType == "date" {
-		endDate = timeSlot.Recurrence.EndValue
-	} else if timeSlot.Recurrence.EndType == "never" {
-		// For never-ending events, create events for next 10 years
-		endDate = time.Now().AddDate(10, 0, 0)
-	}
-
-	// Generate events based on recurrence settings
-	currentDate := timeSlot.StartDate
-	for currentDate.Before(endDate) {
-		for _, service := range services {
-			event := &models.Event{
-				TimeSlotServiceID: service.ID,
-				Capacity:          service.Capacity,
-				DateTime:          currentDate,
-				ServiceTypeID:     service.ServiceTypeID,
-			}
-			events = append(events, event)
-		}
-
-		// Calculate next occurrence based on frequency and interval
-		switch timeSlot.Recurrence.Frequency {
-		case "daily":
-			currentDate = currentDate.AddDate(0, 0, int(timeSlot.Recurrence.Interval))
-		case "weekly":
-			currentDate = currentDate.AddDate(0, 0, int(timeSlot.Recurrence.Interval)*7)
-		case "monthly":
-			currentDate = currentDate.AddDate(0, int(timeSlot.Recurrence.Interval), 0)
-		default:
-			return nil, fmt.Errorf("unsupported recurrence frequency: %s", timeSlot.Recurrence.Frequency)
-		}
-	}
-
-	return events, nil
 }

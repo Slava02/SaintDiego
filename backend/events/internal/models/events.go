@@ -15,6 +15,7 @@ type Event struct {
 	Datetime          time.Time `bun:"datetime" json:"datetime"`
 	ServiceTypeID     int64     `bun:"service_type_id" json:"service_type_id"`
 	ParticipantsCount int32     `bun:"participants_count" json:"participants_count"`
+	ServiceName       string    `bun:"service_name" json:"service_name"`
 	// Many-to-many relationship with Client through EventClient
 	Clients []*Client `bun:"m2m:event_client,join:Event=Client"`
 }

@@ -9,6 +9,8 @@ properties:
   serviceTypeId:
     type: integer
     format: int64
+  serviceName:
+    type: string
   capacity:
     type: integer
     format: int32
@@ -24,6 +26,7 @@ required:
   - datetime
   - serviceTypeId
   - id
+  - serviceName
   - participantsCount
 example:
   id: 1

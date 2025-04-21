@@ -6,6 +6,8 @@ github.com/HdrHistogram/hdrhistogram-go v1.1.2 h1:5IcZpTvzydCQeHzK4Ef/D5rrSqwxob
 github.com/HdrHistogram/hdrhistogram-go v1.1.2/go.mod h1:yDgFjdqOqDEKOvasDdhWNXYg9BVp4O+o5f6V/ehm6Oo=
 github.com/Slava02/SaintDiego/backend/common v0.0.0-20250411063008-4869bc3eb03d h1:+45PJHuvWX4lGKEc5F1muAXHMxHE0NTZqVZraGPemq0=
 github.com/Slava02/SaintDiego/backend/common v0.0.0-20250411063008-4869bc3eb03d/go.mod h1:8oSaCQ4JmfnNdyIJNgdFICVGcN86zsrkqv2mHbELzhY=
+github.com/Slava02/SaintDiego/backend/services v0.0.0-20250421063233-7e839628bdfe h1:XydJBILFQ1JxTFwxr+cqwLX0wxMd803J/BJWiHcB7T8=
+github.com/Slava02/SaintDiego/backend/services v0.0.0-20250421063233-7e839628bdfe/go.mod h1:bgsoxzYz+zbnVe/E5iCEdM4ulaYfab4eooO2B2rKwQE=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=

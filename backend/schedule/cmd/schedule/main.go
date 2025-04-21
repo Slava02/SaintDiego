@@ -19,6 +19,7 @@ import (
 	"github.com/Slava02/SaintDiego/backend/common/closer"
 	"github.com/Slava02/SaintDiego/backend/common/logger"
 	"github.com/Slava02/SaintDiego/backend/common/tracing"
+	"github.com/Slava02/SaintDiego/backend/schedule/internal/clients/grpc-services"
 	"github.com/Slava02/SaintDiego/backend/schedule/internal/config"
 	server "github.com/Slava02/SaintDiego/backend/schedule/internal/server"
 	_ "github.com/go-sql-driver/mysql"
@@ -83,9 +84,18 @@ func run() error {
 	timeSlotsRepo := timeslots_repo.NewTimeSlotRepository(timeslots_repo.NewOptions(db))
 	locationsRepo := locations_repo.NewLocationRepository(locations_repo.NewOptions(db))
 
+	// Clients
+
+	manager, err := grpc_services.NewManager(grpc_services.ManagerOptions{
+		ServicesAddr: cfg.GRPCClient.ClientServices.Addr,
+	})
+	if err != nil {
+		return fmt.Errorf("init services client: %v", err)
+	}
+
 	// Usecases
 
-	timeSlotsUsecase, err := timeSlots.New(timeSlots.NewOptions(timeSlotsRepo, db))
+	timeSlotsUsecase, err := timeSlots.New(timeSlots.NewOptions(timeSlotsRepo, db, manager.Services()))
 	if err != nil {
 		lg.Error("init timeSlots usecase", zap.Error(err))
 		return fmt.Errorf("init timeSlots usecase: %v", err)

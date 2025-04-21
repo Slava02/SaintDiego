@@ -13,6 +13,7 @@ type OptOptionsSetter func(o *Options)
 func NewOptions(
 	TimeSlotsRepository ITimeSlotsRepository,
 	Transactor Transactor,
+	ServicesClient IServicesClient,
 	options ...OptOptionsSetter,
 ) Options {
 	o := Options{}
@@ -22,6 +23,8 @@ func NewOptions(
 	o.TimeSlotsRepository = TimeSlotsRepository
 
 	o.Transactor = Transactor
+
+	o.ServicesClient = ServicesClient
 
 	for _, opt := range options {
 		opt(&o)
@@ -33,6 +36,7 @@ func (o *Options) Validate() error {
 	errs := new(errors461e464ebed9.ValidationErrors)
 	errs.Add(errors461e464ebed9.NewValidationError("TimeSlotsRepository", _validate_Options_TimeSlotsRepository(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("Transactor", _validate_Options_Transactor(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("ServicesClient", _validate_Options_ServicesClient(o)))
 	return errs.AsError()
 }
 
@@ -46,6 +50,13 @@ func _validate_Options_TimeSlotsRepository(o *Options) error {
 func _validate_Options_Transactor(o *Options) error {
 	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.Transactor, "required"); err != nil {
 		return fmt461e464ebed9.Errorf("field `Transactor` did not pass the test: %w", err)
+	}
+	return nil
+}
+
+func _validate_Options_ServicesClient(o *Options) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.ServicesClient, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `ServicesClient` did not pass the test: %w", err)
 	}
 	return nil
 }

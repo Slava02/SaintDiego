@@ -222,5 +222,6 @@ func convertEventToResponse(event *models.Event) Event {
 		Datetime:          event.Datetime,
 		ServiceTypeId:     event.ServiceTypeID,
 		ParticipantsCount: event.ParticipantsCount,
+		ServiceName:       event.ServiceName,
 	}
 }

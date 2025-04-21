@@ -68,3 +68,8 @@ type Event struct {
 	// Relations
 	TimeSlotService *TimeSlotService `bun:"rel:belongs-to,join:time_slot_service_id=id" json:"time_slot_service,omitempty"`
 }
+
+type ServiceType struct {
+	ID   int64  ` json:"id" validate:"required,min=1"`
+	Name string `json:"name" validate:"required,max=256"`
+}

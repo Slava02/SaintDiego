@@ -96,6 +96,7 @@ message Event {
   int32 capacity = 4;
   google.protobuf.Timestamp datetime = 5;
   int32 participantsCount = 6;
+  string serviceName = 7;
 }
 
 message Participant {
