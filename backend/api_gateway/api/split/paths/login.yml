@@ -1,0 +1,28 @@
+post:
+  tags:
+    - auth
+  summary: Вход в систему
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/LoginRequest.yml
+  responses:
+    '200':
+      description: Успешный ответ
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/LoginResponse.yml
+    '400':
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml

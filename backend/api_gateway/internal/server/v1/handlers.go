@@ -12,6 +12,7 @@ type Options struct {
 	eventsUC    IEventsUC    `option:"mandatory" validate:"required"`
 	volunteerUC IVolunteerUC `option:"mandatory" validate:"required"`
 	clientUC    IClientUC    `option:"mandatory" validate:"required"`
+	authUC      IAuthUC      `option:"mandatory" validate:"required"`
 }
 
 type Handlers struct {
@@ -21,6 +22,7 @@ type Handlers struct {
 	eventsUC    IEventsUC
 	volunteerUC IVolunteerUC
 	clientUC    IClientUC
+	authUC      IAuthUC
 }
 
 var _ ServerInterface = (*Handlers)(nil)

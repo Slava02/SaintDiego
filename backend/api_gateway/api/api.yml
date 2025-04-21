@@ -15,27 +15,27 @@ paths:
         - locations
       summary: Получение списка локаций
       responses:
-        '200':
+        "200":
           description: Успешный ответ
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Location'
+                  $ref: "#/components/schemas/Location"
                 maxItems: 100
-        '400':
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     post:
       tags:
         - locations
@@ -44,31 +44,31 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateLocationRequest'
+              $ref: "#/components/schemas/CreateLocationRequest"
         required: true
       responses:
-        '201':
+        "201":
           description: Локация успешно создана
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Location'
+                $ref: "#/components/schemas/Location"
               example:
                 id: 3
                 name: Новый храм
                 address: ул. Новая, 67
-        '400':
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /locations/{id}:
     put:
       tags:
@@ -87,27 +87,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateLocationRequest'
+              $ref: "#/components/schemas/UpdateLocationRequest"
         required: true
       responses:
-        '200':
+        "200":
           description: Локация успешно обновлена
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Location'
-        '400':
+                $ref: "#/components/schemas/Location"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     delete:
       tags:
         - locations
@@ -122,7 +122,7 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Локация успешно удалена
           content:
             application/json:
@@ -131,18 +131,18 @@ paths:
                 properties:
                   success:
                     type: boolean
-        '400':
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /services:
     get:
       tags:
@@ -172,24 +172,24 @@ paths:
           schema:
             type: boolean
       responses:
-        '200':
+        "200":
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetServicesResponse'
-        '400':
+                $ref: "#/components/schemas/GetServicesResponse"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /services/{id}:
     get:
       tags:
@@ -205,27 +205,27 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ServiceType'
+                $ref: "#/components/schemas/ServiceType"
               example:
                 id: 1
                 name: Исповедь
-        '400':
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     put:
       tags:
         - services
@@ -243,30 +243,30 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateServiceRegistrationRequest'
+              $ref: "#/components/schemas/UpdateServiceRegistrationRequest"
         required: true
       responses:
-        '200':
+        "200":
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ServiceType'
+                $ref: "#/components/schemas/ServiceType"
               example:
                 id: 1
                 name: Исповедь
-        '400':
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /timeSlots:
     get:
       tags:
@@ -298,27 +298,27 @@ paths:
             type: string
             format: date-time
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TimeSlot'
+                  $ref: "#/components/schemas/TimeSlot"
                 maxItems: 100
-        '400':
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     post:
       tags:
         - timeSlots
@@ -327,27 +327,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateTimeSlotRequest'
+              $ref: "#/components/schemas/CreateTimeSlotRequest"
         required: true
       responses:
-        '201':
+        "201":
           description: Временной слот успешно создан
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TimeSlot'
-        '400':
+                $ref: "#/components/schemas/TimeSlot"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /timeSlots/{id}:
     get:
       tags:
@@ -363,24 +363,24 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Временной слот
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TimeSlot'
-        '400':
+                $ref: "#/components/schemas/TimeSlot"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     put:
       tags:
         - timeSlots
@@ -398,27 +398,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TimeSlot'
+              $ref: "#/components/schemas/TimeSlot"
         required: true
       responses:
-        '200':
+        "200":
           description: Временной слот успешно обновлен
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TimeSlot'
-        '400':
+                $ref: "#/components/schemas/TimeSlot"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     delete:
       tags:
         - timeSlots
@@ -433,7 +433,7 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Временной слот успешно удален
           content:
             application/json:
@@ -442,18 +442,18 @@ paths:
                 properties:
                   success:
                     type: boolean
-        '400':
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /timeSlots/{id}/activate:
     patch:
       tags:
@@ -470,24 +470,24 @@ paths:
             format: int64
           example: 1
       responses:
-        '200':
+        "200":
           description: Временной слот успешно активирован
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TimeSlot'
-        '400':
+                $ref: "#/components/schemas/TimeSlot"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /timeSlots/{id}/archive:
     patch:
       tags:
@@ -503,24 +503,24 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Временной слот успешно архивирован
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TimeSlot'
-        '400':
+                $ref: "#/components/schemas/TimeSlot"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /events:
     get:
       parameters:
@@ -583,24 +583,24 @@ paths:
         - events
       summary: Получение списка событий
       responses:
-        '200':
+        "200":
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetEventsResponse'
-        '400':
+                $ref: "#/components/schemas/GetEventsResponse"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /events/{id}:
     get:
       tags:
@@ -616,24 +616,24 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Event'
-        '400':
+                $ref: "#/components/schemas/Event"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     put:
       tags:
         - events
@@ -651,27 +651,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateEventRequest'
+              $ref: "#/components/schemas/UpdateEventRequest"
         required: true
       responses:
-        '200':
+        "200":
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Event'
-        '400':
+                $ref: "#/components/schemas/Event"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     delete:
       tags:
         - events
@@ -686,7 +686,7 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Успешный ответ
           content:
             application/json:
@@ -695,18 +695,18 @@ paths:
                 properties:
                   success:
                     type: boolean
-        '400':
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /events/{id}/participants:
     get:
       tags:
@@ -739,24 +739,24 @@ paths:
             maximum: 100
             default: 20
       responses:
-        '200':
+        "200":
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetParticipantsResponse'
-        '400':
+                $ref: "#/components/schemas/GetParticipantsResponse"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     put:
       tags:
         - events
@@ -774,9 +774,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddParticipantToEventRequest'
+              $ref: "#/components/schemas/AddParticipantToEventRequest"
       responses:
-        '204':
+        "204":
           description: Успешный ответ
           content:
             application/json:
@@ -786,24 +786,24 @@ paths:
                   success:
                     type: boolean
                     example: true
-        '400':
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '403':
+                $ref: "#/components/schemas/Error"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /events/services/{id}:
     get:
       tags:
@@ -836,24 +836,24 @@ paths:
             maximum: 100
             default: 20
       responses:
-        '200':
+        "200":
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetEventsResponse'
-        '400':
+                $ref: "#/components/schemas/GetEventsResponse"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /clients:
     get:
       parameters:
@@ -874,26 +874,26 @@ paths:
         - clients
       summary: Получение списка живых клиентов
       responses:
-        '200':
+        "200":
           description: Успешный ответ
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/GetClientsResponse'
-        '400':
+                  $ref: "#/components/schemas/GetClientsResponse"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     post:
       tags:
         - clients
@@ -902,26 +902,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateClientRequest'
+              $ref: "#/components/schemas/CreateClientRequest"
       responses:
-        '201':
+        "201":
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Client'
-        '400':
+                $ref: "#/components/schemas/Client"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /clients/{id}:
     get:
       tags:
@@ -937,24 +937,24 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Client'
-        '400':
+                $ref: "#/components/schemas/Client"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     put:
       tags:
         - clients
@@ -972,26 +972,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BlockClientRequest'
+              $ref: "#/components/schemas/BlockClientRequest"
       responses:
-        '200':
+        "200":
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Client'
-        '400':
+                $ref: "#/components/schemas/Client"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /clients/{id}/services:
     get:
       tags:
@@ -1024,24 +1024,24 @@ paths:
             maximum: 100
             default: 20
       responses:
-        '200':
+        "200":
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetAvailableServicesResponse'
-        '400':
+                $ref: "#/components/schemas/GetAvailableServicesResponse"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /volunteers:
     post:
       tags:
@@ -1051,26 +1051,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Volunteer'
+              $ref: "#/components/schemas/Volunteer"
       responses:
-        '201':
+        "201":
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Volunteer'
-        '400':
+                $ref: "#/components/schemas/Volunteer"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /volunteers/{tg_id}:
     get:
       tags:
@@ -1086,24 +1086,24 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Volunteer'
-        '400':
+                $ref: "#/components/schemas/Volunteer"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     put:
       tags:
         - volunteers
@@ -1121,26 +1121,76 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateVolunteerRequest'
+              $ref: "#/components/schemas/UpdateVolunteerRequest"
       responses:
-        '200':
+        "200":
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Volunteer'
-        '400':
+                $ref: "#/components/schemas/Volunteer"
+        "400":
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
+
+  /login:
+    post:
+      tags:
+        - auth
+      summary: Вход в систему
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /logout:
+    post:
+      tags:
+        - auth
+      summary: Выход из системы
+      responses:
+        "200":
+          description: Успешный ответ
+        "400":
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   securitySchemes:
     BearerAuth:
@@ -1148,6 +1198,28 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+      example:
+        username: admin
+        password: password
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+        - token
+      example:
+        token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
     Location:
       type: object
       properties:
@@ -1236,7 +1308,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/ServiceType'
+            $ref: "#/components/schemas/ServiceType"
         total:
           type: integer
           format: int32
@@ -1296,7 +1368,7 @@ components:
         serviceTypeId: 1
         capacity: 20
         bookingWindow: 30
-        time: '2024-03-20T09:00:00Z'
+        time: "2024-03-20T09:00:00Z"
     Recurrence:
       type: object
       properties:
@@ -1327,7 +1399,7 @@ components:
         frequency: weekly
         interval: 1
         endType: date
-        endValue: '2024-04-20T19:00:00Z'
+        endValue: "2024-04-20T19:00:00Z"
     TimeSlot:
       type: object
       properties:
@@ -1361,9 +1433,9 @@ components:
         services:
           type: array
           items:
-            $ref: '#/components/schemas/TimeSlotService'
+            $ref: "#/components/schemas/TimeSlotService"
         recurrence:
-          $ref: '#/components/schemas/Recurrence'
+          $ref: "#/components/schemas/Recurrence"
       required:
         - id
         - title
@@ -1380,20 +1452,20 @@ components:
         type: single
         locationId: 1
         capacity: 50
-        startDate: '2024-03-20T09:00:00Z'
-        endDate: '2024-03-20T10:00:00Z'
+        startDate: "2024-03-20T09:00:00Z"
+        endDate: "2024-03-20T10:00:00Z"
         status: active
         services:
           - timeSlotId: 1
             serviceTypeId: 1
             capacity: 20
             bookingWindow: 30
-            time: '2024-03-20T09:00:00Z'
+            time: "2024-03-20T09:00:00Z"
           - timeSlotId: 1
             serviceTypeId: 2
             capacity: 30
             bookingWindow: 30
-            time: '2024-03-20T09:30:00Z'
+            time: "2024-03-20T09:30:00Z"
     CreateTimeSlotRequest:
       type: object
       properties:
@@ -1427,9 +1499,9 @@ components:
         services:
           type: array
           items:
-            $ref: '#/components/schemas/TimeSlotService'
+            $ref: "#/components/schemas/TimeSlotService"
         recurrence:
-          $ref: '#/components/schemas/Recurrence'
+          $ref: "#/components/schemas/Recurrence"
       required:
         - title
         - type
@@ -1443,22 +1515,22 @@ components:
         type: recurring
         locationId: 1
         capacity: 100
-        startDate: '2025-03-20T18:00:00Z'
-        endDate: '2025-03-20T19:00:00Z'
+        startDate: "2025-03-20T18:00:00Z"
+        endDate: "2025-03-20T19:00:00Z"
         services:
           - serviceTypeId: 1
             capacity: 40
             bookingWindow: 30
-            time: '2025-03-20T18:00:00Z'
+            time: "2025-03-20T18:00:00Z"
           - serviceTypeId: 2
             capacity: 60
             bookingWindow: 30
-            time: '2025-03-20T18:30:00Z'
+            time: "2025-03-20T18:30:00Z"
         recurrence:
           frequency: weekly
           interval: 1
           endType: date
-          endValue: '2025-04-20T19:00:00Z'
+          endValue: "2025-04-20T19:00:00Z"
     Event:
       type: object
       properties:
@@ -1494,7 +1566,7 @@ components:
         id: 1
         timeSlotServiceId: 1
         capacity: 20
-        datetime: '2024-03-20T09:00:00Z'
+        datetime: "2024-03-20T09:00:00Z"
         participantsCount: 10
     GetEventsResponse:
       type: object
@@ -1502,7 +1574,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/Event'
+            $ref: "#/components/schemas/Event"
         total:
           type: integer
           format: int32
@@ -1526,11 +1598,11 @@ components:
           - id: 1
             timeSlotServiceId: 1
             capacity: 20
-            datetime: '2024-03-20T09:00:00Z'
+            datetime: "2024-03-20T09:00:00Z"
           - id: 2
             timeSlotServiceId: 2
             capacity: 20
-            datetime: '2024-03-20T09:00:00Z'
+            datetime: "2024-03-20T09:00:00Z"
         total: 100
         page: 1
         per_page: 10
@@ -1549,7 +1621,7 @@ components:
         - datetime
       example:
         capacity: 20
-        datetime: '2024-03-20T09:00:00Z'
+        datetime: "2024-03-20T09:00:00Z"
     Participant:
       type: object
       properties:
@@ -1593,7 +1665,7 @@ components:
         first_name: Иван
         middle_name: Иванович
         last_name: Иванов
-        birth_date: '2024-03-20T09:00:00Z'
+        birth_date: "2024-03-20T09:00:00Z"
         volunteer_tg: 1
         volunteer_tg_login: ivan_ivanov
         volounteer_first_name: Иван
@@ -1606,7 +1678,7 @@ components:
         participants:
           type: array
           items:
-            $ref: '#/components/schemas/Participant'
+            $ref: "#/components/schemas/Participant"
         total:
           type: integer
           format: int32
@@ -1690,7 +1762,7 @@ components:
         clients:
           type: array
           items:
-            $ref: '#/components/schemas/Client'
+            $ref: "#/components/schemas/Client"
         total:
           type: integer
           format: int32
@@ -1754,7 +1826,7 @@ components:
         services:
           type: array
           items:
-            $ref: '#/components/schemas/ServiceType'
+            $ref: "#/components/schemas/ServiceType"
       required:
         - services
     Volunteer:
