@@ -73,6 +73,7 @@ func (u *UseCase) DeleteEvent(ctx context.Context, id int64) error {
 }
 
 // TODO: возвращать нормальную ошибку, если он уже записан и проверить можно ли записаться на это событие
+// TODO:  проверить хватает ли мест по timeSlot
 func (u *UseCase) AddParticipantToEvent(ctx context.Context, params *AddParticipantToEventRequest) error {
 	return u.eventRepository.AddParticipantToEvent(ctx, params.EventID, params.ParticipantID, params.VolunteerID)
 }

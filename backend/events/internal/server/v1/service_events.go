@@ -196,6 +196,7 @@ func convertModelEventToPB(event *models.Event) *pb.Event {
 		Capacity:          event.Capacity,
 		Datetime:          timestamppb.New(event.Datetime),
 		ServiceTypeId:     event.ServiceTypeID,
+		ParticipantsCount: event.ParticipantsCount,
 	}
 }
 

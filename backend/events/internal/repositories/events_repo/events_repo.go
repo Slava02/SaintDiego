@@ -32,7 +32,10 @@ func NewEventRepository(opts Options) (*EventRepository, error) {
 
 func (r *EventRepository) GetEvents(ctx context.Context, params *GetEventsParams) ([]*models.Event, int64, error) {
 	// Создаем основной запрос для получения данных
-	query := r.db.Select(ctx, &models.Event{})
+	query := r.db.Select(ctx, &models.Event{}).
+		ColumnExpr("e.*, COUNT(ec.id) as participants_count").
+		Join("LEFT JOIN event_client ec ON e.id = ec.event_id").
+		Group("e.id")
 
 	// Применяем фильтры к обоим запросам
 	if params.LocationID != nil {

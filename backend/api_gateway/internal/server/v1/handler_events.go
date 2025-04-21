@@ -209,13 +209,7 @@ func convertParticipantsToResponse(participants []*models.Participant) []Partici
 func convertEventsToResponse(events []*models.Event) []Event {
 	response := make([]Event, len(events))
 	for i, event := range events {
-		response[i] = Event{
-			Id:                event.ID,
-			TimeSlotServiceId: event.TimeSlotServiceID,
-			Capacity:          event.Capacity,
-			Datetime:          event.Datetime,
-			ServiceTypeId:     event.ServiceTypeID,
-		}
+		response[i] = convertEventToResponse(event)
 	}
 	return response
 }
@@ -227,5 +221,6 @@ func convertEventToResponse(event *models.Event) Event {
 		Capacity:          event.Capacity,
 		Datetime:          event.Datetime,
 		ServiceTypeId:     event.ServiceTypeID,
+		ParticipantsCount: event.ParticipantsCount,
 	}
 }

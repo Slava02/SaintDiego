@@ -62,13 +62,7 @@ func (u *UseCase) GetEvents(ctx context.Context, req *GetEventsParams) ([]*model
 
 	events := make([]*models.Event, len(pbRes.Events))
 	for i, event := range pbRes.Events {
-		events[i] = &models.Event{
-			ID:                event.Id,
-			TimeSlotServiceID: event.TimeSlotServiceId,
-			Capacity:          event.Capacity,
-			Datetime:          event.Datetime.AsTime(),
-			ServiceTypeID:     event.ServiceTypeId,
-		}
+		events[i] = convertEventToResponse(event)
 	}
 
 	return events, int32(pbRes.Total), nil
@@ -84,13 +78,7 @@ func (u *UseCase) GetEvent(ctx context.Context, id int64) (*models.Event, error)
 		return nil, err
 	}
 
-	return &models.Event{
-		ID:                pbRes.Id,
-		TimeSlotServiceID: pbRes.TimeSlotServiceId,
-		Capacity:          pbRes.Capacity,
-		Datetime:          pbRes.Datetime.AsTime(),
-		ServiceTypeID:     pbRes.ServiceTypeId,
-	}, nil
+	return convertEventToResponse(pbRes), nil
 }
 
 func (u *UseCase) UpdateEvent(ctx context.Context, req *UpdateEventRequest) (*models.Event, error) {
@@ -105,13 +93,7 @@ func (u *UseCase) UpdateEvent(ctx context.Context, req *UpdateEventRequest) (*mo
 		return nil, err
 	}
 
-	return &models.Event{
-		ID:                pbRes.Id,
-		TimeSlotServiceID: pbRes.TimeSlotServiceId,
-		Capacity:          pbRes.Capacity,
-		Datetime:          pbRes.Datetime.AsTime(),
-		ServiceTypeID:     pbRes.ServiceTypeId,
-	}, nil
+	return convertEventToResponse(pbRes), nil
 }
 
 func (u *UseCase) DeleteEvent(ctx context.Context, id int64) error {
@@ -190,14 +172,19 @@ func (u *UseCase) GetEventsByServiceId(ctx context.Context, params *GetEventsSer
 
 	events := make([]*models.Event, len(pbRes.Events))
 	for i, event := range pbRes.Events {
-		events[i] = &models.Event{
-			ID:                event.Id,
-			TimeSlotServiceID: event.TimeSlotServiceId,
-			Capacity:          event.Capacity,
-			Datetime:          event.Datetime.AsTime(),
-			ServiceTypeID:     event.ServiceTypeId,
-		}
+		events[i] = convertEventToResponse(event)
 	}
 
 	return events, int32(pbRes.Total), nil
+}
+
+func convertEventToResponse(event *pb.Event) *models.Event {
+	return &models.Event{
+		ID:                event.Id,
+		TimeSlotServiceID: event.TimeSlotServiceId,
+		Capacity:          event.Capacity,
+		Datetime:          event.Datetime.AsTime(),
+		ServiceTypeID:     event.ServiceTypeId,
+		ParticipantsCount: event.ParticipantsCount,
+	}
 }
