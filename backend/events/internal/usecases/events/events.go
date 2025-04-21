@@ -17,6 +17,9 @@ type IEventRepository interface {
 	AddParticipantToEvent(ctx context.Context, eventID, participantID, volunteerID int64) error
 	GetEventsByServiceId(ctx context.Context, serviceID int64, page int64, perPage int64) ([]*models.Event, int64, error)
 	GetParticipantsByEventId(ctx context.Context, eventID int64, page int64, perPage int64) ([]*models.Participant, int64, error)
+	GetTimeSlotIDByEventID(ctx context.Context, eventID int64) (int64, error)
+	// TODO: вынести в timeslot service
+	GetTimeSlotWithParticipantCount(ctx context.Context, timeSlotServiceID int64) (*models.TimeSlotWithParticipantCount, error)
 }
 
 //go:generate options-gen -out-filename=events_options.gen.go -from-struct=Options
@@ -72,7 +75,6 @@ func (u *UseCase) DeleteEvent(ctx context.Context, id int64) error {
 	return u.eventRepository.DeleteEvent(ctx, id)
 }
 
-// TODO:  проверить хватает ли мест по timeSlot
 func (u *UseCase) AddParticipantToEvent(ctx context.Context, params *AddParticipantToEventRequest) error {
 	event, err := u.eventRepository.GetEvent(ctx, params.EventID)
 	if err != nil {
@@ -81,6 +83,20 @@ func (u *UseCase) AddParticipantToEvent(ctx context.Context, params *AddParticip
 
 	if event.ParticipantsCount >= event.Capacity {
 		return fmt.Errorf("event is full")
+	}
+
+	timeSlotID, err := u.eventRepository.GetTimeSlotIDByEventID(ctx, event.ID)
+	if err != nil {
+		return fmt.Errorf("get time slot id: %v", err)
+	}
+
+	timeSlot, err := u.eventRepository.GetTimeSlotWithParticipantCount(ctx, timeSlotID)
+	if err != nil {
+		return fmt.Errorf("get time slot: %v", err)
+	}
+
+	if timeSlot.ParticipantCount >= timeSlot.Capacity {
+		return fmt.Errorf("time slot is full")
 	}
 
 	return u.eventRepository.AddParticipantToEvent(ctx, params.EventID, params.ParticipantID, params.VolunteerID)

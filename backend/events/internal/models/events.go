@@ -77,3 +77,11 @@ type Participant struct {
 	VolounteerMiddleName string    `json:"volounteer_middle_name" validate:"omitempty"`
 	VolounteerLastName   string    `json:"volounteer_last_name" validate:"omitempty"`
 }
+
+type TimeSlotWithParticipantCount struct {
+	bun.BaseModel `bun:"table:time_slot,alias:ts"`
+
+	ID               int64 `bun:"id,pk,autoincrement" json:"id"`
+	Capacity         int32 `bun:"capacity" json:"capacity" validate:"required,min=1"`
+	ParticipantCount int32 `bun:"participant_count" json:"participant_count" validate:"required,min=1"`
+}

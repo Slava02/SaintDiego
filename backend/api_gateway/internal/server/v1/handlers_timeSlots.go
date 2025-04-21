@@ -52,6 +52,7 @@ func (h Handlers) GetTimeSlots(ctx echo.Context, params GetTimeSlotsParams) erro
 	return ctx.JSON(http.StatusOK, timeSlots)
 }
 
+// TODO: нцжно валидировать capacity timeSlot и capacity event
 func (h Handlers) PostTimeSlots(ctx echo.Context) error {
 	var req timeSlots.CreateTimeSlotReq
 	if err := ctx.Bind(&req); err != nil {

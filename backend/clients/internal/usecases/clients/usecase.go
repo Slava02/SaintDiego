@@ -119,7 +119,6 @@ func (u *UseCase) GetClientServices(ctx context.Context, req *GetClientServicesR
 		return []*models.ServiceTypes{serviceType}, 1, nil
 	}
 
-	// TODO: yадо подумать как сделать так, чтобы не отображались тут первичное и вторичное собеседование. Наверное, проще всего будет просто не делать их доступными для регистрации, так как выше они уже возвращаются
 	services, total, err := u.clientsRepository.GetClientServices(ctx, client.Id, req.Page, req.PerPage)
 	if err != nil {
 		return nil, 0, fmt.Errorf("get client services: %w", err)
