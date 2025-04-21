@@ -38,7 +38,6 @@ func New(opts Options) (*UseCase, error) {
 	}, nil
 }
 
-// TODO: тут бы проверять открыт ли данный сервис для регистрации
 func (u UseCase) CreateTimeSlot(ctx context.Context, req *CreateTimeSlotReq) (*models.TimeSlot, error) {
 	pbReq := &pb.CreateTimeSlotRequest{
 		Title:      req.Title,

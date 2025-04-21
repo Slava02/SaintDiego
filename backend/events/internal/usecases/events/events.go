@@ -72,9 +72,17 @@ func (u *UseCase) DeleteEvent(ctx context.Context, id int64) error {
 	return u.eventRepository.DeleteEvent(ctx, id)
 }
 
-// TODO: возвращать нормальную ошибку, если он уже записан и проверить можно ли записаться на это событие
 // TODO:  проверить хватает ли мест по timeSlot
 func (u *UseCase) AddParticipantToEvent(ctx context.Context, params *AddParticipantToEventRequest) error {
+	event, err := u.eventRepository.GetEvent(ctx, params.EventID)
+	if err != nil {
+		return fmt.Errorf("get event: %v", err)
+	}
+
+	if event.ParticipantsCount >= event.Capacity {
+		return fmt.Errorf("event is full")
+	}
+
 	return u.eventRepository.AddParticipantToEvent(ctx, params.EventID, params.ParticipantID, params.VolunteerID)
 }
 

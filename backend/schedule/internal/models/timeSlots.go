@@ -60,7 +60,7 @@ type Event struct {
 
 	ID                int64     `bun:"id,pk,autoincrement" json:"id"`
 	TimeSlotServiceID int64     `bun:"time_slot_service_id,notnull" json:"time_slot_service_id" validate:"required"`
-	ServiceName       string    `bun:"service_name,notnull" json:"service_name" validate:"required,max=256"` // TODO: get from service services
+	ServiceName       string    `bun:"service_name,notnull" json:"service_name" validate:"required,max=256"`
 	Capacity          int32     `bun:"capacity,notnull" json:"capacity" validate:"required,min=1"`
 	DateTime          time.Time `bun:"datetime,notnull" json:"datetime" validate:"required"`
 	ServiceTypeID     int64     `bun:"service_type_id,notnull" json:"service_type_id" validate:"required"`

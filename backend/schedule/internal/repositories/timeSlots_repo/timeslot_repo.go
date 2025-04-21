@@ -183,6 +183,7 @@ func (r *TimeSlotRepository) GetTimeSlot(ctx context.Context, id int64) (*models
 	return timeSlot, nil
 }
 
+// TODO: всю логику перенести в usecase
 func (r *TimeSlotRepository) DeleteTimeSlot(ctx context.Context, id int64) error {
 	return r.db.WithinTransaction(ctx, func(txCtx context.Context) error {
 		// First, get all services for this time slot

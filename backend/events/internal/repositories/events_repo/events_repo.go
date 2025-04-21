@@ -84,7 +84,12 @@ func (r *EventRepository) GetEvents(ctx context.Context, params *GetEventsParams
 
 func (r *EventRepository) GetEvent(ctx context.Context, id int64) (*models.Event, error) {
 	var event models.Event
-	err := r.db.Select(ctx, &event).Where("id = ?", id).Scan(ctx)
+	err := r.db.Select(ctx, &event).
+		ColumnExpr("e.*, COUNT(ec.id) as participants_count").
+		Join("LEFT JOIN event_client ec ON e.id = ec.event_id").
+		Group("e.id").
+		Where("e.id = ?", id).
+		Scan(ctx)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, status.Errorf(codes.NotFound, "event not found")
@@ -175,13 +180,20 @@ func (r *EventRepository) GetParticipantsByEventId(ctx context.Context, eventID 
 	return participants, int64(total), nil
 }
 
+// Список событий по serviceID, с учетом окна бронирования и количества участников
 func (r *EventRepository) GetEventsByServiceId(ctx context.Context, serviceID int64, page int64, perPage int64) ([]*models.Event, int64, error) {
 	var events []*models.Event
 
 	offset := (page - 1) * perPage
 
 	total, err := r.db.Select(ctx, &events).
-		Where("service_type_id = ?", serviceID).
+		ColumnExpr("e.*, COUNT(ec.id) as participants_count").
+		Join("LEFT JOIN event_client ec ON e.id = ec.event_id").
+		Join("JOIN time_slot_service tss ON e.time_slot_service_id = tss.id").
+		Group("e.id").
+		Where("e.service_type_id = ?", serviceID).
+		Where("e.datetime <= DATE_ADD(CURDATE(), INTERVAL tss.booking_window DAY)").
+		Having("COUNT(ec.id) < e.capacity").
 		Limit(int(perPage)).
 		Offset(int(offset)).
 		ScanAndCount(ctx, &events)

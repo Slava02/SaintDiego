@@ -22,8 +22,6 @@ type IEventsUC interface {
 	GetEventsByServiceId(ctx context.Context, params *events.GetEventsServicesIdParams) ([]*models.Event, int32, error)
 }
 
-// TODO: тут везде нужно добавить количество участников
-
 func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
 	var req struct {
 		Page          int32   `query:"page" json:"page" validate:"omitempty,min=1"`
@@ -162,8 +160,6 @@ func (h Handlers) GetEventsIdParticipants(c echo.Context, id int64, params GetEv
 	})
 }
 
-// TODO: тут нужно выводить доступные events с учетом количества участников
-// TODO: нужно выводит с учетом окна бронирования
 func (h Handlers) GetEventsServicesId(c echo.Context, id int64, params GetEventsServicesIdParams) error {
 	var req events.GetEventsServicesIdParams
 	if err := c.Bind(&req); err != nil {
