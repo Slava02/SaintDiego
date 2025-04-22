@@ -1,12 +1,12 @@
 type: object
 properties:
-  username:
+  login:
     type: string
   password:
     type: string
 required:
-  - username
+  - login
   - password
 example:
-  username: admin
+  login: admin
   password: password

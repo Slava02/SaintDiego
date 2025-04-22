@@ -23,3 +23,6 @@ addr = ":50054"
 
 [services.clients]
 addr = ":50055"
+
+[services.auth]
+addr = ":50056"

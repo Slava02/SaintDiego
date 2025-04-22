@@ -31,6 +31,7 @@ type MicroservicesConfig struct {
 	Events     EventsConfig     `toml:"events"`
 	Volunteers VolunteersConfig `toml:"volunteers"`
 	Clients    ClientsConfig    `toml:"clients"`
+	Auth       AuthConfig       `toml:"auth"`
 }
 
 type VolunteersConfig struct {
@@ -50,5 +51,9 @@ type ServicesConfig struct {
 }
 
 type EventsConfig struct {
+	Addr string `toml:"addr" validate:"required,hostname_port"`
+}
+
+type AuthConfig struct {
 	Addr string `toml:"addr" validate:"required,hostname_port"`
 }

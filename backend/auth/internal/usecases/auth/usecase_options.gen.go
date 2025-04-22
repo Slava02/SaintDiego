@@ -11,14 +11,17 @@ import (
 type OptOptionsSetter func(o *Options)
 
 func NewOptions(
-	VolunteersRepository IVolunteersRepository,
+	AuthRepository IAuthRepository,
+	Secret string,
 	options ...OptOptionsSetter,
 ) Options {
 	o := Options{}
 
 	// Setting defaults from field tag (if present)
 
-	o.VolunteersRepository = VolunteersRepository
+	o.AuthRepository = AuthRepository
+
+	o.Secret = Secret
 
 	for _, opt := range options {
 		opt(&o)
@@ -28,13 +31,21 @@ func NewOptions(
 
 func (o *Options) Validate() error {
 	errs := new(errors461e464ebed9.ValidationErrors)
-	errs.Add(errors461e464ebed9.NewValidationError("VolunteersRepository", _validate_Options_VolunteersRepository(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("AuthRepository", _validate_Options_AuthRepository(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("Secret", _validate_Options_Secret(o)))
 	return errs.AsError()
 }
 
-func _validate_Options_VolunteersRepository(o *Options) error {
-	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.VolunteersRepository, "required"); err != nil {
-		return fmt461e464ebed9.Errorf("field `VolunteersRepository` did not pass the test: %w", err)
+func _validate_Options_AuthRepository(o *Options) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.AuthRepository, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `AuthRepository` did not pass the test: %w", err)
+	}
+	return nil
+}
+
+func _validate_Options_Secret(o *Options) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.Secret, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `Secret` did not pass the test: %w", err)
 	}
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/auth"
 	"github.com/labstack/echo/v4"
 )
 
@@ -26,18 +27,4 @@ func (h Handlers) PostLogin(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, LoginResponse{
 		Token: response.Token,
 	})
-}
-
-func (h Handlers) PostLogout(ctx echo.Context) error {
-	var req auth.LogoutRequest
-	if err := ctx.Bind(&req); err != nil {
-		return ctx.JSON(http.StatusBadRequest, err.Error())
-	}
-
-	err := h.authUC.Logout(ctx.Request().Context(), &req)
-	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
-	}
-
-	return ctx.NoContent(http.StatusOK)
 }

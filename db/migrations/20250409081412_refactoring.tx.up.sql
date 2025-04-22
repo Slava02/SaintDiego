@@ -218,6 +218,19 @@ CREATE TABLE IF NOT EXISTS `event_client` (
     CONSTRAINT `FK_event_volunteer` FOREIGN KEY (`volunteer_id`) REFERENCES `volunteer` (`tg_id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 --bun:split
+CREATE TABLE IF NOT EXISTS schedule_users (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `login` varchar(255) NOT NULL,
+    `password_hash` varchar(255) NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+--bun:split
+INSERT INTO `schedule_users` (`login`, `password_hash`)
+VALUES (
+        'admin',
+        '$2a$13$cI4NIIfGiqgNsggT6yuxJOJsxY.haqepg7odDM2NeJcveDHD1bISm'
+    );
+--bun:split
 INSERT INTO `location` (`name`, `address`)
 VALUES ('Центр социальной помощи', 'ул. Ленина, 10'),
     ('Социальный центр "Забота"', 'пр. Победы, 25'),

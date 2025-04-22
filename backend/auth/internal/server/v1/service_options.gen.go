@@ -11,7 +11,7 @@ import (
 type OptOptionsSetter func(o *Options)
 
 func NewOptions(
-	authUC IVolunteersUC,
+	authUC IAuthUC,
 	options ...OptOptionsSetter,
 ) Options {
 	o := Options{}

@@ -16,6 +16,7 @@ func NewManagerOptions(
 	EventsAddr string,
 	VolunteersAddr string,
 	ClientsAddr string,
+	AuthAddr string,
 	options ...OptManagerOptionsSetter,
 ) ManagerOptions {
 	o := ManagerOptions{}
@@ -32,6 +33,8 @@ func NewManagerOptions(
 
 	o.ClientsAddr = ClientsAddr
 
+	o.AuthAddr = AuthAddr
+
 	for _, opt := range options {
 		opt(&o)
 	}
@@ -45,6 +48,7 @@ func (o *ManagerOptions) Validate() error {
 	errs.Add(errors461e464ebed9.NewValidationError("EventsAddr", _validate_ManagerOptions_EventsAddr(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("VolunteersAddr", _validate_ManagerOptions_VolunteersAddr(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("ClientsAddr", _validate_ManagerOptions_ClientsAddr(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("AuthAddr", _validate_ManagerOptions_AuthAddr(o)))
 	return errs.AsError()
 }
 
@@ -79,6 +83,13 @@ func _validate_ManagerOptions_VolunteersAddr(o *ManagerOptions) error {
 func _validate_ManagerOptions_ClientsAddr(o *ManagerOptions) error {
 	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.ClientsAddr, "required"); err != nil {
 		return fmt461e464ebed9.Errorf("field `ClientsAddr` did not pass the test: %w", err)
+	}
+	return nil
+}
+
+func _validate_ManagerOptions_AuthAddr(o *ManagerOptions) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.AuthAddr, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `AuthAddr` did not pass the test: %w", err)
 	}
 	return nil
 }

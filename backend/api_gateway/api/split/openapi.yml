@@ -47,8 +47,6 @@ paths:
     $ref: paths/volunteers_{tg_id}.yml
   /login:
     $ref: paths/login.yml
-  /logout:
-    $ref: paths/logout.yml
 components:
   securitySchemes:
     BearerAuth:

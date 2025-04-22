@@ -9,7 +9,7 @@ import (
 	"syscall"
 
 	"github.com/Slava02/SaintDiego/backend/auth/internal/config"
-	"github.com/Slava02/SaintDiego/backend/auth/pkg/pb"
+	pb "github.com/Slava02/SaintDiego/backend/auth/pkg/pb"
 	"github.com/Slava02/SaintDiego/backend/common/closer"
 	"github.com/Slava02/SaintDiego/backend/common/interceptors"
 	"github.com/pkg/errors"
@@ -23,18 +23,18 @@ import (
 
 //go:generate options-gen -out-filename=server_options.gen.go -from-struct=Options
 type Options struct {
-	Lg                *zap.Logger                `option:"mandatory" validate:"required"`
-	ServerConfig      *config.ServerConfig       `option:"mandatory" validate:"required"`
-	Production        bool                       `option:"optional" default:"false"`
-	VolunteersService pb.VolunteersServiceServer `option:"mandatory" validate:"required"`
+	Lg           *zap.Logger          `option:"mandatory" validate:"required"`
+	ServerConfig *config.ServerConfig `option:"mandatory" validate:"required"`
+	Production   bool                 `option:"optional" default:"false"`
+	AuthService  pb.AuthServer        `option:"mandatory" validate:"required"`
 }
 
 type Server struct {
-	lg                *zap.Logger
-	srv               *grpc.Server
-	production        bool
-	addr              string
-	VolunteersService pb.VolunteersServiceServer
+	lg          *zap.Logger
+	srv         *grpc.Server
+	production  bool
+	addr        string
+	AuthService pb.AuthServer
 }
 
 func New(opts Options) (*Server, error) {
@@ -58,18 +58,18 @@ func New(opts Options) (*Server, error) {
 	)
 
 	return &Server{
-		lg:                opts.Lg,
-		srv:               srv,
-		production:        opts.Production,
-		addr:              opts.ServerConfig.Addr,
-		VolunteersService: opts.VolunteersService,
+		lg:          opts.Lg,
+		srv:         srv,
+		production:  opts.Production,
+		addr:        opts.ServerConfig.Addr,
+		AuthService: opts.AuthService,
 	}, nil
 }
 
 func (s *Server) Run(ctx context.Context) error {
 	defer closer.CloseAll()
 
-	pb.RegisterVolunteersServiceServer(s.srv, s.VolunteersService)
+	pb.RegisterAuthServer(s.srv, s.AuthService)
 
 	l, err := net.Listen("tcp", s.addr)
 	if err != nil {

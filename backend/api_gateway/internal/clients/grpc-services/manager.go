@@ -16,6 +16,7 @@ type ManagerOptions struct {
 	EventsAddr     string `option:"mandatory" validate:"required"`
 	VolunteersAddr string `option:"mandatory" validate:"required"`
 	ClientsAddr    string `option:"mandatory" validate:"required"`
+	AuthAddr       string `option:"mandatory" validate:"required"`
 }
 
 type Manager struct {
@@ -24,6 +25,7 @@ type Manager struct {
 	eventsClient     *EventsClient
 	volunteersClient *VolunteersClient
 	clientsClient    *ClientsClient
+	authClient       *AuthClient
 }
 
 func NewManager(opts ManagerOptions) (*Manager, error) {
@@ -62,12 +64,19 @@ func NewManager(opts ManagerOptions) (*Manager, error) {
 		return nil, fmt.Errorf("failed to create clients client: %w", err)
 	}
 
+	authClient, err := NewAuthClient(AuthClientOptions{
+		AuthServerAddr: opts.AuthAddr,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create auth client: %w", err)
+	}
 	return &Manager{
 		scheduleClient:   scheduleClient,
 		servicesClient:   servicesClient,
 		eventsClient:     eventsClient,
 		volunteersClient: volunteersClient,
 		clientsClient:    clientsClient,
+		authClient:       authClient,
 	}, nil
 }
 
@@ -87,6 +96,9 @@ func (m *Manager) Close() error {
 	}
 	if err := m.clientsClient.Close(); err != nil {
 		return fmt.Errorf("failed to close clients client: %w", err)
+	}
+	if err := m.authClient.Close(); err != nil {
+		return fmt.Errorf("failed to close auth client: %w", err)
 	}
 	return nil
 }
@@ -114,4 +126,9 @@ func (m *Manager) Volunteers() *VolunteersClient {
 // Clients returns the clients service client
 func (m *Manager) Clients() *ClientsClient {
 	return m.clientsClient
+}
+
+// Auth returns the auth service client
+func (m *Manager) Auth() *AuthClient {
+	return m.authClient
 }

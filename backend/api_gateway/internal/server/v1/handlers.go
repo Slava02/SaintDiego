@@ -39,5 +39,6 @@ func NewHandlers(opts Options) (Handlers, error) {
 		eventsUC:    opts.eventsUC,
 		volunteerUC: opts.volunteerUC,
 		clientUC:    opts.clientUC,
+		authUC:      opts.authUC,
 	}, nil
 }

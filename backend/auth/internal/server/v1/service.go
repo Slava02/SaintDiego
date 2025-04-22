@@ -3,17 +3,17 @@ package v1
 import (
 	"fmt"
 
-	"github.com/Slava02/SaintDiego/backend/auth/pkg/pb"
+	pb "github.com/Slava02/SaintDiego/backend/auth/pkg/pb"
 )
 
 //go:generate options-gen -out-filename=service_options.gen.go -from-struct=Options
 type Options struct {
-	authUC IVolunteersUC `option:"mandatory" validate:"required"`
+	authUC IAuthUC `option:"mandatory" validate:"required"`
 }
 
 type Implementation struct {
-	pb.UnimplementedVolunteersServiceServer
-	authUC IVolunteersUC
+	pb.UnimplementedAuthServer
+	authUC IAuthUC
 }
 
 func NewImplementation(opts Options) (*Implementation, error) {

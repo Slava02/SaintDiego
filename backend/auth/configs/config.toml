@@ -6,7 +6,7 @@ env = "dev"
 level = "debug"
 
 [server]
-addr = ":50054"
+addr = ":50056"
 max_connection_idle = 10
 timeout = 10
 max_connection_age = 10
@@ -18,3 +18,6 @@ db_name = "homeless"
 password = "12345ghJkbn"
 user = "homeless"
 port = "39410"
+
+[jwt]
+secret = "secret"

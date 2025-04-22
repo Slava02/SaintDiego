@@ -10,6 +10,7 @@ type Config struct {
 	Log      LogConfig      `toml:"log"`
 	Database DatabaseConfig `toml:"database"`
 	Server   ServerConfig   `toml:"server"`
+	JWT      JWTConfig      `toml:"jwt"`
 }
 
 type GlobalConfig struct {
@@ -45,4 +46,8 @@ func (c DatabaseConfig) Conn() string {
 	res := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", c.User, c.Password, c.Host, c.Port, c.DBName)
 	fmt.Println(res)
 	return res
+}
+
+type JWTConfig struct {
+	Secret string `toml:"secret" validate:"required"`
 }

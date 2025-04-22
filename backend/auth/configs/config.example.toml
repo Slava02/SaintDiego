@@ -19,3 +19,6 @@ db_name = "33"
 password = "33"
 user = "33"
 port = "33"
+
+[jwt]
+secret = "secret"

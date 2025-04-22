@@ -10,6 +10,7 @@ import (
 	grpc_services "github.com/Slava02/SaintDiego/backend/api_gateway/internal/clients/grpc-services"
 	server "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server"
 	v1 "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1"
+	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/auth"
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/clients"
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/events"
 	locations "github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/locations"
@@ -29,11 +30,12 @@ func initServer(
 	eventsAddr string,
 	volunteersAddr string,
 	clientsAddr string,
+	authAddr string,
 ) (*server.Server, error) {
 	lg := zap.L().Named(nameServer)
 
 	// Create gRPC client manager
-	manager, err := grpc_services.NewManager(grpc_services.NewManagerOptions(scheduleAddr, servicesAddr, eventsAddr, volunteersAddr, clientsAddr))
+	manager, err := grpc_services.NewManager(grpc_services.NewManagerOptions(scheduleAddr, servicesAddr, eventsAddr, volunteersAddr, clientsAddr, authAddr))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create gRPC client manager: %v", err)
 	}
@@ -69,7 +71,12 @@ func initServer(
 		return nil, fmt.Errorf("create clients usecase: %v", err)
 	}
 
-	v1Handlers, err := v1.NewHandlers(v1.NewOptions(timeSlotsUC, locationsUC, servicesUC, eventsUC, volunteersUC, clientsUC))
+	authUC, err := auth.New(auth.NewOptions(manager.Auth()))
+	if err != nil {
+		return nil, fmt.Errorf("create auth usecase: %v", err)
+	}
+
+	v1Handlers, err := v1.NewHandlers(v1.NewOptions(timeSlotsUC, locationsUC, servicesUC, eventsUC, volunteersUC, clientsUC, authUC))
 	if err != nil {
 		return nil, fmt.Errorf("create v1 handlers: %v", err)
 	}

@@ -78,14 +78,14 @@ func run() error {
 
 	// Repositories
 
-	authRepo, err := auth_repo.NewVolunteerRepository(auth_repo.NewOptions(db))
+	authRepo, err := auth_repo.NewUserRepository(auth_repo.NewOptions(db))
 	if err != nil {
 		return fmt.Errorf("init auth repo: %v", err)
 	}
 
 	// Usecases
 
-	usecase, err := auth.New(auth.NewOptions(authRepo))
+	usecase, err := auth.New(auth.NewOptions(authRepo, cfg.JWT.Secret))
 	if err != nil {
 		lg.Error("init auth usecase", zap.Error(err))
 		return fmt.Errorf("init auth usecase: %v", err)
