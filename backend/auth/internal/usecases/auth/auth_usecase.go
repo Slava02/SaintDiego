@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Slava02/SaintDiego/backend/auth/internal/models"
+	"github.com/Slava02/SaintDiego/backend/auth/pkg/jwtAuth"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -55,7 +56,7 @@ func (u *UseCase) Login(ctx context.Context, req *LoginRequest) (*LoginResponse,
 		return nil, fmt.Errorf("failed to compare password: %v", err)
 	}
 
-	token, err := generateToken(user.ID, u.tokenTTL, u.secret)
+	token, err := jwtAuth.GenerateToken(user.ID, u.tokenTTL, u.secret)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create token: %v", err)
 	}
