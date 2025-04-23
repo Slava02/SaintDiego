@@ -3,21 +3,19 @@ package auth
 import (
 	"time"
 
-	"github.com/golang-jwt/jwt"
-
 	"github.com/Slava02/SaintDiego/backend/auth/internal/models"
+	"github.com/golang-jwt/jwt/v5"
 )
 
-func newToken(user *models.User, duration time.Duration, secret string) (string, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
-	claims["uid"] = user.ID
-	claims["login"] = user.Username
-	claims["exp"] = time.Now().Add(duration).Unix()
-
-	tokenString, err := token.SignedString([]byte(secret))
-	if err != nil {
-		return "", err
+func generateToken(userID int64, duration time.Duration, secret string) (string, error) {
+	claims := &models.JWTClaims{
+		UserID: userID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(duration)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
 	}
-	return tokenString, nil
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(secret))
 }

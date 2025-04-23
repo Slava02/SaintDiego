@@ -26,3 +26,6 @@ addr = ":50055"
 
 [services.auth]
 addr = ":50056"
+
+[jwt]
+secret = "secret"

@@ -3,6 +3,7 @@ package auth
 
 import (
 	fmt461e464ebed9 "fmt"
+	"time"
 
 	errors461e464ebed9 "github.com/kazhuravlev/options-gen/pkg/errors"
 	validator461e464ebed9 "github.com/kazhuravlev/options-gen/pkg/validator"
@@ -13,6 +14,7 @@ type OptOptionsSetter func(o *Options)
 func NewOptions(
 	AuthRepository IAuthRepository,
 	Secret string,
+	TokenTTL time.Duration,
 	options ...OptOptionsSetter,
 ) Options {
 	o := Options{}
@@ -22,6 +24,8 @@ func NewOptions(
 	o.AuthRepository = AuthRepository
 
 	o.Secret = Secret
+
+	o.TokenTTL = TokenTTL
 
 	for _, opt := range options {
 		opt(&o)
@@ -33,6 +37,7 @@ func (o *Options) Validate() error {
 	errs := new(errors461e464ebed9.ValidationErrors)
 	errs.Add(errors461e464ebed9.NewValidationError("AuthRepository", _validate_Options_AuthRepository(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("Secret", _validate_Options_Secret(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("TokenTTL", _validate_Options_TokenTTL(o)))
 	return errs.AsError()
 }
 
@@ -46,6 +51,13 @@ func _validate_Options_AuthRepository(o *Options) error {
 func _validate_Options_Secret(o *Options) error {
 	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.Secret, "required"); err != nil {
 		return fmt461e464ebed9.Errorf("field `Secret` did not pass the test: %w", err)
+	}
+	return nil
+}
+
+func _validate_Options_TokenTTL(o *Options) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.TokenTTL, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `TokenTTL` did not pass the test: %w", err)
 	}
 	return nil
 }

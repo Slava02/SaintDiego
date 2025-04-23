@@ -2,9 +2,11 @@ package serverclient
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	oapimdlwr "github.com/oapi-codegen/echo-middleware"
@@ -37,6 +39,7 @@ type Options struct {
 	allowOrigins []string           `option:"mandatory" validate:"min=1"`
 	v1Swagger    *openapi3.T        `option:"mandatory" validate:"required"`
 	v1Handlers   v1.ServerInterface `option:"mandatory" validate:"required"`
+	jwtSecret    string             `option:"mandatory" validate:"required"`
 }
 
 type Server struct {
@@ -60,18 +63,31 @@ func New(opts Options) (*Server, error) {
 		apmecho.Middleware(nameServer),
 	)
 
-	validatorMiddleware := oapimdlwr.OapiRequestValidatorWithOptions(opts.v1Swagger, &oapimdlwr.Options{
+	v1Group := e.Group("v1", oapimdlwr.OapiRequestValidatorWithOptions(opts.v1Swagger, &oapimdlwr.Options{
 		Options: openapi3filter.Options{
 			ExcludeRequestBody:  false,
 			ExcludeResponseBody: true,
 			AuthenticationFunc:  openapi3filter.NoopAuthenticationFunc,
 		},
 		SilenceServersWarning: true,
-	})
+	}),
+		func(next echo.HandlerFunc) echo.HandlerFunc {
+			return func(c echo.Context) error {
+				if c.Path() == "/v1/login" {
+					return next(c)
+				}
+				return middlewares.NewJWTMiddleware(opts.jwtSecret)(next)(c)
+			}
+		},
+	)
 
-	v1.RegisterHandlersWithBaseURL(e, opts.v1Handlers, "/v1")
+	v1.RegisterHandlers(v1Group, opts.v1Handlers)
 
-	e.Group("/v1").Use(validatorMiddleware)
+	data, err := json.MarshalIndent(e.Routes(), "", "  ")
+	if err != nil {
+		return nil, fmt.Errorf("marshal routes: %v", err)
+	}
+	os.WriteFile("backend/api_gateway/internal/server/routes.json", data, 0644)
 
 	return &Server{
 		lg: zap.L().Named(nameServer),

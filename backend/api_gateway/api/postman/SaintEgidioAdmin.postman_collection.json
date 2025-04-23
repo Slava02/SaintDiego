@@ -5,7 +5,7 @@
             "description": "",
             "item": [
                 {
-                    "id": "ab9556d7-1674-4527-ae39-29a7e98bd88f",
+                    "id": "5bb3ae00-8dee-4a02-bbcc-d1acd3b0a470",
                     "name": "Получение списка локаций",
                     "request": {
                         "name": "Получение списка локаций",
@@ -32,7 +32,7 @@
                     },
                     "response": [
                         {
-                            "id": "bdcbae8e-7fa1-4947-a55e-6f63223fa4cd",
+                            "id": "69afe890-25c6-4eb2-8619-f25c1a0b7e4d",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -75,7 +75,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "85fa7a02-4796-4b1d-b620-a847acfae250",
+                            "id": "7ff37ef7-8afb-4c75-a555-42c4ae3f726b",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -118,7 +118,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "aa93299d-56e9-4815-8dc7-37399f8b8eb9",
+                            "id": "92d8572f-afcc-45dc-a76c-f6245012abab",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -167,7 +167,7 @@
                     }
                 },
                 {
-                    "id": "34954e83-bc75-46ab-aa8a-f9167998c976",
+                    "id": "b05b12eb-3fd6-4834-b19c-b3024c1c2bf0",
                     "name": "Создание новой локации",
                     "request": {
                         "name": "Создание новой локации",
@@ -207,7 +207,7 @@
                     },
                     "response": [
                         {
-                            "id": "5e4a662e-2d27-4133-b9ac-15ed88d1166f",
+                            "id": "7373743c-8189-46e3-b68a-3eace91580d4",
                             "name": "Локация успешно создана",
                             "originalRequest": {
                                 "url": {
@@ -263,7 +263,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "4ba28670-1124-407f-8c1e-b2d4bacd566c",
+                            "id": "c489ef48-7257-4931-bcbd-deebeae0678a",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -319,7 +319,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "72ee6084-5943-4431-bbf7-580b76826953",
+                            "id": "10a69de7-d464-417b-98e6-bd998b848570",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -381,7 +381,7 @@
                     }
                 },
                 {
-                    "id": "d739187b-cad7-43e8-ae6f-33dd6b323425",
+                    "id": "ef17035f-3449-45e4-8b2c-8d155ae3ab77",
                     "name": "Обновление локации по идентификатору",
                     "request": {
                         "name": "Обновление локации по идентификатору",
@@ -433,7 +433,7 @@
                     },
                     "response": [
                         {
-                            "id": "024d0af1-945e-4c05-9bb4-4326dc2ab755",
+                            "id": "88841254-5f3a-46fb-bc61-ddb883e97c70",
                             "name": "Локация успешно обновлена",
                             "originalRequest": {
                                 "url": {
@@ -490,7 +490,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "a98049e0-5515-4787-abf8-949fc8904460",
+                            "id": "4ce4cb27-9fda-49f3-9b92-16721f743e82",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -547,7 +547,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "10af286d-6b75-49a7-bdaa-bbad249b45ca",
+                            "id": "833a5029-ba60-4e67-a0b3-4274d2ef949c",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -610,7 +610,7 @@
                     }
                 },
                 {
-                    "id": "922e0ab4-ec25-4b19-91a4-016f5da31164",
+                    "id": "e2daccb2-9107-4070-934e-f165a29d011d",
                     "name": "Удаление локации по идентификатору",
                     "request": {
                         "name": "Удаление локации по идентификатору",
@@ -649,7 +649,7 @@
                     },
                     "response": [
                         {
-                            "id": "c553189c-2982-4d69-81fd-d12d77d646b1",
+                            "id": "322d1956-dc94-4327-b863-7f956a4788a4",
                             "name": "Локация успешно удалена",
                             "originalRequest": {
                                 "url": {
@@ -693,7 +693,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "4b6c2879-b333-491d-a41d-93b5f9c6dfd3",
+                            "id": "2c416409-26b5-447a-b60a-b2ce04b3979d",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -737,7 +737,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "d9638928-2d3a-4dca-94c6-fd838be1095f",
+                            "id": "195e3370-c632-4d00-b5e1-47fba89871a6",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -793,7 +793,7 @@
             "description": "",
             "item": [
                 {
-                    "id": "ea184dee-9c6b-4723-8376-32fdeee99c33",
+                    "id": "19d42293-8e11-42e7-8697-1c55b4da609d",
                     "name": "Получение списка услуг",
                     "request": {
                         "name": "Получение списка услуг",
@@ -848,7 +848,7 @@
                     },
                     "response": [
                         {
-                            "id": "b2b5885a-87fa-48ec-a91e-ff475ed5572e",
+                            "id": "386b79b9-0af3-47f8-9cd2-830b5e6e4dc4",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -919,7 +919,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "8daa92b9-ac52-4135-8aa5-fbd1e8b34f09",
+                            "id": "f58a3c5c-a734-4a63-a724-8bd6deee68be",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -990,7 +990,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "0d5d7f74-911b-4296-9027-6d40a4eae96a",
+                            "id": "5873449f-413d-4cff-9adb-e82468154915",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -1067,7 +1067,7 @@
                     }
                 },
                 {
-                    "id": "2bb6a1e2-c54e-42cd-9eaf-e15aa74a6254",
+                    "id": "9023305e-8452-473b-a66b-4d5bfe72df62",
                     "name": "Получение информации об услуге по идентификатору",
                     "request": {
                         "name": "Получение информации об услуге по идентификатору",
@@ -1106,7 +1106,7 @@
                     },
                     "response": [
                         {
-                            "id": "fdbeadf4-cef5-48ef-93b1-096896c46b3a",
+                            "id": "c352c793-e514-472c-930c-44a5183dceef",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -1150,7 +1150,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "fc2c4b8e-429e-4b59-b09d-ab3e51d9b756",
+                            "id": "42961c73-090c-46e2-a3e8-19d59f423757",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -1194,7 +1194,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "f1ce9c79-266d-41c9-8707-dd54b705d267",
+                            "id": "cb6b59e6-d4da-42b5-b7cd-bdf78fcb104d",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -1244,7 +1244,7 @@
                     }
                 },
                 {
-                    "id": "acd2d97b-6358-4db5-98f5-affa267a1e8a",
+                    "id": "6b4453a6-eb5d-4be0-8757-da1d5e1822a5",
                     "name": "Обновление информации об услуге по идентификатору",
                     "request": {
                         "name": "Обновление информации об услуге по идентификатору",
@@ -1296,7 +1296,7 @@
                     },
                     "response": [
                         {
-                            "id": "73979cda-886c-4d33-8139-95e30b2b5c26",
+                            "id": "93500282-63a8-40eb-83d3-50a8611f6e7a",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -1353,7 +1353,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "d3f791a4-7d8f-47e9-aaea-8e40c2f6a18e",
+                            "id": "4775266f-5b34-463a-96db-3425ff6d24a7",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -1410,7 +1410,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "adb245bb-5d63-429b-963e-a11879df9e49",
+                            "id": "8cfb538a-099e-499d-8ce6-e4f964bbfafb",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -1479,7 +1479,7 @@
             "description": "",
             "item": [
                 {
-                    "id": "c993dacf-91b7-445f-aff9-530ecaf737e7",
+                    "id": "f76084fe-26ec-43a3-a4bc-cc511729a070",
                     "name": "Получение списка временных слотов",
                     "request": {
                         "name": "Получение списка временных слотов",
@@ -1537,7 +1537,7 @@
                     },
                     "response": [
                         {
-                            "id": "8cd7e842-ae10-49ac-8cf9-34e6a60dc587",
+                            "id": "560e10bc-6081-4767-b0e5-109bcd31cb13",
                             "name": "OK",
                             "originalRequest": {
                                 "url": {
@@ -1603,12 +1603,12 @@
                                     "value": "application/json"
                                 }
                             ],
-                            "body": "[\n  {\n    \"id\": \"<long>\",\n    \"title\": \"<string>\",\n    \"type\": \"recurring\",\n    \"locationId\": \"<long>\",\n    \"capacity\": \"<integer>\",\n    \"startDate\": \"<dateTime>\",\n    \"endDate\": \"<dateTime>\",\n    \"status\": \"active\",\n    \"services\": [\n      {\n        \"serviceTypeId\": \"<long>\",\n        \"capacity\": \"<integer>\",\n        \"bookingWindow\": \"<integer>\",\n        \"time\": \"<dateTime>\",\n        \"id\": \"<long>\"\n      },\n      {\n        \"serviceTypeId\": \"<long>\",\n        \"capacity\": \"<integer>\",\n        \"bookingWindow\": \"<integer>\",\n        \"time\": \"<dateTime>\",\n        \"id\": \"<long>\"\n      }\n    ],\n    \"recurrence\": {\n      \"frequency\": \"daily\",\n      \"interval\": \"<integer>\",\n      \"endType\": \"date\",\n      \"endValue\": \"<dateTime>\"\n    }\n  },\n  {\n    \"id\": \"<long>\",\n    \"title\": \"<string>\",\n    \"type\": \"single\",\n    \"locationId\": \"<long>\",\n    \"capacity\": \"<integer>\",\n    \"startDate\": \"<dateTime>\",\n    \"endDate\": \"<dateTime>\",\n    \"status\": \"active\",\n    \"services\": [\n      {\n        \"serviceTypeId\": \"<long>\",\n        \"capacity\": \"<integer>\",\n        \"bookingWindow\": \"<integer>\",\n        \"time\": \"<dateTime>\",\n        \"id\": \"<long>\"\n      },\n      {\n        \"serviceTypeId\": \"<long>\",\n        \"capacity\": \"<integer>\",\n        \"bookingWindow\": \"<integer>\",\n        \"time\": \"<dateTime>\",\n        \"id\": \"<long>\"\n      }\n    ],\n    \"recurrence\": {\n      \"frequency\": \"monthly\",\n      \"interval\": \"<integer>\",\n      \"endType\": \"never\",\n      \"endValue\": \"<dateTime>\"\n    }\n  }\n]",
+                            "body": "[\n  {\n    \"id\": \"<long>\",\n    \"title\": \"<string>\",\n    \"type\": \"recurring\",\n    \"locationId\": \"<long>\",\n    \"capacity\": \"<integer>\",\n    \"startDate\": \"<dateTime>\",\n    \"endDate\": \"<dateTime>\",\n    \"status\": \"archived\",\n    \"services\": [\n      {\n        \"serviceTypeId\": \"<long>\",\n        \"capacity\": \"<integer>\",\n        \"bookingWindow\": \"<integer>\",\n        \"time\": \"<dateTime>\",\n        \"id\": \"<long>\"\n      },\n      {\n        \"serviceTypeId\": \"<long>\",\n        \"capacity\": \"<integer>\",\n        \"bookingWindow\": \"<integer>\",\n        \"time\": \"<dateTime>\",\n        \"id\": \"<long>\"\n      }\n    ],\n    \"recurrence\": {\n      \"frequency\": \"monthly\",\n      \"interval\": \"<integer>\",\n      \"endType\": \"date\",\n      \"endValue\": \"<dateTime>\"\n    }\n  },\n  {\n    \"id\": \"<long>\",\n    \"title\": \"<string>\",\n    \"type\": \"single\",\n    \"locationId\": \"<long>\",\n    \"capacity\": \"<integer>\",\n    \"startDate\": \"<dateTime>\",\n    \"endDate\": \"<dateTime>\",\n    \"status\": \"archived\",\n    \"services\": [\n      {\n        \"serviceTypeId\": \"<long>\",\n        \"capacity\": \"<integer>\",\n        \"bookingWindow\": \"<integer>\",\n        \"time\": \"<dateTime>\",\n        \"id\": \"<long>\"\n      },\n      {\n        \"serviceTypeId\": \"<long>\",\n        \"capacity\": \"<integer>\",\n        \"bookingWindow\": \"<integer>\",\n        \"time\": \"<dateTime>\",\n        \"id\": \"<long>\"\n      }\n    ],\n    \"recurrence\": {\n      \"frequency\": \"weekly\",\n      \"interval\": \"<integer>\",\n      \"endType\": \"date\",\n      \"endValue\": \"<dateTime>\"\n    }\n  }\n]",
                             "cookie": [],
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "5af0bd46-dae5-470e-801b-ff4a050e5387",
+                            "id": "0adfc080-1b25-48d6-ba19-00a8c8efb579",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -1679,7 +1679,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "d27a8bfc-70be-460e-a4ad-3472d95ae81f",
+                            "id": "83cd2019-2116-457e-9b1c-daf70565a4fa",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -1756,7 +1756,7 @@
                     }
                 },
                 {
-                    "id": "859e7d99-e015-43df-9ff5-ab6064681150",
+                    "id": "712be52b-d744-4ae0-9508-4a961e56c197",
                     "name": "Создание нового временного слота",
                     "request": {
                         "name": "Создание нового временного слота",
@@ -1784,7 +1784,7 @@
                         "method": "POST",
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"daily\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"date\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
+                            "raw": "{\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"monthly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"never\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
                             "options": {
                                 "raw": {
                                     "headerFamily": "json",
@@ -1796,7 +1796,7 @@
                     },
                     "response": [
                         {
-                            "id": "a4eda569-fe2a-4d9e-8941-043d36d8c7eb",
+                            "id": "c6d8e5f0-9417-409b-a9a7-12135ac3c6bf",
                             "name": "Временной слот успешно создан",
                             "originalRequest": {
                                 "url": {
@@ -1830,7 +1830,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"daily\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"date\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
+                                    "raw": "{\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"monthly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"never\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1847,12 +1847,12 @@
                                     "value": "application/json"
                                 }
                             ],
-                            "body": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"active\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"date\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
+                            "body": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"archived\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"never\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
                             "cookie": [],
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "48b6b65e-e2b1-40ad-87ae-def9e6296234",
+                            "id": "6df5b747-46d9-4e88-8d44-6b058af447a9",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -1886,7 +1886,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"daily\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"date\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
+                                    "raw": "{\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"monthly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"never\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1908,7 +1908,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "4a3255fc-942d-4a6d-8ede-99f98266fe0e",
+                            "id": "326acf43-a4df-40a9-b59a-3b1f665540a4",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -1942,7 +1942,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"daily\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"date\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
+                                    "raw": "{\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"monthly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"never\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1970,7 +1970,7 @@
                     }
                 },
                 {
-                    "id": "25bb50d3-4831-4dba-8870-dee73370c63b",
+                    "id": "3e290968-7bc6-466d-9819-e33e82d05e0c",
                     "name": "Получение временного слота по идентификатору",
                     "request": {
                         "name": "Получение временного слота по идентификатору",
@@ -2009,7 +2009,7 @@
                     },
                     "response": [
                         {
-                            "id": "a1bc9911-73f6-4c27-9eab-25f90fd423a9",
+                            "id": "aaae7a2a-5989-4be5-80d7-65dde202d7fd",
                             "name": "Временной слот",
                             "originalRequest": {
                                 "url": {
@@ -2048,12 +2048,12 @@
                                     "value": "application/json"
                                 }
                             ],
-                            "body": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"active\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"date\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
+                            "body": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"archived\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"never\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
                             "cookie": [],
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "a257a646-b91a-4d32-834d-441ea9d6ce49",
+                            "id": "9300b0cf-9004-459a-adca-1bc6a50c06a1",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -2097,7 +2097,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "ebff30dd-d590-4b0e-9b5a-2ade284aeb79",
+                            "id": "d0eb2179-bdbe-499b-9102-09f5b0c434d8",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -2147,7 +2147,7 @@
                     }
                 },
                 {
-                    "id": "d55abb36-b2ed-4543-923f-1327ecb61861",
+                    "id": "b059d7ea-3093-41d5-a5b8-56bedb660bcd",
                     "name": "Обновление временного слота",
                     "request": {
                         "name": "Обновление временного слота",
@@ -2187,7 +2187,7 @@
                         "method": "PUT",
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"active\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"date\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
+                            "raw": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"archived\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"never\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
                             "options": {
                                 "raw": {
                                     "headerFamily": "json",
@@ -2199,7 +2199,7 @@
                     },
                     "response": [
                         {
-                            "id": "779b040f-f223-4bcd-ad28-d2f5651eabeb",
+                            "id": "02b4a7ab-b2ae-4104-a027-2dd1265273e3",
                             "name": "Временной слот успешно обновлен",
                             "originalRequest": {
                                 "url": {
@@ -2234,7 +2234,7 @@
                                 "method": "PUT",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"active\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"date\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
+                                    "raw": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"archived\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"never\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -2251,12 +2251,12 @@
                                     "value": "application/json"
                                 }
                             ],
-                            "body": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"active\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"date\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
+                            "body": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"archived\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"never\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
                             "cookie": [],
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "edd7a574-d7bc-4c4e-9308-486827535520",
+                            "id": "18c5284e-28b0-43b2-a742-e60c1a6e5a3f",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -2291,7 +2291,7 @@
                                 "method": "PUT",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"active\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"date\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
+                                    "raw": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"archived\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"never\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -2313,7 +2313,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "30f1d241-6bf9-44a2-bba1-bd545d3b7384",
+                            "id": "adb12ed1-627b-47cf-ac82-ce1e5ffc4ad6",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -2348,7 +2348,7 @@
                                 "method": "PUT",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"active\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"date\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
+                                    "raw": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"archived\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"never\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -2376,7 +2376,7 @@
                     }
                 },
                 {
-                    "id": "21403813-1254-4c26-b635-6cf31eda0160",
+                    "id": "db0f193e-035e-4382-8335-715068c270a1",
                     "name": "Удаление временного слота",
                     "request": {
                         "name": "Удаление временного слота",
@@ -2415,7 +2415,7 @@
                     },
                     "response": [
                         {
-                            "id": "2211165d-0c45-4b6c-ba02-8b0822bd1e56",
+                            "id": "d44b9aa7-1855-4662-a4ed-f65bba6e06cb",
                             "name": "Временной слот успешно удален",
                             "originalRequest": {
                                 "url": {
@@ -2459,7 +2459,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "68ff1ed9-364b-4aa4-990e-3ee736650325",
+                            "id": "45e886e0-ee22-48c0-86b6-9bf5ad6373ac",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -2503,7 +2503,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "d3975272-93fe-4a42-9b19-aded0abd773d",
+                            "id": "ae8f55c5-a4f4-4cc3-98ba-ce77890a5034",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -2553,7 +2553,7 @@
                     }
                 },
                 {
-                    "id": "413e5832-27d2-4574-96cb-75448bd04742",
+                    "id": "1d5f2f5a-2255-4262-823b-f2d501a3fe4f",
                     "name": "Активация временного слота",
                     "request": {
                         "name": "Активация временного слота",
@@ -2593,7 +2593,7 @@
                     },
                     "response": [
                         {
-                            "id": "72eda8af-e1f5-4bc8-9287-8ed6cb848e8b",
+                            "id": "34bb84ee-f65a-403e-888c-5df5230823bc",
                             "name": "Временной слот успешно активирован",
                             "originalRequest": {
                                 "url": {
@@ -2633,12 +2633,12 @@
                                     "value": "application/json"
                                 }
                             ],
-                            "body": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"active\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"date\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
+                            "body": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"archived\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"never\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
                             "cookie": [],
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "92fa5875-6c7b-427c-81b1-d45bfe5b490c",
+                            "id": "f8ab3a2b-e761-48d1-97b1-32858851ec30",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -2683,7 +2683,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "9004a47b-ce78-4706-a4ca-62f2ee161359",
+                            "id": "bcaee6b9-ab2d-4163-a47d-9401cc61e812",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -2734,7 +2734,7 @@
                     }
                 },
                 {
-                    "id": "7b02e83f-93b8-457d-b9ce-e793a1128bb1",
+                    "id": "c4e848a8-3d09-45dc-b74c-a8229a210779",
                     "name": "Архивация временного слота",
                     "request": {
                         "name": "Архивация временного слота",
@@ -2774,7 +2774,7 @@
                     },
                     "response": [
                         {
-                            "id": "62132318-85de-4018-99c0-405c23396ab8",
+                            "id": "0ffe55f6-53ec-4b16-bc41-26aa07eae0e4",
                             "name": "Временной слот успешно архивирован",
                             "originalRequest": {
                                 "url": {
@@ -2814,12 +2814,12 @@
                                     "value": "application/json"
                                 }
                             ],
-                            "body": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"active\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"date\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
+                            "body": "{\n  \"id\": \"<long>\",\n  \"title\": \"<string>\",\n  \"type\": \"recurring\",\n  \"locationId\": \"<long>\",\n  \"capacity\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"endDate\": \"<dateTime>\",\n  \"status\": \"archived\",\n  \"services\": [\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    },\n    {\n      \"serviceTypeId\": \"<long>\",\n      \"capacity\": \"<integer>\",\n      \"bookingWindow\": \"<integer>\",\n      \"time\": \"<dateTime>\",\n      \"id\": \"<long>\"\n    }\n  ],\n  \"recurrence\": {\n    \"frequency\": \"weekly\",\n    \"interval\": \"<integer>\",\n    \"endType\": \"never\",\n    \"endValue\": \"<dateTime>\"\n  }\n}",
                             "cookie": [],
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "348ebf7a-1900-4660-9c6a-1ec3fe1b1459",
+                            "id": "e2687b8f-722d-4e2b-9d4e-182d94fc922c",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -2864,7 +2864,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "3ef2ac1a-f8ed-4e90-bb67-78c3fa5cb392",
+                            "id": "e6b77abc-dd49-40fb-b90e-e179620ef847",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -2921,7 +2921,7 @@
             "description": "",
             "item": [
                 {
-                    "id": "ec790ebb-397d-46c0-b35b-a07aecde12da",
+                    "id": "b35f730c-8072-493b-9a9b-16e833ac10eb",
                     "name": "Получение списка событий",
                     "request": {
                         "name": "Получение списка событий",
@@ -3021,7 +3021,7 @@
                     },
                     "response": [
                         {
-                            "id": "574fc0f2-8c2b-4217-9293-150fc2e707eb",
+                            "id": "332aa069-d0e9-4b49-9882-6024995729fc",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -3137,7 +3137,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "a22b4942-7218-493b-8990-43803af56ba9",
+                            "id": "30b1f1d2-9666-484e-98ef-8a76dbe83374",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -3253,7 +3253,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "628d1752-946e-425b-bc4e-aec2b84ce481",
+                            "id": "2770ee1c-0fc7-4043-bf49-3ed9626b2732",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -3375,7 +3375,7 @@
                     }
                 },
                 {
-                    "id": "f330356b-c519-47c9-a76d-b307d88966e1",
+                    "id": "e3f99119-2518-449d-99f5-7f99d32d8616",
                     "name": "Получение события по идентификатору",
                     "request": {
                         "name": "Получение события по идентификатору",
@@ -3414,7 +3414,7 @@
                     },
                     "response": [
                         {
-                            "id": "048a5b1d-d9dd-4779-93a8-90852f44cb0e",
+                            "id": "51c52a1d-d1be-4ddb-98a6-19bfc91b0a42",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -3458,7 +3458,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "6f91416c-6f7e-490c-a58c-ef7a1827bfd3",
+                            "id": "7f9747a0-1cc6-4ed7-88c2-8e15e42ea1db",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -3502,7 +3502,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "db93101c-1b20-48e8-baed-798fee041341",
+                            "id": "474b0526-7068-40de-a4f8-0aaf3a01a634",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -3552,7 +3552,7 @@
                     }
                 },
                 {
-                    "id": "98953387-8429-4802-b0d5-0c41ccb12966",
+                    "id": "5733094c-855a-4311-b490-48c4b1cafad8",
                     "name": "Обновление события по идентификатору",
                     "request": {
                         "name": "Обновление события по идентификатору",
@@ -3604,7 +3604,7 @@
                     },
                     "response": [
                         {
-                            "id": "cc0484e4-c7ea-476e-be92-74560838e717",
+                            "id": "d78643ad-fc09-40b8-bd14-a34fa7ff8540",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -3661,7 +3661,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "91a92ef3-af2b-4cf6-bcd4-1c0115c9e322",
+                            "id": "59b04195-491f-4661-b6b9-1e7c26a6ce90",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -3718,7 +3718,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "b5f785e9-de28-44be-97f3-8a253686e4f1",
+                            "id": "a1932a80-eb4f-4210-9f5a-1ac4a55abf30",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -3781,7 +3781,7 @@
                     }
                 },
                 {
-                    "id": "8716f63a-37c7-4134-8169-1f13d2c06d1d",
+                    "id": "c20ad966-f6a0-4298-ad3e-c48ec1e2a59c",
                     "name": "Удаление события по идентификатору",
                     "request": {
                         "name": "Удаление события по идентификатору",
@@ -3820,7 +3820,7 @@
                     },
                     "response": [
                         {
-                            "id": "618c2a85-73e2-4154-810f-4a79d171ee38",
+                            "id": "b5faa85c-5b90-4598-8bee-28514a1ae650",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -3864,7 +3864,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "a99a225d-97d2-4ba1-8868-416e63a92b8b",
+                            "id": "3c67165e-12d8-4508-a9d4-b2d7c1124a19",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -3908,7 +3908,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "3ed1aa8a-667c-4d57-8895-cb0967bdc91b",
+                            "id": "0dd29f94-eff7-4a5d-895a-07118430896f",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -3958,7 +3958,7 @@
                     }
                 },
                 {
-                    "id": "cbbac201-d621-43d5-b9cc-c8ee0a7e199f",
+                    "id": "179c635b-014d-4c1a-9718-29bfe0ea5454",
                     "name": "Получение списка участников события",
                     "request": {
                         "name": "Получение списка участников события",
@@ -4017,7 +4017,7 @@
                     },
                     "response": [
                         {
-                            "id": "aa45e3e4-b298-46ff-9638-391d91087a5d",
+                            "id": "94e18368-8e91-4904-8c6a-818764b62b84",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -4081,7 +4081,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "ddea6d0c-9dfa-4a65-be79-97ad4813034d",
+                            "id": "bf68f6a1-2422-4a6f-805e-acec67e7c024",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -4145,7 +4145,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "f35e92e8-1dae-438e-822c-a8ca3e91f386",
+                            "id": "9d76018b-df61-440f-999c-0df066e4be17",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -4215,7 +4215,7 @@
                     }
                 },
                 {
-                    "id": "4a89704f-4a60-4e58-9534-084952d7ba7a",
+                    "id": "36b5219b-8d1d-46a3-abb3-27629836f1f9",
                     "name": "Добавление участника к событию",
                     "request": {
                         "name": "Добавление участника к событию",
@@ -4268,7 +4268,7 @@
                     },
                     "response": [
                         {
-                            "id": "ca215276-d13b-4db8-8039-5ece969c8d37",
+                            "id": "b095cce6-adc7-4cb8-bd8b-8832cc8376f5",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -4326,7 +4326,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "8f618faa-8238-43f7-857c-bec3585184b4",
+                            "id": "acd8866a-f1a3-4885-a2f7-42eb0e4bb6d6",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -4384,7 +4384,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "8b63a31c-281c-40c4-897b-b481c155c604",
+                            "id": "f36e42a0-e007-48d2-9f3c-8928b1838ab3",
                             "name": "Forbidden",
                             "originalRequest": {
                                 "url": {
@@ -4442,7 +4442,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "d28915b0-c97d-42a3-93ca-ab2dd83684c0",
+                            "id": "5897f191-a46b-4abc-90c2-4d36ead3c162",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -4506,7 +4506,7 @@
                     }
                 },
                 {
-                    "id": "6cdb3a0f-a1f0-4214-939a-aab3cc6a349d",
+                    "id": "1a70b613-2dbd-429e-a215-3a1600918f43",
                     "name": "Получение списка событий по типу услуги",
                     "request": {
                         "name": "Получение списка событий по типу услуги",
@@ -4565,7 +4565,7 @@
                     },
                     "response": [
                         {
-                            "id": "9607a8d1-5683-4be4-9cab-d91ebd526b47",
+                            "id": "003a6084-baba-4ed6-a415-6baf9f938a5b",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -4629,7 +4629,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "fa12f859-063d-4b9d-ac5c-d78b2fd6525a",
+                            "id": "1069f122-0991-41b6-a768-4e6e79ecf0f5",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -4693,7 +4693,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "ff017590-9fd2-422b-ac1e-1b7103a84c07",
+                            "id": "9a37d4cf-f97d-489b-876f-148e95272b97",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -4769,7 +4769,7 @@
             "description": "",
             "item": [
                 {
-                    "id": "20d57082-8193-4873-9cc3-a704692b5829",
+                    "id": "0db22312-58ed-47de-ac16-e0854e29106a",
                     "name": "Получение списка живых клиентов",
                     "request": {
                         "name": "Получение списка живых клиентов",
@@ -4815,7 +4815,7 @@
                     },
                     "response": [
                         {
-                            "id": "bc9fcffb-b302-460d-a41f-29827e757df1",
+                            "id": "7d8b11f4-f4c8-4c62-8118-b24cb94db760",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -4877,7 +4877,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "fee599c9-60f3-4e30-a6ab-59f989bcce5d",
+                            "id": "6cad5217-b372-47cd-8ce7-d61207880d0b",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -4939,7 +4939,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "ff880026-142d-4002-9e22-13a08f0bfd8e",
+                            "id": "07091af3-a048-4849-a0fe-efbc8049db9f",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -5007,7 +5007,7 @@
                     }
                 },
                 {
-                    "id": "a894cc92-e707-4db4-acea-fef8fb419bcb",
+                    "id": "40078b5f-b932-4304-93a6-71995e7f856b",
                     "name": "Создание нового клиента",
                     "request": {
                         "name": "Создание нового клиента",
@@ -5047,7 +5047,7 @@
                     },
                     "response": [
                         {
-                            "id": "65851d50-3419-41c3-a326-6f8f7c5dffd1",
+                            "id": "5b0cfab5-3149-495c-9481-21d24ecf977b",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -5103,7 +5103,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "aa2438c0-fd86-4998-9de7-8a30149b3348",
+                            "id": "2a8ad940-b8dc-4d3d-8f6d-bf777e7bbac5",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -5159,7 +5159,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "1f681034-12b3-47b6-95f5-12f3f2d548bc",
+                            "id": "8766ca43-70d5-42f8-b2cb-8331edb1e12c",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -5221,7 +5221,7 @@
                     }
                 },
                 {
-                    "id": "78b669fb-1862-4b0e-9a70-26f6598cc9c3",
+                    "id": "78a6c5b2-51f8-4ea0-9699-12d666bcd765",
                     "name": "Получение клиента по идентификатору",
                     "request": {
                         "name": "Получение клиента по идентификатору",
@@ -5260,7 +5260,7 @@
                     },
                     "response": [
                         {
-                            "id": "a32ed1fd-83d8-49f0-ae20-778103d4d20f",
+                            "id": "c91bc3fc-5c42-486a-af59-a08eb3834008",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -5304,7 +5304,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "c765bda0-adb8-4fd9-8b74-aaf18b552e3c",
+                            "id": "477b76f3-c34e-4b05-a155-5a1bd3354923",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -5348,7 +5348,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "5e26164e-401b-48ec-92d5-d9a9155ad24c",
+                            "id": "4d4cc444-301e-47f2-aee4-cf627910a70a",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -5398,7 +5398,7 @@
                     }
                 },
                 {
-                    "id": "19835317-9c57-4e13-8951-8c5e4a9771c7",
+                    "id": "c8d7a9e1-ed24-4ccf-9798-3bde7f23e648",
                     "name": "Блокировка/Разблокировка клиента",
                     "request": {
                         "name": "Блокировка/Разблокировка клиента",
@@ -5450,7 +5450,7 @@
                     },
                     "response": [
                         {
-                            "id": "2df17523-246d-4589-bb3e-da681b0450d8",
+                            "id": "9309e1b2-20f2-43c5-94c5-769f5ac4d128",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -5507,7 +5507,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "75d411ab-6c4f-49ec-9234-a45444ebd28d",
+                            "id": "5aff2684-eb08-44aa-8e67-4416f874b6df",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -5564,7 +5564,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "621cc456-8e41-4bb5-b1c6-03fe9da20e95",
+                            "id": "dafd10e6-c0d4-4fab-ba8d-1e3c6060899b",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -5627,7 +5627,7 @@
                     }
                 },
                 {
-                    "id": "d83842c4-9cfc-45fe-80d9-de104a0ff035",
+                    "id": "96349f9e-8ece-4bb4-9bf7-389ac018d184",
                     "name": "Получение списка услуг доступных клиенту",
                     "request": {
                         "name": "Получение списка услуг доступных клиенту",
@@ -5686,7 +5686,7 @@
                     },
                     "response": [
                         {
-                            "id": "83d799c9-f00a-40d4-bd0d-bd499dee3ab7",
+                            "id": "bdfdeccc-8c9d-4632-8953-ba65e5ab125a",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -5750,7 +5750,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "3fd1e977-e7ab-4739-a97d-ec42f76004d7",
+                            "id": "446beb11-8de0-42fd-b657-9afd4c060fce",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -5814,7 +5814,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "ccd8c8b2-3786-4026-a8d0-398a89420daf",
+                            "id": "c2a51b14-1413-48ef-b30c-1f94d860ad1e",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -5890,7 +5890,7 @@
             "description": "",
             "item": [
                 {
-                    "id": "7e18fd1d-1fa3-4f5f-9c2f-a825e6cb00e4",
+                    "id": "32805fa0-7a6e-4664-945d-0b7a098da79a",
                     "name": "Создание нового волонтера",
                     "request": {
                         "name": "Создание нового волонтера",
@@ -5930,7 +5930,7 @@
                     },
                     "response": [
                         {
-                            "id": "00aa34ab-638d-413f-933f-9689fa6da640",
+                            "id": "83fd3fb2-8f8a-46f8-a67c-217def0421cf",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -5986,7 +5986,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "fb1d991b-28a3-4e26-8648-59d159a0c03d",
+                            "id": "3dc172f4-50e9-4eb3-9345-84b44ecd01d7",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -6042,7 +6042,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "e275cadb-04ac-468a-ae5f-228c655df0f9",
+                            "id": "f1ba2703-d769-4edb-be6f-369ae1e48e69",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -6104,7 +6104,7 @@
                     }
                 },
                 {
-                    "id": "60a8a694-b56f-459f-83d1-ee030c78aab5",
+                    "id": "e2a69fe5-fef0-46f5-b379-b4ff1acc43c2",
                     "name": "Получение волонтера по идентификатору",
                     "request": {
                         "name": "Получение волонтера по идентификатору",
@@ -6143,7 +6143,7 @@
                     },
                     "response": [
                         {
-                            "id": "7a4c202d-1094-4b92-a9de-103123942f4a",
+                            "id": "1987c7eb-8fe0-4cdf-b654-3862262d338f",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -6187,7 +6187,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "fa0a588d-f389-4efb-a8d0-94d688a2dc3f",
+                            "id": "ddc57f2e-c893-4d31-a797-c9d7f23450e9",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -6231,7 +6231,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "95169c82-5f7f-4ec1-9fd9-1edb91a156d8",
+                            "id": "1053c8a2-c4fe-478e-b698-34ae5cf6e98e",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -6281,7 +6281,7 @@
                     }
                 },
                 {
-                    "id": "a3d58d18-6599-4ea6-9768-9394c575f8e6",
+                    "id": "ef0366be-2cb9-4e34-a286-e1972a8debc0",
                     "name": "Обновление волонтера",
                     "request": {
                         "name": "Обновление волонтера",
@@ -6333,7 +6333,7 @@
                     },
                     "response": [
                         {
-                            "id": "e8e84e5a-979d-4bb8-8190-e31afc9acbf4",
+                            "id": "95dfc49c-69e9-4a22-b3c2-a828b339edff",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -6390,7 +6390,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "064a3b2c-9683-48b5-bf1e-6772954527dd",
+                            "id": "d39cd19d-f4f6-4b97-bdc2-ba85ff017e64",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -6447,7 +6447,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "12cfe6a1-f0b0-4f6e-bb6e-69f3f1a74a43",
+                            "id": "4644d4c7-01ab-4355-a242-2db69e38f276",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -6516,7 +6516,7 @@
             "description": "",
             "item": [
                 {
-                    "id": "d6cf42d0-483e-442a-abca-ee3676632296",
+                    "id": "412dfd26-88a2-40d3-83be-9af2093f3fb7",
                     "name": "Вход в систему",
                     "request": {
                         "name": "Вход в систему",
@@ -6544,7 +6544,7 @@
                         "method": "POST",
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"username\": \"<string>\",\n  \"password\": \"<string>\"\n}",
+                            "raw": "{\n  \"login\": \"<string>\",\n  \"password\": \"<string>\"\n}",
                             "options": {
                                 "raw": {
                                     "headerFamily": "json",
@@ -6556,7 +6556,7 @@
                     },
                     "response": [
                         {
-                            "id": "6c2be52e-8c2b-477f-a664-927add8da8b6",
+                            "id": "f0b9f3e5-aded-4f84-b555-273e8e543579",
                             "name": "Успешный ответ",
                             "originalRequest": {
                                 "url": {
@@ -6590,7 +6590,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"username\": \"<string>\",\n  \"password\": \"<string>\"\n}",
+                                    "raw": "{\n  \"login\": \"<string>\",\n  \"password\": \"<string>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -6612,7 +6612,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "c6b736e7-087b-41d6-a845-c13e922f8caa",
+                            "id": "63f386c8-d6ed-4c5e-b7aa-7262c9bb2693",
                             "name": "Ошибка валидации",
                             "originalRequest": {
                                 "url": {
@@ -6646,7 +6646,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"username\": \"<string>\",\n  \"password\": \"<string>\"\n}",
+                                    "raw": "{\n  \"login\": \"<string>\",\n  \"password\": \"<string>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -6668,7 +6668,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "3e70a30e-e626-4b06-9600-56aec84b2ea4",
+                            "id": "5a00e661-ea17-4a0d-8d40-aa284bd52eaa",
                             "name": "Internal server error",
                             "originalRequest": {
                                 "url": {
@@ -6702,7 +6702,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"username\": \"<string>\",\n  \"password\": \"<string>\"\n}",
+                                    "raw": "{\n  \"login\": \"<string>\",\n  \"password\": \"<string>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -6750,7 +6750,7 @@
         }
     ],
     "info": {
-        "_postman_id": "3c77dcf8-e0cd-4bf7-a978-d6cbc1987bd4",
+        "_postman_id": "2cdd814a-8892-49ef-bb1a-a43c4fa093a8",
         "name": "Saint Egidio Admin API",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
         "description": {

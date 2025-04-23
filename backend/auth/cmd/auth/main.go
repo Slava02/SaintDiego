@@ -85,7 +85,7 @@ func run() error {
 
 	// Usecases
 
-	usecase, err := auth.New(auth.NewOptions(authRepo, cfg.JWT.Secret))
+	usecase, err := auth.New(auth.NewOptions(authRepo, cfg.JWT.Secret, cfg.JWT.TokenTTL))
 	if err != nil {
 		lg.Error("init auth usecase", zap.Error(err))
 		return fmt.Errorf("init auth usecase: %v", err)

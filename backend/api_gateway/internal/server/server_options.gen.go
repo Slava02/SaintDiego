@@ -19,6 +19,7 @@ func NewOptions(
 	allowOrigins []string,
 	v1Swagger *openapi3.T,
 	v1Handlers v1.ServerInterface,
+	jwtSecret string,
 	options ...OptOptionsSetter,
 ) Options {
 	o := Options{}
@@ -35,6 +36,8 @@ func NewOptions(
 
 	o.v1Handlers = v1Handlers
 
+	o.jwtSecret = jwtSecret
+
 	for _, opt := range options {
 		opt(&o)
 	}
@@ -48,6 +51,7 @@ func (o *Options) Validate() error {
 	errs.Add(errors461e464ebed9.NewValidationError("allowOrigins", _validate_Options_allowOrigins(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("v1Swagger", _validate_Options_v1Swagger(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("v1Handlers", _validate_Options_v1Handlers(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("jwtSecret", _validate_Options_jwtSecret(o)))
 	return errs.AsError()
 }
 
@@ -82,6 +86,13 @@ func _validate_Options_v1Swagger(o *Options) error {
 func _validate_Options_v1Handlers(o *Options) error {
 	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.v1Handlers, "required"); err != nil {
 		return fmt461e464ebed9.Errorf("field `v1Handlers` did not pass the test: %w", err)
+	}
+	return nil
+}
+
+func _validate_Options_jwtSecret(o *Options) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.jwtSecret, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `jwtSecret` did not pass the test: %w", err)
 	}
 	return nil
 }

@@ -24,4 +24,6 @@ ALTER TABLE `service_type` DROP COLUMN IF EXISTS `registration_available`;
 --bun:split
 ALTER TABLE `service_type` DROP COLUMN IF EXISTS `min_period_days`;
 --bun:split
+DROP TABLE IF EXISTS `schedule_users`;
+--bun:split
 SET FOREIGN_KEY_CHECKS = 1;

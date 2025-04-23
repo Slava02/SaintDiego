@@ -3,15 +3,17 @@ module github.com/Slava02/SaintDiego/backend/api_gateway
 go 1.24.2
 
 require (
-	github.com/Slava02/SaintDiego/backend/auth v0.0.0-20250421132310-f418824f9975
+	github.com/Slava02/SaintDiego/backend/auth v0.0.0-20250422130803-9f834b39b0dc
 	github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250419102259-266701d3ccea
-	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250417054842-cb97ca719f45
+	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250421132310-f418824f9975
 	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250421070621-04e9a4832f6a
 	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250416101532-01831f40d320
 	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250416101532-01831f40d320
 	github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250417082830-2c52583760c7
 	github.com/getkin/kin-openapi v0.131.0
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/kazhuravlev/options-gen v0.42.1
+	github.com/labstack/echo-jwt/v4 v4.3.1
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/oapi-codegen/echo-middleware v1.0.2
 	github.com/oapi-codegen/runtime v1.1.1
@@ -20,7 +22,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/sync v0.13.0
-	google.golang.org/grpc v1.71.1
+	google.golang.org/grpc v1.72.0
 	google.golang.org/protobuf v1.36.6
 )
 
@@ -54,11 +56,11 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
-	golang.org/x/crypto v0.36.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/net v0.37.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
-	golang.org/x/time v0.8.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250324211829-b45e905df463 // indirect
+	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
+	golang.org/x/time v0.11.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250421163800-61c742ae3ef0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

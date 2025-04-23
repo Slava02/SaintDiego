@@ -22,3 +22,4 @@ port = "33"
 
 [jwt]
 secret = "secret"
+token_ttl = "1m"

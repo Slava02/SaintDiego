@@ -49,5 +49,6 @@ func (c DatabaseConfig) Conn() string {
 }
 
 type JWTConfig struct {
-	Secret string `toml:"secret" validate:"required"`
+	Secret   string        `toml:"secret" validate:"required"`
+	TokenTTL time.Duration `toml:"token_ttl" validate:"required"`
 }

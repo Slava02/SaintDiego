@@ -31,6 +31,7 @@ func initServer(
 	volunteersAddr string,
 	clientsAddr string,
 	authAddr string,
+	jwtSecret string,
 ) (*server.Server, error) {
 	lg := zap.L().Named(nameServer)
 
@@ -87,6 +88,7 @@ func initServer(
 		allowOrigins,
 		v1Swagger,
 		v1Handlers,
+		jwtSecret,
 	))
 	if err != nil {
 		return nil, fmt.Errorf("build server: %v", err)

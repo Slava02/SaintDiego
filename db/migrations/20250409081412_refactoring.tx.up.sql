@@ -222,13 +222,15 @@ CREATE TABLE IF NOT EXISTS schedule_users (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `login` varchar(255) NOT NULL,
     `password_hash` varchar(255) NOT NULL,
+    `is_admin` boolean NOT NULL DEFAULT false,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 --bun:split
-INSERT INTO `schedule_users` (`login`, `password_hash`)
+INSERT INTO `schedule_users` (`login`, `password_hash`, `is_admin`)
 VALUES (
         'admin',
-        '$2a$13$cI4NIIfGiqgNsggT6yuxJOJsxY.haqepg7odDM2NeJcveDHD1bISm'
+        '$2a$13$cI4NIIfGiqgNsggT6yuxJOJsxY.haqepg7odDM2NeJcveDHD1bISm',
+        true
     );
 --bun:split
 INSERT INTO `location` (`name`, `address`)

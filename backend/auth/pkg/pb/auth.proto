@@ -8,6 +8,14 @@ option go_package = "github.com/Slava02/SaintDiego/backend/auth";
 service Auth {
   // Login logs in a user and returns an auth token.
   rpc Login (LoginRequest) returns (LoginResponse);
+
+  rpc Logout (LogoutRequest) returns (LogoutResponse);
+
+  // ValidateToken validates the given token and returns its status.
+  rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
+
+  // GetUserInfo returns user information for the given token.
+  rpc GetUserInfo (GetUserInfoRequest) returns (GetUserInfoResponse);
 }
 
 message LoginRequest {
@@ -17,5 +25,31 @@ message LoginRequest {
 
 message LoginResponse {
   string token = 1; // Auth token of the logged in user.
+}
+
+message LogoutRequest {
+  string token = 1; // Auth token of the user to logout.
+}
+
+message LogoutResponse {
+  bool success = 1; // Indicates whether the logout was successful.
+}
+
+message ValidateTokenRequest {
+  string token = 1; // Token to validate.
+}
+
+message ValidateTokenResponse {
+  bool valid = 1; // Indicates whether the token is valid.
+}
+
+message GetUserInfoRequest {
+  string token = 1; // Token to get user info for.
+}
+
+message GetUserInfoResponse {
+  int64 user_id = 1; // ID of the user.
+  string username = 2; // Username of the user.
+  repeated string roles = 3; // Roles of the user.
 }
 

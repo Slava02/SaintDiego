@@ -65,6 +65,7 @@ func run() (errReturned error) {
 		cfg.Services.Volunteers.Addr,
 		cfg.Services.Clients.Addr,
 		cfg.Services.Auth.Addr,
+		cfg.Servers.APIGW.JWT.Secret,
 	)
 	if err != nil {
 		return fmt.Errorf("init server: %v", err)

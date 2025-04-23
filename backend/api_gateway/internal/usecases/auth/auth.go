@@ -32,7 +32,7 @@ func New(opts Options) (*UseCase, error) {
 
 func (u *UseCase) Login(ctx context.Context, req *LoginRequest) (*LoginResponse, error) {
 	pbReq := &pb.LoginRequest{
-		Email:    req.Email,
+		Login:    req.Login,
 		Password: req.Password,
 	}
 
@@ -44,12 +44,4 @@ func (u *UseCase) Login(ctx context.Context, req *LoginRequest) (*LoginResponse,
 	return &LoginResponse{
 		Token: pbRes.Token,
 	}, nil
-}
-
-func (u *UseCase) Logout(ctx context.Context, req *LogoutRequest) error {
-	pbReq := &pb.LogoutRequest{
-		Token: req.Token,
-	}
-
-	return u.authClient.Logout(ctx, pbReq)
 }

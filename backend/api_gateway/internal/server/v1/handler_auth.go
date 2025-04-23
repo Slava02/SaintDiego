@@ -10,7 +10,6 @@ import (
 
 type IAuthUC interface {
 	Login(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResponse, error)
-	Logout(ctx context.Context, req *auth.LogoutRequest) error
 }
 
 func (h Handlers) PostLogin(ctx echo.Context) error {

@@ -19,11 +19,13 @@ type IAuthRepository interface {
 type Options struct {
 	AuthRepository IAuthRepository `option:"mandatory" validate:"required"`
 	Secret         string          `option:"mandatory" validate:"required"`
+	TokenTTL       time.Duration   `option:"mandatory" validate:"required"`
 }
 
 type UseCase struct {
 	authRepository IAuthRepository
 	secret         string
+	tokenTTL       time.Duration
 }
 
 func New(opts Options) (*UseCase, error) {
@@ -34,6 +36,7 @@ func New(opts Options) (*UseCase, error) {
 	return &UseCase{
 		authRepository: opts.AuthRepository,
 		secret:         opts.Secret,
+		tokenTTL:       opts.TokenTTL,
 	}, nil
 }
 
@@ -52,7 +55,7 @@ func (u *UseCase) Login(ctx context.Context, req *LoginRequest) (*LoginResponse,
 		return nil, fmt.Errorf("failed to compare password: %v", err)
 	}
 
-	token, err := newToken(user, time.Hour*24, u.secret)
+	token, err := generateToken(user.ID, u.tokenTTL, u.secret)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create token: %v", err)
 	}
