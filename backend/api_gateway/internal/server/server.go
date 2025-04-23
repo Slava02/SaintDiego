@@ -76,7 +76,7 @@ func New(opts Options) (*Server, error) {
 				if c.Path() == "/v1/login" {
 					return next(c)
 				}
-				return middlewares.NewJWTMiddleware(opts.jwtSecret)(next)(c)
+				return middlewares.NewJWTMiddleware([]byte(opts.jwtSecret))(next)(c)
 			}
 		},
 	)

@@ -1,21 +1,21 @@
 package middlewares
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
 
-	"github.com/Slava02/SaintDiego/backend/auth/internal/models"
+	"github.com/Slava02/SaintDiego/backend/auth/pkg/jwtAuth"
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 )
 
 // NewJWTMiddleware creates a new JWT middleware with the given secret
-func NewJWTMiddleware(secret string) echo.MiddlewareFunc {
+func NewJWTMiddleware(secret []byte) echo.MiddlewareFunc {
 	return echojwt.WithConfig(echojwt.Config{
-		SigningKey: []byte(secret),
+		SigningKey: secret,
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return new(models.JWTClaims)
+			return new(jwtAuth.JWTClaims)
 		},
 		TokenLookup: "header:Authorization:Bearer ",
 		// Запрещаем доступ без токена
@@ -24,15 +24,15 @@ func NewJWTMiddleware(secret string) echo.MiddlewareFunc {
 		SigningMethod: "HS256",
 		ParseTokenFunc: func(c echo.Context, auth string) (interface{}, error) {
 			// Парсинг токена с проверкой подписи
-			token, err := jwt.ParseWithClaims(auth, &models.JWTClaims{}, func(t *jwt.Token) (interface{}, error) {
+			token, err := jwt.ParseWithClaims(auth, &jwtAuth.JWTClaims{}, func(t *jwt.Token) (interface{}, error) {
 				if t.Method.Alg() != "HS256" {
-					return nil, errors.New("unexpected signing method")
+					return nil, fmt.Errorf("unexpected signing method: %v", t.Method.Alg())
 				}
 				return secret, nil
 			})
 
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("parse token: %v", err)
 			}
 
 			return token, nil

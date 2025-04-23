@@ -3,7 +3,7 @@ module github.com/Slava02/SaintDiego/backend/api_gateway
 go 1.24.2
 
 require (
-	github.com/Slava02/SaintDiego/backend/auth v0.0.0-20250423111108-990f3e8593db
+	github.com/Slava02/SaintDiego/backend/auth v0.0.0-20250423111436-6cd4c9e44ba8
 	github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250419102259-266701d3ccea
 	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250421132310-f418824f9975
 	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250421070621-04e9a4832f6a

@@ -1,93 +1,8 @@
 [
   {
-    "method": "GET",
-    "path": "/v1/clients",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetClients-fm"
-  },
-  {
-    "method": "GET",
-    "path": "/v1/events",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetEvents-fm"
-  },
-  {
-    "method": "PUT",
-    "path": "/v1/locations/:id",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PutLocationsId-fm"
-  },
-  {
-    "method": "PUT",
-    "path": "/v1/services/:id",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PutServicesId-fm"
-  },
-  {
-    "method": "GET",
-    "path": "/v1/timeSlots",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetTimeSlots-fm"
-  },
-  {
-    "method": "DELETE",
-    "path": "/v1/timeSlots/:id",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).DeleteTimeSlotsId-fm"
-  },
-  {
-    "method": "PUT",
-    "path": "/v1/clients/:id",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PutClientsId-fm"
-  },
-  {
-    "method": "PUT",
-    "path": "/v1/events/:id/participants",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PutEventsIdParticipants-fm"
-  },
-  {
-    "method": "GET",
-    "path": "/v1/locations",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetLocations-fm"
-  },
-  {
-    "method": "POST",
-    "path": "/v1/login",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PostLogin-fm"
-  },
-  {
-    "method": "GET",
-    "path": "/v1/timeSlots/:id",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetTimeSlotsId-fm"
-  },
-  {
-    "method": "PATCH",
-    "path": "/v1/timeSlots/:id/archive",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PatchTimeSlotsIdArchive-fm"
-  },
-  {
-    "method": "DELETE",
-    "path": "/v1/events/:id",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).DeleteEventsId-fm"
-  },
-  {
-    "method": "PUT",
-    "path": "/v1/events/:id",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PutEventsId-fm"
-  },
-  {
-    "method": "GET",
-    "path": "/v1/services",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetServices-fm"
-  },
-  {
-    "method": "POST",
-    "path": "/v1/volunteers",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PostVolunteers-fm"
-  },
-  {
-    "method": "PUT",
-    "path": "/v1/volunteers/:tg_id",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PutVolunteersTgId-fm"
-  },
-  {
-    "method": "DELETE",
-    "path": "/v1/locations/:id",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).DeleteLocationsId-fm"
+    "method": "echo_route_not_found",
+    "path": "/v1/*",
+    "name": "github.com/labstack/echo/v4.init.func1"
   },
   {
     "method": "GET",
@@ -96,23 +11,78 @@
   },
   {
     "method": "GET",
-    "path": "/v1/events/:id/participants",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetEventsIdParticipants-fm"
+    "path": "/v1/events",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetEvents-fm"
+  },
+  {
+    "method": "DELETE",
+    "path": "/v1/timeSlots/:id",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).DeleteTimeSlotsId-fm"
+  },
+  {
+    "method": "POST",
+    "path": "/v1/volunteers",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PostVolunteers-fm"
+  },
+  {
+    "method": "DELETE",
+    "path": "/v1/events/:id",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).DeleteEventsId-fm"
+  },
+  {
+    "method": "GET",
+    "path": "/v1/locations",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetLocations-fm"
+  },
+  {
+    "method": "POST",
+    "path": "/v1/locations",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PostLocations-fm"
+  },
+  {
+    "method": "POST",
+    "path": "/v1/login",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PostLogin-fm"
   },
   {
     "method": "PUT",
-    "path": "/v1/timeSlots/:id",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PutTimeSlotsId-fm"
+    "path": "/v1/services/:id",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PutServicesId-fm"
   },
   {
-    "method": "echo_route_not_found",
-    "path": "/v1",
-    "name": "github.com/labstack/echo/v4.init.func1"
+    "method": "GET",
+    "path": "/v1/services/:id",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetServicesId-fm"
   },
   {
-    "method": "echo_route_not_found",
-    "path": "/v1/*",
-    "name": "github.com/labstack/echo/v4.init.func1"
+    "method": "PUT",
+    "path": "/v1/events/:id",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PutEventsId-fm"
+  },
+  {
+    "method": "POST",
+    "path": "/v1/clients",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PostClients-fm"
+  },
+  {
+    "method": "PUT",
+    "path": "/v1/clients/:id",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PutClientsId-fm"
+  },
+  {
+    "method": "GET",
+    "path": "/v1/clients/:id/services",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetClientsIdServices-fm"
+  },
+  {
+    "method": "GET",
+    "path": "/v1/services",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetServices-fm"
+  },
+  {
+    "method": "PATCH",
+    "path": "/v1/timeSlots/:id/archive",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PatchTimeSlotsIdArchive-fm"
   },
   {
     "method": "GET",
@@ -125,14 +95,29 @@
     "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetEventsId-fm"
   },
   {
-    "method": "POST",
-    "path": "/v1/locations",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PostLocations-fm"
+    "method": "PUT",
+    "path": "/v1/locations/:id",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PutLocationsId-fm"
   },
   {
     "method": "GET",
-    "path": "/v1/services/:id",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetServicesId-fm"
+    "path": "/v1/volunteers/:tg_id",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetVolunteersTgId-fm"
+  },
+  {
+    "method": "GET",
+    "path": "/v1/events/:id/participants",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetEventsIdParticipants-fm"
+  },
+  {
+    "method": "DELETE",
+    "path": "/v1/locations/:id",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).DeleteLocationsId-fm"
+  },
+  {
+    "method": "GET",
+    "path": "/v1/timeSlots",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetTimeSlots-fm"
   },
   {
     "method": "POST",
@@ -140,23 +125,38 @@
     "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PostTimeSlots-fm"
   },
   {
+    "method": "GET",
+    "path": "/v1/timeSlots/:id",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetTimeSlotsId-fm"
+  },
+  {
+    "method": "PUT",
+    "path": "/v1/volunteers/:tg_id",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PutVolunteersTgId-fm"
+  },
+  {
     "method": "PATCH",
     "path": "/v1/timeSlots/:id/activate",
     "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PatchTimeSlotsIdActivate-fm"
   },
   {
-    "method": "POST",
+    "method": "PUT",
+    "path": "/v1/timeSlots/:id",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PutTimeSlotsId-fm"
+  },
+  {
+    "method": "PUT",
+    "path": "/v1/events/:id/participants",
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PutEventsIdParticipants-fm"
+  },
+  {
+    "method": "echo_route_not_found",
+    "path": "/v1",
+    "name": "github.com/labstack/echo/v4.init.func1"
+  },
+  {
+    "method": "GET",
     "path": "/v1/clients",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).PostClients-fm"
-  },
-  {
-    "method": "GET",
-    "path": "/v1/clients/:id/services",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetClientsIdServices-fm"
-  },
-  {
-    "method": "GET",
-    "path": "/v1/volunteers/:tg_id",
-    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetVolunteersTgId-fm"
+    "name": "github.com/Slava02/SaintDiego/backend/api_gateway/internal/server/v1.(*ServerInterfaceWrapper).GetClients-fm"
   }
 ]
