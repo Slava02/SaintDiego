@@ -10,6 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// TODO: возвращается not found, если пользователь не авторизован, надо поправить
 // NewJWTMiddleware creates a new JWT middleware with the given secret
 func NewJWTMiddleware(secret []byte) echo.MiddlewareFunc {
 	return echojwt.WithConfig(echojwt.Config{
@@ -38,8 +39,11 @@ func NewJWTMiddleware(secret []byte) echo.MiddlewareFunc {
 			return token, nil
 		},
 		ErrorHandler: func(c echo.Context, err error) error {
-			// Перенаправление на страницу логина при любой ошибке JWT
-			return c.Redirect(http.StatusSeeOther, "/login")
+			// Возвращаем 401 Unauthorized при ошибках JWT
+			return c.JSON(http.StatusUnauthorized, map[string]string{
+				"error":   "unauthorized",
+				"message": "Invalid or expired token",
+			})
 		},
 	})
 }

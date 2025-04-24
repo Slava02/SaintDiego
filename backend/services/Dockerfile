@@ -16,21 +16,17 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -o main cmd/services/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o main cmd/services/main.go
 
 # Production stage
 FROM alpine:latest AS production
-
-# Define build argument for config path
-ARG CONFIG_PATH=configs/config.docker.toml
-ENV CONFIG_PATH=${CONFIG_PATH}
 
 WORKDIR /app
 
 # Copy binary and config from builder
 COPY --from=builder /app/main .
-COPY --from=builder /app/${CONFIG_PATH} ./configs/
+COPY --from=builder /app/configs/ ./configs/
 
 # Runtime configuration
 ENTRYPOINT ["./main"]
-CMD ["-config=${CONFIG_PATH}"]
+CMD ["-config=configs/config.docker.toml"]

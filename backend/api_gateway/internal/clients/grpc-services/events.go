@@ -3,11 +3,13 @@ package services
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
 	api "github.com/Slava02/SaintDiego/backend/events/pkg/pb"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 )
 
 //go:generate options-gen -out-filename=events_options.gen.go -from-struct=EventsClientOptions
@@ -30,6 +32,10 @@ func NewEventsClient(opts EventsClientOptions) (*EventsClient, error) {
 
 	// Create gRPC connection with tracing interceptor and blocking mode
 	conn, err := grpc.DialContext(ctx, opts.EventsServerAddr,
+		grpc.WithUnaryInterceptor(retry.UnaryClientInterceptor(
+			retry.WithMax(3),
+			retry.WithPerRetryTimeout(2*time.Second),
+		)),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithBlock(), // Wait for connection to be established
 	)

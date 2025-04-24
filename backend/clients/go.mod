@@ -7,6 +7,7 @@ require (
 	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250419102259-266701d3ccea
 	github.com/go-sql-driver/mysql v1.9.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.1
 	github.com/kazhuravlev/options-gen v0.42.1
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pelletier/go-toml v1.9.5

@@ -3,9 +3,11 @@ package grpc_services
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/Slava02/SaintDiego/backend/clients/internal/models"
 	api "github.com/Slava02/SaintDiego/backend/services/pkg/pb"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -30,6 +32,10 @@ func NewServicesClient(opts ServicesClientOptions) (*ServicesClient, error) {
 
 	// Create gRPC connection with tracing interceptor and blocking mode
 	conn, err := grpc.DialContext(ctx, opts.ServicesServerAddr,
+		grpc.WithUnaryInterceptor(retry.UnaryClientInterceptor(
+			retry.WithMax(3),
+			retry.WithPerRetryTimeout(2*time.Second),
+		)),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithBlock(), // Wait for connection to be established
 	)

@@ -1,12 +1,12 @@
 [global]
-name = "events"
+name = "auth"
 env = "dev"
 
 [log]
 level = "debug"
 
 [server]
-addr = ":50054"
+addr = ":50056"
 max_connection_idle = 10
 timeout = 10
 max_connection_age = 10
@@ -21,3 +21,4 @@ port = "39410"
 
 [jwt]
 secret = "secret"
+token_ttl = "24h"

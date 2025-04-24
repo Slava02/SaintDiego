@@ -1,5 +1,5 @@
 [global]
-name = "api-gateway"
+name = "auth"
 env = "dev"
 
 [log]

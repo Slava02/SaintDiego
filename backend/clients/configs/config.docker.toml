@@ -18,3 +18,7 @@ db_name = "homeless"
 password = "12345ghJkbn"
 user = "homeless"
 port = "39410"
+
+[grpc_client]
+[grpc_client.client_services]
+addr = "host.docker.internal:50052"

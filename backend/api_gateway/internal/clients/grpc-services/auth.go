@@ -3,11 +3,13 @@ package services
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
 	api "github.com/Slava02/SaintDiego/backend/auth/pkg/pb"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 )
 
 //go:generate options-gen -out-filename=auth_options.gen.go -from-struct=AuthClientOptions
@@ -28,10 +30,13 @@ func NewAuthClient(opts AuthClientOptions) (*AuthClient, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), connectionTimeout)
 	defer cancel()
 
-	// Create gRPC connection with tracing interceptor and blocking mode
 	conn, err := grpc.DialContext(ctx, opts.AuthServerAddr,
+		grpc.WithUnaryInterceptor(retry.UnaryClientInterceptor(
+			retry.WithMax(3),
+			retry.WithPerRetryTimeout(2*time.Second),
+		)),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(), // Wait for connection to be established
+		grpc.WithBlock(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to Auth service: %w", err)
