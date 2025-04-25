@@ -33,12 +33,16 @@ paths:
     $ref: paths/events_{id}.yml
   /events/{id}/participants:
     $ref: paths/events_{id}_participants.yml
+  /events/{id}/participants/{participant_id}:
+    $ref: paths/events_{id}_participants_{participant_id}.yml
   /events/services/{id}:
     $ref: paths/events_services_{id}.yml
   /clients:
     $ref: paths/clients.yml
   /clients/{id}:
     $ref: paths/clients_{id}.yml
+  /clients/{id}/events:
+    $ref: paths/clients_{id}_events.yml
   /clients/{id}/services:
     $ref: paths/clients_{id}_services.yml
   /volunteers:

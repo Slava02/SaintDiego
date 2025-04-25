@@ -18,6 +18,8 @@ type IEventsClient interface {
 	AddParticipantToEvent(ctx context.Context, req *pb.AddParticipantToEventRequest) (*pb.AddParticipantToEventResponse, error)
 	GetParticipantsByEventId(ctx context.Context, req *pb.GetParticipantsByEventIdRequest) (*pb.GetParticipantsByEventIdResponse, error)
 	GetEventsByServiceId(ctx context.Context, req *pb.GetEventsByServiceIdRequest) (*pb.GetEventsByServiceIdResponse, error)
+	DeleteParticipantFromEvent(ctx context.Context, req *pb.DeleteParticipantFromEventRequest) (*pb.DeleteParticipantFromEventResponse, error)
+	GetClientsIdEvents(ctx context.Context, req *pb.GetClientsIdEventsRequest) (*pb.GetClientsIdEventsResponse, error)
 }
 
 //go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options
@@ -167,6 +169,40 @@ func (u *UseCase) GetEventsByServiceId(ctx context.Context, params *GetEventsSer
 	pbRes, err := u.eventsClient.GetEventsByServiceId(ctx, pbReq)
 	if err != nil {
 		return nil, 0, fmt.Errorf("get events by service id: %v", err)
+	}
+
+	events := make([]*models.Event, len(pbRes.Events))
+	for i, event := range pbRes.Events {
+		events[i] = convertEventToResponse(event)
+	}
+
+	return events, int32(pbRes.Total), nil
+}
+
+func (u *UseCase) DeleteParticipantFromEvent(ctx context.Context, req *DeleteParticipantFromEventRequest) error {
+	pbReq := &pb.DeleteParticipantFromEventRequest{
+		EventId:       req.EventID,
+		ParticipantId: req.ParticipantID,
+	}
+
+	_, err := u.eventsClient.DeleteParticipantFromEvent(ctx, pbReq)
+	if err != nil {
+		return fmt.Errorf("delete participant from event: %v", err)
+	}
+
+	return nil
+}
+
+func (u *UseCase) GetClientsIdEvents(ctx context.Context, params *GetClientsIdEventsParams) ([]*models.Event, int32, error) {
+	pbReq := &pb.GetClientsIdEventsRequest{
+		Id:      params.ID,
+		Page:    int64(params.Page),
+		PerPage: int64(params.PerPage),
+	}
+
+	pbRes, err := u.eventsClient.GetClientsIdEvents(ctx, pbReq)
+	if err != nil {
+		return nil, 0, fmt.Errorf("get clients id events: %v", err)
 	}
 
 	events := make([]*models.Event, len(pbRes.Events))

@@ -20,6 +20,8 @@ type IEventsUC interface {
 	AddParticipantToEvent(ctx context.Context, req *events.AddParticipantToEventRequest) error
 	GetParticipantsByEventId(ctx context.Context, params *events.GetEventsIdParticipantsParams) ([]*models.Participant, int32, error)
 	GetEventsByServiceId(ctx context.Context, params *events.GetEventsServicesIdParams) ([]*models.Event, int32, error)
+	GetClientsIdEvents(ctx context.Context, params *events.GetClientsIdEventsParams) ([]*models.Event, int32, error)
+	DeleteParticipantFromEvent(ctx context.Context, req *events.DeleteParticipantFromEventRequest) error
 }
 
 func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
@@ -180,6 +182,40 @@ func (h Handlers) GetEventsServicesId(c echo.Context, id int64, params GetEvents
 		PerPage:    req.PerPage,
 		TotalPages: int32(math.Ceil(float64(total) / float64(req.PerPage))),
 	})
+}
+
+func (h Handlers) GetClientsIdEvents(ctx echo.Context, id int64, params GetClientsIdEventsParams) error {
+	var req events.GetClientsIdEventsParams
+	if err := ctx.Bind(&req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	req.ID = id
+
+	events, total, err := h.eventsUC.GetClientsIdEvents(ctx.Request().Context(), &req)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusOK, GetEventsResponse{
+		Items:      convertEventsToResponse(events),
+		Total:      int32(total),
+		Page:       req.Page,
+		PerPage:    req.PerPage,
+		TotalPages: int32(math.Ceil(float64(total) / float64(req.PerPage))),
+	})
+}
+
+func (h Handlers) DeleteEventsIdParticipantsParticipantId(c echo.Context, id int64, participantId int64) error {
+	err := h.eventsUC.DeleteParticipantFromEvent(c.Request().Context(), &events.DeleteParticipantFromEventRequest{
+		EventID:       id,
+		ParticipantID: participantId,
+	})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.NoContent(http.StatusNoContent)
 }
 
 func convertParticipantsToResponse(participants []*models.Participant) []Participant {

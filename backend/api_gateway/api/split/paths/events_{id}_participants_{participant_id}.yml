@@ -1,0 +1,50 @@
+delete:
+  tags:
+    - events
+  summary: Удаление участника из события
+  parameters:
+    - name: id
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+    - name: participant_id
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '204':
+      description: Успешный ответ
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+    '400':
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml

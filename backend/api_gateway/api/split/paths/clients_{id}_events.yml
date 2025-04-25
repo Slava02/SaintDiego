@@ -1,0 +1,53 @@
+get:
+  tags:
+    - clients
+  summary: Получение списка событий клиента
+  parameters:
+    - name: id
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+    - name: history_limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 3
+    - name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 1
+    - name: per_page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 5
+  responses:
+    '200':
+      description: Успешный ответ
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/GetEventsResponse.yml
+    '400':
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
