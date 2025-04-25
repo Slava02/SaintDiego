@@ -6,13 +6,25 @@ import logging
 import aiocron
 from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
+import json
 
 from config import settings
 from src.models.client import Client
 
 
 class ClientService:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(ClientService, cls).__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+
     def __init__(self):
+        if self._initialized:
+            return
+            
         self.api_url = settings.api_url
         self.headers = {
             "Authorization": f"Bearer {settings.api_token.get_secret_value()}"
@@ -22,6 +34,7 @@ class ClientService:
         self.logger = logging.getLogger(__name__)
         self._search_cache: Dict[str, List[Tuple[Client, int]]] = {}
         self._executor = ThreadPoolExecutor(max_workers=4)
+        self._initialized = True
 
     async def start(self):
         """Запуск сервиса и настройка периодического обновления"""
@@ -133,4 +146,31 @@ class ClientService:
 
     def get_client_by_id(self, client_id: int) -> Optional[Client]:
         """Получение клиента по ID"""
-        return self.clients.get(client_id) 
+        return self.clients.get(client_id)
+
+    async def create_client(self, first_name: str, middle_name: str, last_name: str) -> Optional[Client]:
+        """Создание нового клиента"""
+        url = f"{self.api_url}/clients"
+        data = {
+            "first_name": first_name,
+            "middle_name": middle_name,
+            "last_name": last_name
+        }
+        
+        self.logger.info(f"Creating client: {url} with data {json.dumps(data)}")
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, json=data, headers=self.headers) as response:
+                response_text = await response.text()
+                self.logger.info(f"Response from {url}: {response.status} - {response_text}")
+                
+                if response.status == 201:
+                    data = await response.json()
+                    client = Client.from_dict(data)
+                    # Добавляем клиента в локальное хранилище
+                    self.clients[client.id] = client
+                    # Очищаем кэш поиска
+                    self._search_cache.clear()
+                    return client
+                self.logger.error(f"Failed to create client: {response_text}")
+                return None 

@@ -107,24 +107,3 @@ class BookingService:
                 self.logger.error(f"Failed to book event: {response_text}")
                 return False
 
-    async def create_client(self, first_name: str, middle_name: str, last_name: str) -> Optional[Client]:
-        """Создание нового клиента"""
-        url = f"{self.api_url}/clients"
-        data = {
-            "first_name": first_name,
-            "middle_name": middle_name,
-            "last_name": last_name
-        }
-        
-        self.logger.info(f"Creating client: {url} with data {json.dumps(data)}")
-        
-        async with aiohttp.ClientSession() as session:
-            async with session.post(url, json=data, headers=self.headers) as response:
-                response_text = await response.text()
-                self.logger.info(f"Response from {url}: {response.status} - {response_text}")
-                
-                if response.status == 201:
-                    data = await response.json()
-                    return Client.from_dict(data)
-                self.logger.error(f"Failed to create client: {response_text}")
-                return None 

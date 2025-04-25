@@ -21,9 +21,9 @@ class Client:
         blocked_reason: Optional[str] = None
     ):
         self.id = id
-        self.first_name = first_name
-        self.middle_name = middle_name
-        self.last_name = last_name
+        self.first_name = first_name or ""
+        self.middle_name = middle_name or ""
+        self.last_name = last_name or ""
         self.is_homeless = is_homeless
         self.photo_name = photo_name
         self.birth_date = birth_date
@@ -34,8 +34,8 @@ class Client:
         self.blocked_reason = blocked_reason
         
         # Предварительная обработка строк для поиска
-        self._search_name = self._normalize_name(f"{last_name} {first_name} {middle_name}")
-        self._search_name_reversed = self._normalize_name(f"{first_name} {middle_name} {last_name}")
+        self._search_name = self._normalize_name(f"{self.last_name} {self.first_name} {self.middle_name}")
+        self._search_name_reversed = self._normalize_name(f"{self.first_name} {self.middle_name} {self.last_name}")
         
         # Кэш для хранения результатов сравнения
         self._similarity_cache: Dict[str, int] = {}
@@ -48,6 +48,9 @@ class Client:
         - Удаление лишних пробелов
         - Удаление специальных символов
         """
+        if not name:
+            return ""
+            
         # Приводим к нижнему регистру и удаляем лишние пробелы
         name = name.lower().strip()
         # Удаляем специальные символы, оставляем только буквы и пробелы
@@ -76,9 +79,9 @@ class Client:
 
         return cls(
             id=data['id'],
-            first_name=data['first_name'],
-            middle_name=data['middle_name'],
-            last_name=data['last_name'],
+            first_name=data.get('first_name', ''),
+            middle_name=data.get('middle_name', ''),
+            last_name=data.get('last_name', ''),
             is_homeless=data.get('is_homeless', False),
             photo_name=data.get('photo_name'),
             birth_date=birth_date,
@@ -109,7 +112,7 @@ class Client:
     @property
     def full_name(self) -> str:
         """Полное ФИО"""
-        return f"{self.last_name} {self.first_name} {self.middle_name}"
+        return f"{self.last_name} {self.first_name} {self.middle_name}".strip()
 
     @property
     def search_name(self) -> str:
@@ -121,8 +124,20 @@ class Client:
         Вычисляет степень схожести с поисковым запросом
         Возвращает максимальный score из различных методов сравнения
         """
+        # Если поисковый запрос пустой, возвращаем 0
+        if not search_query or not search_query.strip():
+            return 0
+            
+        # Если имя клиента пустое, возвращаем 0
+        if not self._search_name or not self._search_name.strip():
+            return 0
+            
         # Нормализуем поисковый запрос
         search_query = self._normalize_name(search_query)
+        
+        # Если после нормализации запрос пустой, возвращаем 0
+        if not search_query:
+            return 0
         
         # Проверяем кэш
         if search_query in self._similarity_cache:

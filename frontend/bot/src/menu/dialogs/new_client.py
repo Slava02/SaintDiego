@@ -1,22 +1,28 @@
+import logging
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import Message
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.text import Const, Format
-from aiogram_dialog.widgets.kbd import Button, Row, Back
+from aiogram_dialog.widgets.kbd import Button, Row, Back, Select, Column
 from aiogram_dialog.widgets.input import MessageInput
-import logging
 
 from src.utils.validators import validate_full_name
-from src.services.booking import BookingService
+from src.services.client import ClientService
+from src.models.client import Client
 
 logger = logging.getLogger(__name__)
 
+# Get singleton instance of ClientService
+client_service = ClientService()
+
 class NewClientSG(StatesGroup):
+    """States for new client dialog"""
     input_name = State()
+    check_existing = State()
     confirm = State()
 
 async def name_handler(message: Message, widget: MessageInput, manager: DialogManager):
-    """Обработчик ввода ФИО"""
+    """Handle name input"""
     logger.info(f"Processing name input: {message.text}")
     
     is_valid, error_message, name_parts = validate_full_name(message.text)
@@ -29,16 +35,46 @@ async def name_handler(message: Message, widget: MessageInput, manager: DialogMa
     first_name, middle_name, last_name = name_parts
     logger.info(f"Valid name parts: first_name={first_name}, middle_name={middle_name}, last_name={last_name}")
     
-    # Сохраняем данные в dialog_data
+    # Save data in dialog_data
     manager.dialog_data["first_name"] = first_name
     manager.dialog_data["middle_name"] = middle_name
     manager.dialog_data["last_name"] = last_name
     
+    # Check for existing clients
+    existing_clients = client_service.find_client_by_name(
+        full_name=f"{last_name} {first_name} {middle_name}",
+        min_similarity=98,
+        limit=3
+    )
+    
+    if existing_clients:
+        # Save existing clients for display
+        manager.dialog_data["existing_clients"] = [
+            {
+                "id": client.id,
+                "full_name": client.full_name,
+                "birth_date": "НОВЫЙ" if client.is_new else (client.birth_date.strftime("%d.%m.%Y") if client.birth_date else ""),
+                "is_new": client.is_new
+            }
+            for client, _ in existing_clients
+        ]
+        await manager.switch_to(NewClientSG.check_existing)
+    else:
+        await manager.switch_to(NewClientSG.confirm)
+    
     await message.delete()
-    await manager.next()
+
+async def get_existing_clients_data(dialog_manager: DialogManager, **kwargs):
+    """Get data for existing clients window"""
+    return {
+        "clients": dialog_manager.dialog_data.get("existing_clients", []),
+        "first_name": dialog_manager.dialog_data.get("first_name"),
+        "middle_name": dialog_manager.dialog_data.get("middle_name"),
+        "last_name": dialog_manager.dialog_data.get("last_name"),
+    }
 
 async def get_name_data(dialog_manager: DialogManager, **kwargs):
-    """Геттер для данных имени"""
+    """Get data for name confirmation window"""
     return {
         "first_name": dialog_manager.dialog_data.get("first_name"),
         "middle_name": dialog_manager.dialog_data.get("middle_name"),
@@ -46,10 +82,9 @@ async def get_name_data(dialog_manager: DialogManager, **kwargs):
     }
 
 async def on_confirm(callback, button, manager: DialogManager):
-    """Обработчик подтверждения"""
-    # Создаем нового клиента
-    booking_service = BookingService()
-    client = await booking_service.create_client(
+    """Handle confirmation"""
+    # Create new client
+    client = await client_service.create_client(
         first_name=manager.dialog_data["first_name"],
         middle_name=manager.dialog_data["middle_name"],
         last_name=manager.dialog_data["last_name"]
@@ -57,7 +92,7 @@ async def on_confirm(callback, button, manager: DialogManager):
     
     if client:
         logger.info(f"Client created successfully: {client}")
-        # Сохраняем ID клиента в dialog_data
+        # Save client ID in dialog_data
         manager.dialog_data["client_id"] = client.id
         await manager.done({"client_id": client.id})
     else:
@@ -65,7 +100,11 @@ async def on_confirm(callback, button, manager: DialogManager):
         await callback.message.answer("❌ Произошла ошибка при создании клиента")
         await manager.done()
 
-# Диалог ввода ФИО
+async def on_create_new(callback, button, manager: DialogManager):
+    """Handle create new client button click"""
+    await manager.switch_to(NewClientSG.confirm)
+
+# Name input dialog
 new_client_dialog = Dialog(
     Window(
         Const("Введите ФИО нового посетителя в формате:\nИмя Отчество Фамилия"),
@@ -74,6 +113,25 @@ new_client_dialog = Dialog(
             content_types=["text"]
         ),
         state=NewClientSG.input_name,
+    ),
+    Window(
+        Format("Найдены похожие клиенты:\n\n"
+               "Выберите существующего клиента или создайте нового:"),
+        Column(
+            Select(
+                Format("{item[full_name]} ({item[birth_date]})"),
+                id="existing_clients",
+                item_id_getter=lambda x: str(x["id"]),
+                items="clients",
+                on_click=lambda c, b, m: None  # TODO: Add handler for existing client selection
+            ),
+        ),
+        Row(
+            Back(Const("◀️ Назад")),
+            Button(Const("➕ Создать нового"), id="create_new", on_click=on_create_new),
+        ),
+        state=NewClientSG.check_existing,
+        getter=get_existing_clients_data,
     ),
     Window(
         Format("Проверьте данные:\n\n"

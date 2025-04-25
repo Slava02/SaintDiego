@@ -27,8 +27,8 @@ from config import settings
 from src.handlers.registration import router as registration_router
 from src.handlers.menu import router as menu_router
 from src.services.client import ClientService
-from src.dialogs.menu import menu_dialog
-from src.dialogs.new_client import new_client_dialog
+from src.menu import menu_dialog
+from src.menu.dialogs import new_client_dialog
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
