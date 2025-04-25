@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Slava02/SaintDiego/backend/schedule/internal/models"
 	"github.com/Slava02/SaintDiego/backend/schedule/internal/usecases/locations"
@@ -70,6 +71,9 @@ func (i *Implementation) UpdateLocation(ctx context.Context, req *pb.UpdateLocat
 		Address: req.Address,
 	})
 	if err != nil {
+		if errors.Is(err, locations.ErrLocationNotFound) {
+			return nil, status.Errorf(codes.NotFound, "location not found")
+		}
 		return nil, status.Errorf(codes.Internal, "failed to update location: %v", err)
 	}
 
@@ -86,6 +90,9 @@ func (i *Implementation) DeleteLocation(ctx context.Context, req *pb.DeleteLocat
 
 	err := i.locationsUC.DeleteLocation(ctx, req.Id)
 	if err != nil {
+		if errors.Is(err, locations.ErrLocationNotFound) {
+			return nil, status.Errorf(codes.NotFound, "location not found")
+		}
 		return nil, status.Errorf(codes.Internal, "failed to delete location: %v", err)
 	}
 

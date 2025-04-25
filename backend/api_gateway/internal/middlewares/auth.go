@@ -41,8 +41,8 @@ func NewJWTMiddleware(secret []byte) echo.MiddlewareFunc {
 		ErrorHandler: func(c echo.Context, err error) error {
 			// Возвращаем 401 Unauthorized при ошибках JWT
 			return c.JSON(http.StatusUnauthorized, map[string]string{
-				"error":   "unauthorized",
-				"message": "Invalid or expired token",
+				"message": "unauthorized",
+				"details": "Invalid or expired token",
 			})
 		},
 	})

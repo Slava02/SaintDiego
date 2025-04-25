@@ -2,11 +2,13 @@ package timeSlots
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"slices"
 	"time"
 
 	"github.com/Slava02/SaintDiego/backend/schedule/internal/models"
+	timeSlotsRepo "github.com/Slava02/SaintDiego/backend/schedule/internal/repositories/timeSlots_repo"
 )
 
 //go:generate mockery --name ITimeSlotsRepository --output ./mocks --outpkg mocks --case underscore
@@ -33,6 +35,10 @@ type IServicesClient interface {
 type Transactor interface {
 	WithinTransaction(ctx context.Context, tFunc func(ctx context.Context) error) error
 }
+
+var (
+	ErrTimeSlotNotFound = errors.New("time slot not found")
+)
 
 //go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options
 type Options struct {
@@ -99,14 +105,35 @@ func (u UseCase) CreateTimeSlot(ctx context.Context, req *CreateTimeSlotReq) (*m
 }
 
 func (u UseCase) GetTimeSlots(ctx context.Context, req *GetTimeSlotsReq) ([]*models.TimeSlot, error) {
-	return u.timeSlotsRepository.GetTimeSlots(ctx, req.Status, req.StartDate, req.EndDate)
+	timeSlots, err := u.timeSlotsRepository.GetTimeSlots(ctx, req.Status, req.StartDate, req.EndDate)
+	if err != nil {
+		if errors.Is(err, timeSlotsRepo.ErrTimeSlotNotFound) {
+			return nil, fmt.Errorf("get time slots: %v", err)
+		}
+		return nil, fmt.Errorf("get time slots: %v", err)
+	}
+
+	return timeSlots, nil
 }
 
 func (u UseCase) GetTimeSlot(ctx context.Context, id int64) (*models.TimeSlot, error) {
-	return u.timeSlotsRepository.GetTimeSlot(ctx, id)
+	timeSlot, err := u.timeSlotsRepository.GetTimeSlot(ctx, id)
+	if err != nil {
+		if errors.Is(err, timeSlotsRepo.ErrTimeSlotNotFound) {
+			return nil, fmt.Errorf("get time slot: %v", err)
+		}
+		return nil, fmt.Errorf("get time slot: %v", err)
+	}
+
+	return timeSlot, nil
 }
 
 func (u UseCase) DeleteTimeSlot(ctx context.Context, id int64) error {
+	_, err := u.GetTimeSlot(ctx, id)
+	if err != nil {
+		return fmt.Errorf("get time slot: %v", err)
+	}
+
 	if err := u.timeSlotsRepository.DeleteTimeSlot(ctx, id); err != nil {
 		return fmt.Errorf("delete time slot: %v", err)
 	}
@@ -115,7 +142,7 @@ func (u UseCase) DeleteTimeSlot(ctx context.Context, id int64) error {
 }
 
 func (u UseCase) ActivateTimeSlot(ctx context.Context, id int64) error {
-	timeSlot, err := u.timeSlotsRepository.GetTimeSlot(ctx, id)
+	timeSlot, err := u.GetTimeSlot(ctx, id)
 	if err != nil {
 		return fmt.Errorf("get time slot: %v", err)
 	}
@@ -128,7 +155,7 @@ func (u UseCase) ActivateTimeSlot(ctx context.Context, id int64) error {
 }
 
 func (u UseCase) ArchiveTimeSlot(ctx context.Context, id int64) error {
-	timeSlot, err := u.timeSlotsRepository.GetTimeSlot(ctx, id)
+	timeSlot, err := u.GetTimeSlot(ctx, id)
 	if err != nil {
 		return fmt.Errorf("get time slot: %v", err)
 	}

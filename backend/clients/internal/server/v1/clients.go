@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Slava02/SaintDiego/backend/clients/internal/models"
 	"github.com/Slava02/SaintDiego/backend/clients/internal/usecases/clients"
@@ -51,7 +52,12 @@ func (i *Implementation) GetClientById(ctx context.Context, req *pb.GetClientByI
 
 	client, err := i.clientsUC.GetClientByID(ctx, req.Id)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get client: %v", err)
+		switch {
+		case errors.Is(err, clients.ErrClientNotFound):
+			return nil, status.Errorf(codes.NotFound, "client not found")
+		default:
+			return nil, status.Errorf(codes.Internal, "failed to get client: %v", err)
+		}
 	}
 
 	return convertModelClientToPB(client), nil
@@ -85,7 +91,12 @@ func (i *Implementation) BlockClient(ctx context.Context, req *pb.BlockClientReq
 		BlockReason: req.BlockReason,
 	})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to block client: %v", err)
+		switch {
+		case errors.Is(err, clients.ErrClientNotFound):
+			return nil, status.Errorf(codes.NotFound, "client not found")
+		default:
+			return nil, status.Errorf(codes.Internal, "failed to block client: %v", err)
+		}
 	}
 
 	return convertModelClientToPB(client), nil
@@ -103,7 +114,14 @@ func (i *Implementation) GetClientServices(ctx context.Context, req *pb.GetClien
 		PerPage:  int32(req.PerPage),
 	})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get client services: %v", err)
+		switch {
+		case errors.Is(err, clients.ErrClientNotFound):
+			return nil, status.Errorf(codes.NotFound, "client not found")
+		case errors.Is(err, clients.ErrServiceTypeNotFound):
+			return nil, status.Errorf(codes.NotFound, "service type not found")
+		default:
+			return nil, status.Errorf(codes.Internal, "failed to get client services: %v", err)
+		}
 	}
 
 	pbServices := make([]*pb.ServiceType, len(services))

@@ -28,7 +28,7 @@ type UseCase struct {
 
 func New(opts Options) (*UseCase, error) {
 	if err := opts.Validate(); err != nil {
-		return nil, fmt.Errorf("validate options: %v", err)
+		return nil, fmt.Errorf("validate options: %w", err)
 	}
 
 	return &UseCase{
@@ -44,7 +44,7 @@ func (u *UseCase) GetClients(ctx context.Context, params *GetClientParams) ([]*m
 
 	pbRes, err := u.clientsClient.GetClients(ctx, pbReq)
 	if err != nil {
-		return nil, 0, fmt.Errorf("get clients: %v", err)
+		return nil, 0, fmt.Errorf("get clients: %w", err)
 	}
 
 	clients := make([]*models.Client, len(pbRes.Clients))
@@ -62,7 +62,7 @@ func (u *UseCase) GetClientsId(ctx context.Context, id int64) (*models.Client, e
 
 	pbRes, err := u.clientsClient.GetClientById(ctx, pbReq)
 	if err != nil {
-		return nil, fmt.Errorf("get client by id: %v", err)
+		return nil, fmt.Errorf("get client by id: %w", err)
 	}
 
 	return convertClientToResponse(pbRes), nil
@@ -77,7 +77,7 @@ func (u *UseCase) PostClients(ctx context.Context, req *CreateClientRequest) (*m
 
 	pbRes, err := u.clientsClient.CreateClient(ctx, pbReq)
 	if err != nil {
-		return nil, fmt.Errorf("create client: %v", err)
+		return nil, fmt.Errorf("create client: %w", err)
 	}
 
 	return convertClientToResponse(pbRes), nil
@@ -92,7 +92,7 @@ func (u *UseCase) PutClientsId(ctx context.Context, req *BlockClientRequest) (*m
 
 	pbRes, err := u.clientsClient.BlockClient(ctx, pbReq)
 	if err != nil {
-		return nil, fmt.Errorf("block client: %v", err)
+		return nil, fmt.Errorf("block client: %w", err)
 	}
 
 	return convertClientToResponse(pbRes), nil
@@ -107,7 +107,7 @@ func (u *UseCase) GetClientsIdServices(ctx context.Context, params *GetClientsId
 
 	pbRes, err := u.clientsClient.GetClientServices(ctx, pbReq)
 	if err != nil {
-		return nil, 0, fmt.Errorf("get client services: %v", err)
+		return nil, 0, fmt.Errorf("get client services: %w", err)
 	}
 
 	services := make([]*models.ServiceType, len(pbRes.Services))

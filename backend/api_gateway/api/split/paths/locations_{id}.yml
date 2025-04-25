@@ -30,6 +30,18 @@ put:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
+    '401':
+      description: Access denied
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
     '500':
       description: Internal server error
       content:
@@ -61,6 +73,18 @@ delete:
                 type: boolean
     '400':
       description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '401':
+      description: Access denied
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '404':
+      description: Not found
       content:
         application/json:
           schema:

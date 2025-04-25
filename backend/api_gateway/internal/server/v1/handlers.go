@@ -2,6 +2,8 @@ package v1
 
 import (
 	"fmt"
+
+	"github.com/Slava02/SaintDiego/backend/common/pointer"
 )
 
 //go:generate options-gen -out-filename=handlers_options.gen.go -from-struct=Options
@@ -41,4 +43,11 @@ func NewHandlers(opts Options) (Handlers, error) {
 		clientUC:    opts.clientUC,
 		authUC:      opts.authUC,
 	}, nil
+}
+
+func Err(msg string, details string) any {
+	return Error{
+		Message: msg,
+		Details: pointer.PtrWithZeroAsNil(details),
+	}
 }

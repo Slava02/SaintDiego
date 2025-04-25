@@ -15,12 +15,12 @@ type IAuthUC interface {
 func (h Handlers) PostLogin(ctx echo.Context) error {
 	var req auth.LoginRequest
 	if err := ctx.Bind(&req); err != nil {
-		return ctx.JSON(http.StatusBadRequest, err.Error())
+		return ctx.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
 	}
 
 	response, err := h.authUC.Login(ctx.Request().Context(), &req)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
+		return ctx.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
 	}
 
 	return ctx.JSON(http.StatusOK, LoginResponse{

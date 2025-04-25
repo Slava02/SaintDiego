@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Slava02/SaintDiego/backend/volunteers/internal/models"
 	"github.com/Slava02/SaintDiego/backend/volunteers/internal/usecases/volunteers"
@@ -48,6 +49,9 @@ func (v *Implementation) GetVolunteerByTgId(ctx context.Context, req *pb.GetVolu
 
 	volunteer, err := v.volunteersUC.GetVolunteerByTgId(ctx, req.TgId)
 	if err != nil {
+		if errors.Is(err, volunteers.ErrVolunteerNotFound) {
+			return nil, status.Errorf(codes.NotFound, "volunteer not found")
+		}
 		return nil, status.Errorf(codes.Internal, "failed to get volunteer by tg id: %v", err)
 	}
 
@@ -73,6 +77,9 @@ func (v *Implementation) UpdateVolunteer(ctx context.Context, req *pb.UpdateVolu
 
 	volunteer, err := v.volunteersUC.UpdateVolunteer(ctx, updateVolunteerReq)
 	if err != nil {
+		if errors.Is(err, volunteers.ErrVolunteerNotFound) {
+			return nil, status.Errorf(codes.NotFound, "volunteer not found")
+		}
 		return nil, status.Errorf(codes.Internal, "failed to update volunteer: %v", err)
 	}
 

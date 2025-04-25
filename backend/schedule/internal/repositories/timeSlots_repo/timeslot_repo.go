@@ -12,6 +12,10 @@ import (
 	"github.com/uptrace/bun"
 )
 
+var (
+	ErrTimeSlotNotFound = errors.New("time slot not found")
+)
+
 //go:generate options-gen -out-filename=timeslot_repo_options.gen.go -from-struct=Options
 type Options struct {
 	DB *storage.Database `option:"mandatory" validate:"required"`
@@ -34,6 +38,9 @@ func (r *TimeSlotRepository) InsertUpdateTimeSlot(ctx context.Context, timeSlot 
 		Set("status = ?", timeSlot.Status).
 		Exec(ctx)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%w", ErrTimeSlotNotFound)
+		}
 		return nil, fmt.Errorf("create time slot: %w", err)
 	}
 
@@ -154,6 +161,9 @@ func (r *TimeSlotRepository) GetTimeSlot(ctx context.Context, id int64) (*models
 		Where("id = ?", id).
 		Scan(ctx)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%w", ErrTimeSlotNotFound)
+		}
 		return nil, fmt.Errorf("select time slot: %w", err)
 	}
 

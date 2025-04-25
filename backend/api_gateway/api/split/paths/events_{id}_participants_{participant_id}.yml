@@ -36,8 +36,8 @@ delete:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    '403':
-      description: Forbidden
+    '401':
+      description: Access denied
       content:
         application/json:
           schema:

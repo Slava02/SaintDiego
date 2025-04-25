@@ -2,11 +2,9 @@ package serverclient
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	oapimdlwr "github.com/oapi-codegen/echo-middleware"
@@ -82,12 +80,6 @@ func New(opts Options) (*Server, error) {
 	)
 
 	v1.RegisterHandlers(v1Group, opts.v1Handlers)
-
-	data, err := json.MarshalIndent(e.Routes(), "", "  ")
-	if err != nil {
-		return nil, fmt.Errorf("marshal routes: %v", err)
-	}
-	os.WriteFile("backend/api_gateway/internal/server/routes.json", data, 0644)
 
 	return &Server{
 		lg: zap.L().Named(nameServer),

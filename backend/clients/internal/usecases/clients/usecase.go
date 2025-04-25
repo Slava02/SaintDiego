@@ -2,11 +2,15 @@ package clients
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/Slava02/SaintDiego/backend/clients/internal/models"
+	"github.com/Slava02/SaintDiego/backend/clients/internal/repositories/clients_repo"
 	"github.com/Slava02/SaintDiego/backend/common/pointer"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type IClientsRepository interface {
@@ -27,6 +31,11 @@ const (
 	PrimaryInterviewClientAvailableServiceTypeID = 15
 )
 
+var (
+	ErrClientNotFound      = errors.New("client not found")
+	ErrServiceTypeNotFound = errors.New("service type not found")
+)
+
 //go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options
 type Options struct {
 	ClientsRepository IClientsRepository `option:"mandatory" validate:"required"`
@@ -40,7 +49,7 @@ type UseCase struct {
 
 func New(opts Options) (*UseCase, error) {
 	if err := opts.Validate(); err != nil {
-		return nil, fmt.Errorf("validate options: %v", err)
+		return nil, fmt.Errorf("validate options: %w", err)
 	}
 
 	return &UseCase{
@@ -65,6 +74,9 @@ func (u *UseCase) GetClients(ctx context.Context, req *GetClientsReq) ([]*models
 func (u *UseCase) GetClientByID(ctx context.Context, id int64) (*models.Client, error) {
 	client, err := u.clientsRepository.GetClientByID(ctx, id)
 	if err != nil {
+		if errors.Is(err, clients_repo.ErrClientNotFound) {
+			return nil, fmt.Errorf("get client by id: %w", ErrClientNotFound)
+		}
 		return nil, fmt.Errorf("get client by id: %w", err)
 	}
 
@@ -79,26 +91,49 @@ func (u *UseCase) CreateClient(ctx context.Context, req *CreateClientReq) (*mode
 		MiddleName: req.MiddleName,
 	}
 
-	return u.clientsRepository.CreateClient(ctx, client)
+	client, err := u.clientsRepository.CreateClient(ctx, client)
+	if err != nil {
+		return nil, fmt.Errorf("create client: %w", err)
+	}
+
+	return client, nil
 }
 
 func (u *UseCase) BlockClient(ctx context.Context, req *BlockClientReq) (*models.Client, error) {
 	if req.IsBlocked {
-		return u.clientsRepository.BlockClient(ctx, req.ID, req.BlockReason)
+		client, err := u.clientsRepository.BlockClient(ctx, req.ID, req.BlockReason)
+		if err != nil {
+			if errors.Is(err, clients_repo.ErrClientNotFound) {
+				return nil, fmt.Errorf("block client: %w", ErrClientNotFound)
+			}
+			return nil, fmt.Errorf("block client: %w", err)
+		}
+
+		return client, nil
 	}
 
-	return u.clientsRepository.UnblockClient(ctx, req.ID)
+	client, err := u.clientsRepository.UnblockClient(ctx, req.ID)
+	if err != nil {
+		if errors.Is(err, clients_repo.ErrClientNotFound) {
+			return nil, fmt.Errorf("unblock client: %w", ErrClientNotFound)
+		}
+		return nil, fmt.Errorf("unblock client: %w", err)
+	}
+
+	return client, nil
 }
 
 func (u *UseCase) GetClientServices(ctx context.Context, req *GetClientServicesReq) ([]*models.ServiceTypes, int64, error) {
 
 	client, err := u.clientsRepository.GetClientByID(ctx, req.ClientID)
 	if err != nil {
+		if errors.Is(err, clients_repo.ErrClientNotFound) {
+			return nil, 0, fmt.Errorf("get client by id: %w", ErrClientNotFound)
+		}
 		return nil, 0, fmt.Errorf("get client by id: %w", err)
 	}
 
 	// Если клиент заблокирован или не посещал центр более года, то ему доступна услуга "Повторное собеседование"
-	// TODO: тут нужно вернуть ошибку, что клиент заблокирован или не посещал центр более года
 	if pointer.Indirect(client.IsBlocked) || clientLastVisitMoreThanYearAgo(client) {
 		serviceType, err := u.servicesClient.GetServiceTypeById(ctx, ReinterviewClientAvailableServiceTypeID)
 		if err != nil {
@@ -109,10 +144,16 @@ func (u *UseCase) GetClientServices(ctx context.Context, req *GetClientServicesR
 	}
 
 	// Если клиент новый, то ему доступна услуга "Первичное собеседование"
-	// TODO: тут нужно вернуть ошибку, что клиент новый
 	if clientIsNew(client) {
 		serviceType, err := u.servicesClient.GetServiceTypeById(ctx, PrimaryInterviewClientAvailableServiceTypeID)
 		if err != nil {
+			if e, ok := status.FromError(err); ok {
+				switch e.Code() {
+				case codes.NotFound:
+					return nil, 0, fmt.Errorf("get service type by id: %w", ErrServiceTypeNotFound)
+				}
+			}
+
 			return nil, 0, fmt.Errorf("get service type by id: %w", err)
 		}
 
@@ -121,6 +162,9 @@ func (u *UseCase) GetClientServices(ctx context.Context, req *GetClientServicesR
 
 	services, total, err := u.clientsRepository.GetClientServices(ctx, client.Id, req.Page, req.PerPage)
 	if err != nil {
+		if errors.Is(err, clients_repo.ErrClientNotFound) {
+			return nil, 0, fmt.Errorf("get client services: %w", ErrClientNotFound)
+		}
 		return nil, 0, fmt.Errorf("get client services: %w", err)
 	}
 

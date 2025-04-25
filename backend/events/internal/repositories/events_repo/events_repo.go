@@ -10,8 +10,11 @@ import (
 	"github.com/Slava02/SaintDiego/backend/common/storage"
 	"github.com/Slava02/SaintDiego/backend/events/internal/models"
 	"github.com/uptrace/bun"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+)
+
+var (
+	ErrEventNotFound  = errors.New("event not found")
+	ErrClientNotFound = errors.New("client not found")
 )
 
 //go:generate options-gen -out-filename=events_repo_options.gen.go -from-struct=Options
@@ -45,7 +48,6 @@ func (r *EventRepository) GetEvents(ctx context.Context, params *GetEventsParams
 		query = query.Where("time_slot.location_id = ?", *params.LocationID)
 	}
 
-	// TODO: потестить
 	if params.ParticipantID != nil {
 		query = query.Where("ec.client_id = ?", *params.ParticipantID)
 	}
@@ -92,7 +94,7 @@ func (r *EventRepository) GetEvent(ctx context.Context, id int64) (*models.Event
 		Scan(ctx)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, status.Errorf(codes.NotFound, "event not found")
+			return nil, fmt.Errorf("%w", ErrEventNotFound)
 		}
 
 		return nil, fmt.Errorf("scan event: %w", err)
@@ -101,17 +103,15 @@ func (r *EventRepository) GetEvent(ctx context.Context, id int64) (*models.Event
 }
 
 func (r *EventRepository) UpdateEvent(ctx context.Context, id int64, capacity int32, datetime time.Time) (*models.Event, error) {
-	existingEvent := &models.Event{}
-
-	err := r.db.Select(ctx, existingEvent).Where("id = ?", id).Scan(ctx)
+	existingEvent, err := r.GetEvent(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("get existing event: %w", err)
+		return nil, fmt.Errorf("get event: %w", err)
 	}
 
 	// Update only capacity and datetime
 	_, err = r.db.Update(ctx, &models.Event{}).
-		Column("capacity").
-		Column("datetime").
+		Set("capacity = ?", capacity).
+		Set("datetime = ?", datetime).
 		Where("id = ?", id).
 		Exec(ctx)
 	if err != nil {
@@ -124,6 +124,8 @@ func (r *EventRepository) UpdateEvent(ctx context.Context, id int64, capacity in
 		Datetime:          datetime,
 		TimeSlotServiceID: existingEvent.TimeSlotServiceID,
 		ServiceTypeID:     existingEvent.ServiceTypeID,
+		ParticipantsCount: existingEvent.ParticipantsCount,
+		ServiceName:       existingEvent.ServiceName,
 	}, nil
 }
 
@@ -142,6 +144,9 @@ func (r *EventRepository) AddParticipantToEvent(ctx context.Context, eventID, cl
 		VolunteerID: volunteerID,
 	}).Exec(ctx)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return fmt.Errorf("%w", ErrEventNotFound)
+		}
 		return fmt.Errorf("add participant to event: %w", err)
 	}
 	return nil
@@ -206,13 +211,22 @@ func (r *EventRepository) GetEventsByServiceId(ctx context.Context, serviceID in
 }
 
 func (r *EventRepository) GetTimeSlotIDByEventID(ctx context.Context, eventID int64) (int64, error) {
+	_, err := r.GetEvent(ctx, eventID)
+	if err != nil {
+		if errors.Is(err, ErrEventNotFound) {
+			return 0, fmt.Errorf("%w", ErrEventNotFound)
+		}
+
+		return 0, fmt.Errorf("get event: %w", err)
+	}
+
 	type TimeSlotID struct {
 		bun.BaseModel `bun:"table:time_slot,alias:ts"`
 		ID            int64 `bun:"id"`
 	}
 
 	var timeSlotID TimeSlotID
-	err := r.db.Select(ctx, &timeSlotID).
+	err = r.db.Select(ctx, &timeSlotID).
 		ColumnExpr("ts.id").
 		Join("JOIN time_slot_service tss ON ts.id = tss.time_slot_id").
 		Join("JOIN event e ON tss.id = e.time_slot_service_id").
@@ -221,6 +235,7 @@ func (r *EventRepository) GetTimeSlotIDByEventID(ctx context.Context, eventID in
 	if err != nil {
 		return 0, fmt.Errorf("get time slot id: %w", err)
 	}
+
 	return timeSlotID.ID, nil
 }
 
@@ -270,4 +285,17 @@ func (r *EventRepository) GetClientsIdEvents(ctx context.Context, clientID int64
 	}
 
 	return events, int64(total), nil
+}
+
+func (r *EventRepository) GetClient(ctx context.Context, clientID int64) (*models.Client, error) {
+	var client models.Client
+	err := r.db.Select(ctx, &client).Where("id = ?", clientID).Scan(ctx)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%w", ErrClientNotFound)
+		}
+		return nil, fmt.Errorf("get client: %w", err)
+	}
+
+	return &client, nil
 }

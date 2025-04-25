@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Slava02/SaintDiego/backend/events/internal/models"
 	"github.com/Slava02/SaintDiego/backend/events/internal/usecases/events"
@@ -47,13 +48,18 @@ func (s *Implementation) GetEvents(ctx context.Context, req *pb.GetEventsRequest
 		eventParams.ToDate = &toDate
 	}
 
-	events, total, err := s.eventsUC.GetEvents(ctx, eventParams)
+	eventsResponse, total, err := s.eventsUC.GetEvents(ctx, eventParams)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get events: %v", err)
+		switch {
+		case errors.Is(err, events.ErrClientNotFound):
+			return nil, status.Errorf(codes.NotFound, "client not found")
+		default:
+			return nil, status.Errorf(codes.Internal, "failed to get events: %v", err)
+		}
 	}
 
-	pbEvents := make([]*pb.Event, len(events))
-	for i, event := range events {
+	pbEvents := make([]*pb.Event, len(eventsResponse))
+	for i, event := range eventsResponse {
 		pbEvents[i] = convertModelEventToPB(event)
 	}
 
@@ -71,7 +77,12 @@ func (s *Implementation) GetEventById(ctx context.Context, req *pb.GetEventByIdR
 
 	event, err := s.eventsUC.GetEvent(ctx, req.Id)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get event: %v", err)
+		switch {
+		case errors.Is(err, events.ErrEventNotFound):
+			return nil, status.Errorf(codes.NotFound, "event not found")
+		default:
+			return nil, status.Errorf(codes.Internal, "failed to get event: %v", err)
+		}
 	}
 
 	return convertModelEventToPB(event), nil
@@ -89,7 +100,12 @@ func (s *Implementation) UpdateEvent(ctx context.Context, req *pb.UpdateEventReq
 		Datetime: req.Datetime.AsTime(),
 	})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to update event: %v", err)
+		switch {
+		case errors.Is(err, events.ErrEventNotFound):
+			return nil, status.Errorf(codes.NotFound, "event not found")
+		default:
+			return nil, status.Errorf(codes.Internal, "failed to update event: %v", err)
+		}
 	}
 
 	return convertModelEventToPB(event), nil
@@ -103,7 +119,12 @@ func (s *Implementation) DeleteEvent(ctx context.Context, req *pb.DeleteEventReq
 
 	err := s.eventsUC.DeleteEvent(ctx, req.Id)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to delete event: %v", err)
+		switch {
+		case errors.Is(err, events.ErrEventNotFound):
+			return nil, status.Errorf(codes.NotFound, "event not found")
+		default:
+			return nil, status.Errorf(codes.Internal, "failed to delete event: %v", err)
+		}
 	}
 
 	return &pb.DeleteEventResponse{
@@ -126,7 +147,18 @@ func (s *Implementation) AddParticipantToEvent(ctx context.Context, req *pb.AddP
 
 	err := s.eventsUC.AddParticipantToEvent(ctx, addParticipantToEventParams)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to add participant to event: %v", err)
+		switch {
+		case errors.Is(err, events.ErrEventNotFound):
+			return nil, status.Errorf(codes.NotFound, "event not found")
+		case errors.Is(err, events.ErrClientNotFound):
+			return nil, status.Errorf(codes.NotFound, "client not found")
+		case errors.Is(err, events.ErrEventIsFull):
+			return nil, status.Errorf(codes.ResourceExhausted, "event is full")
+		case errors.Is(err, events.ErrTimeSlotIsFull):
+			return nil, status.Errorf(codes.ResourceExhausted, "time slot is full")
+		default:
+			return nil, status.Errorf(codes.Internal, "failed to add participant to event: %v", err)
+		}
 	}
 
 	return &pb.AddParticipantToEventResponse{
@@ -146,7 +178,12 @@ func (s *Implementation) GetParticipantsByEventId(ctx context.Context, req *pb.G
 		PerPage: req.PerPage,
 	})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get participants by event id: %v", err)
+		switch {
+		case errors.Is(err, events.ErrEventNotFound):
+			return nil, status.Errorf(codes.NotFound, "event not found")
+		default:
+			return nil, status.Errorf(codes.Internal, "failed to get participants by event id: %v", err)
+		}
 	}
 
 	pbParticipants := make([]*pb.Participant, len(participants))
@@ -198,7 +235,14 @@ func (s *Implementation) DeleteParticipantFromEvent(ctx context.Context, req *pb
 		ParticipantID: req.ParticipantId,
 	})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to delete participant from event: %v", err)
+		switch {
+		case errors.Is(err, events.ErrEventNotFound):
+			return nil, status.Errorf(codes.NotFound, "event not found")
+		case errors.Is(err, events.ErrClientNotFound):
+			return nil, status.Errorf(codes.NotFound, "client not found")
+		default:
+			return nil, status.Errorf(codes.Internal, "failed to delete participant from event: %v", err)
+		}
 	}
 
 	return &pb.DeleteParticipantFromEventResponse{
@@ -212,17 +256,22 @@ func (s *Implementation) GetClientsIdEvents(ctx context.Context, req *pb.GetClie
 
 	span.SetTag("id", req.Id)
 
-	events, total, err := s.eventsUC.GetClientsIdEvents(ctx, &events.GetClientsIdEventsParams{
+	eventsResponse, total, err := s.eventsUC.GetClientsIdEvents(ctx, &events.GetClientsIdEventsParams{
 		ID:      req.Id,
 		Page:    req.Page,
 		PerPage: req.PerPage,
 	})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get clients id events: %v", err)
+		switch {
+		case errors.Is(err, events.ErrClientNotFound):
+			return nil, status.Errorf(codes.NotFound, "client not found")
+		default:
+			return nil, status.Errorf(codes.Internal, "failed to get clients id events: %v", err)
+		}
 	}
 
-	pbEvents := make([]*pb.Event, len(events))
-	for i, event := range events {
+	pbEvents := make([]*pb.Event, len(eventsResponse))
+	for i, event := range eventsResponse {
 		pbEvents[i] = convertModelEventToPB(event)
 	}
 

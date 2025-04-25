@@ -2,10 +2,16 @@ package locations_repo
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/Slava02/SaintDiego/backend/common/storage"
 	"github.com/Slava02/SaintDiego/backend/schedule/internal/models"
+)
+
+var (
+	ErrLocationNotFound = errors.New("location not found")
 )
 
 //go:generate options-gen -out-filename=locations_repo_options.gen.go -from-struct=Options
@@ -26,6 +32,9 @@ func (r *LocationRepository) GetLocations(ctx context.Context) ([]*models.Locati
 
 	err := r.db.Select(ctx, &locations).Scan(ctx)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%w", ErrLocationNotFound)
+		}
 		return nil, fmt.Errorf("select locations: %w", err)
 	}
 
@@ -73,4 +82,14 @@ func (r *LocationRepository) DeleteLocation(ctx context.Context, id int64) error
 		return fmt.Errorf("delete location: %w", err)
 	}
 	return nil
+}
+
+func (r *LocationRepository) GetLocationById(ctx context.Context, id int64) (*models.Location, error) {
+	location := &models.Location{}
+	err := r.db.Select(ctx, location).Where("id = ?", id).Scan(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("select location: %w", err)
+	}
+
+	return location, nil
 }

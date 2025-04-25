@@ -8,6 +8,8 @@ import (
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/clients"
 	"github.com/labstack/echo/v4"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type IClientUC interface {
@@ -21,12 +23,12 @@ type IClientUC interface {
 func (h Handlers) GetClients(ctx echo.Context, params GetClientsParams) error {
 	var req clients.GetClientParams
 	if err := ctx.Bind(&req); err != nil {
-		return ctx.JSON(http.StatusBadRequest, err.Error())
+		return ctx.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
 	}
 
 	clients, total, err := h.clientUC.GetClients(ctx.Request().Context(), &req)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
+		return ctx.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
 	}
 
 	totalPages := int32(math.Ceil(float64(total) / float64(req.PerPage)))
@@ -43,12 +45,12 @@ func (h Handlers) GetClients(ctx echo.Context, params GetClientsParams) error {
 func (h Handlers) PostClients(ctx echo.Context) error {
 	var req clients.CreateClientRequest
 	if err := ctx.Bind(&req); err != nil {
-		return ctx.JSON(http.StatusBadRequest, err.Error())
+		return ctx.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
 	}
 
 	client, err := h.clientUC.PostClients(ctx.Request().Context(), &req)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
+		return ctx.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
 	}
 
 	return ctx.JSON(http.StatusCreated, convertClientToResponse(client))
@@ -57,7 +59,12 @@ func (h Handlers) PostClients(ctx echo.Context) error {
 func (h Handlers) GetClientsId(ctx echo.Context, id int64) error {
 	client, err := h.clientUC.GetClientsId(ctx.Request().Context(), id)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
+		switch status.Code(err) {
+		case codes.NotFound:
+			return ctx.JSON(http.StatusNotFound, Err("Client not found", err.Error()))
+		default:
+			return ctx.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
+		}
 	}
 
 	return ctx.JSON(http.StatusOK, convertClientToResponse(client))
@@ -66,14 +73,19 @@ func (h Handlers) GetClientsId(ctx echo.Context, id int64) error {
 func (h Handlers) PutClientsId(ctx echo.Context, id int64) error {
 	var req clients.BlockClientRequest
 	if err := ctx.Bind(&req); err != nil {
-		return ctx.JSON(http.StatusBadRequest, err.Error())
+		return ctx.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
 	}
 
 	req.ID = id
 
 	client, err := h.clientUC.PutClientsId(ctx.Request().Context(), &req)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
+		switch status.Code(err) {
+		case codes.NotFound:
+			return ctx.JSON(http.StatusNotFound, Err("Client not found", err.Error()))
+		default:
+			return ctx.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
+		}
 	}
 
 	return ctx.JSON(http.StatusOK, convertClientToResponse(client))
@@ -82,14 +94,19 @@ func (h Handlers) PutClientsId(ctx echo.Context, id int64) error {
 func (h Handlers) GetClientsIdServices(ctx echo.Context, id int64, params GetClientsIdServicesParams) error {
 	var req clients.GetClientsIdServicesParams
 	if err := ctx.Bind(&req); err != nil {
-		return ctx.JSON(http.StatusBadRequest, err.Error())
+		return ctx.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
 	}
 
 	req.ID = id
 
 	services, total, err := h.clientUC.GetClientsIdServices(ctx.Request().Context(), &req)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
+		switch status.Code(err) {
+		case codes.NotFound:
+			return ctx.JSON(http.StatusNotFound, Err("Client not found", err.Error()))
+		default:
+			return ctx.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
+		}
 	}
 
 	return ctx.JSON(http.StatusOK, GetServicesResponse{

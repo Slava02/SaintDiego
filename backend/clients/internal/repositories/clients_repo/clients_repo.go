@@ -10,8 +10,10 @@ import (
 	"github.com/Slava02/SaintDiego/backend/clients/internal/models"
 	"github.com/Slava02/SaintDiego/backend/common/storage"
 	"github.com/uptrace/bun"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+)
+
+var (
+	ErrClientNotFound = errors.New("client not found")
 )
 
 //go:generate options-gen -out-filename=repo_options.gen.go -from-struct=Options
@@ -77,7 +79,7 @@ func (r *ClientsRepository) GetClientByID(ctx context.Context, id int64) (*model
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, status.Errorf(codes.NotFound, "client not found")
+			return nil, fmt.Errorf("%w", ErrClientNotFound)
 		}
 		return nil, fmt.Errorf("get client: %w", err)
 	}
@@ -101,7 +103,7 @@ func (r *ClientsRepository) BlockClient(ctx context.Context, id int64, blockReas
 	err := r.db.Select(ctx, client).Where("id = ?", id).Scan(ctx)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, status.Errorf(codes.NotFound, "client not found")
+			return nil, fmt.Errorf("%w", ErrClientNotFound)
 		}
 		return nil, fmt.Errorf("get client: %w", err)
 	}
@@ -126,7 +128,7 @@ func (r *ClientsRepository) UnblockClient(ctx context.Context, id int64) (*model
 	err := r.db.Select(ctx, client).Where("id = ?", id).Scan(ctx)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, status.Errorf(codes.NotFound, "client not found")
+			return nil, fmt.Errorf("%w", ErrClientNotFound)
 		}
 		return nil, fmt.Errorf("get client: %w", err)
 	}
@@ -175,6 +177,9 @@ func (r *ClientsRepository) GetClientServices(ctx context.Context, clientID int6
 
 	total, err := query.ScanAndCount(ctx, &services)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, 0, fmt.Errorf("%w", ErrClientNotFound)
+		}
 		return nil, 0, fmt.Errorf("get client services: %w", err)
 	}
 

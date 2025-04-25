@@ -2,10 +2,16 @@ package services_repo
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/Slava02/SaintDiego/backend/common/storage"
 	"github.com/Slava02/SaintDiego/backend/services/internal/models"
+)
+
+var (
+	ErrServiceTypeNotFound = errors.New("service type not found")
 )
 
 //go:generate options-gen -out-filename=services_repo_options.gen.go -from-struct=Options
@@ -48,6 +54,9 @@ func (r *ServiceRepository) GetServiceTypeById(ctx context.Context, id int64) (*
 		Where("id = ?", id).
 		Scan(ctx)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%w", ErrServiceTypeNotFound)
+		}
 		return nil, fmt.Errorf("select service by id: %w", err)
 	}
 

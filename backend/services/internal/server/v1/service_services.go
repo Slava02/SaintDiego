@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Slava02/SaintDiego/backend/services/internal/models"
 	"github.com/Slava02/SaintDiego/backend/services/internal/usecases/services"
@@ -53,6 +54,9 @@ func (i *Implementation) GetServiceTypeById(ctx context.Context, req *pb.GetServ
 
 	service, err := i.servicesUC.GetServiceTypeById(ctx, req.Id)
 	if err != nil {
+		if errors.Is(err, services.ErrServiceTypeNotFound) {
+			return nil, status.Errorf(codes.NotFound, "service type not found")
+		}
 		return nil, status.Errorf(codes.Internal, "failed to get service: %v", err)
 	}
 
@@ -74,6 +78,9 @@ func (i *Implementation) UpdateServiceType(ctx context.Context, req *pb.UpdateSe
 		RegistrationAvailable: req.RegistrationAvailable,
 	})
 	if err != nil {
+		if errors.Is(err, services.ErrServiceTypeNotFound) {
+			return nil, status.Errorf(codes.NotFound, "service type not found")
+		}
 		return nil, status.Errorf(codes.Internal, "failed to update service type: %v", err)
 	}
 

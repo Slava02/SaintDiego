@@ -33,7 +33,7 @@ type UseCase struct {
 
 func New(opts Options) (*UseCase, error) {
 	if err := opts.Validate(); err != nil {
-		return nil, fmt.Errorf("validate options: %v", err)
+		return nil, fmt.Errorf("validate options: %w", err)
 	}
 
 	return &UseCase{
@@ -59,7 +59,7 @@ func (u *UseCase) GetEvents(ctx context.Context, req *GetEventsParams) ([]*model
 
 	pbRes, err := u.eventsClient.GetEvents(ctx, pbReq)
 	if err != nil {
-		return nil, 0, fmt.Errorf("get events: %v", err)
+		return nil, 0, fmt.Errorf("get events: %w", err)
 	}
 
 	events := make([]*models.Event, len(pbRes.Events))
@@ -105,7 +105,7 @@ func (u *UseCase) DeleteEvent(ctx context.Context, id int64) error {
 
 	_, err := u.eventsClient.DeleteEvent(ctx, pbReq)
 	if err != nil {
-		return fmt.Errorf("delete event: %v", err)
+		return fmt.Errorf("delete event: %w", err)
 	}
 
 	return nil
@@ -120,7 +120,7 @@ func (u *UseCase) AddParticipantToEvent(ctx context.Context, req *AddParticipant
 
 	_, err := u.eventsClient.AddParticipantToEvent(ctx, pbReq)
 	if err != nil {
-		return fmt.Errorf("add participant to event: %v", err)
+		return fmt.Errorf("add participant to event: %w", err)
 	}
 
 	return nil
@@ -135,7 +135,7 @@ func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEvent
 
 	pbRes, err := u.eventsClient.GetParticipantsByEventId(ctx, pbReq)
 	if err != nil {
-		return nil, 0, fmt.Errorf("get participants: %v", err)
+		return nil, 0, fmt.Errorf("get participants: %w", err)
 	}
 
 	participants := make([]*models.Participant, len(pbRes.Participants))
@@ -168,7 +168,7 @@ func (u *UseCase) GetEventsByServiceId(ctx context.Context, params *GetEventsSer
 
 	pbRes, err := u.eventsClient.GetEventsByServiceId(ctx, pbReq)
 	if err != nil {
-		return nil, 0, fmt.Errorf("get events by service id: %v", err)
+		return nil, 0, fmt.Errorf("get events by service id: %w", err)
 	}
 
 	events := make([]*models.Event, len(pbRes.Events))
@@ -187,7 +187,7 @@ func (u *UseCase) DeleteParticipantFromEvent(ctx context.Context, req *DeletePar
 
 	_, err := u.eventsClient.DeleteParticipantFromEvent(ctx, pbReq)
 	if err != nil {
-		return fmt.Errorf("delete participant from event: %v", err)
+		return fmt.Errorf("delete participant from event: %w", err)
 	}
 
 	return nil
@@ -202,7 +202,7 @@ func (u *UseCase) GetClientsIdEvents(ctx context.Context, params *GetClientsIdEv
 
 	pbRes, err := u.eventsClient.GetClientsIdEvents(ctx, pbReq)
 	if err != nil {
-		return nil, 0, fmt.Errorf("get clients id events: %v", err)
+		return nil, 0, fmt.Errorf("get clients id events: %w", err)
 	}
 
 	events := make([]*models.Event, len(pbRes.Events))

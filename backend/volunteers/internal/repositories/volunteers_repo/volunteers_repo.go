@@ -2,10 +2,16 @@ package volunteers_repo
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/Slava02/SaintDiego/backend/common/storage"
 	"github.com/Slava02/SaintDiego/backend/volunteers/internal/models"
+)
+
+var (
+	ErrVolunteerNotFound = errors.New("volunteer not found")
 )
 
 //go:generate options-gen -out-filename=repo_options.gen.go -from-struct=Options
@@ -36,7 +42,13 @@ func (r *VolunteerRepository) CreateVolunteer(ctx context.Context, volunteer *mo
 func (r *VolunteerRepository) GetVolunteerByTgId(ctx context.Context, tgId int64) (*models.Volunteer, error) {
 	volunteer := new(models.Volunteer)
 	err := r.db.Select(ctx, volunteer).Where("tg_id = ?", tgId).Scan(ctx)
-	return volunteer, err
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%w", ErrVolunteerNotFound)
+		}
+		return nil, fmt.Errorf("get volunteer by tg id: %w", err)
+	}
+	return volunteer, nil
 }
 
 func (r *VolunteerRepository) UpdateVolunteer(ctx context.Context, req *UpdateVolunteerReq) (*models.Volunteer, error) {

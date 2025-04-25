@@ -10,6 +10,8 @@ import (
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/events"
 	"github.com/Slava02/SaintDiego/backend/common/pointer"
 	"github.com/labstack/echo/v4"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type IEventsUC interface {
@@ -36,7 +38,7 @@ func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
 		ToDate        string  `query:"to_date" json:"to_date" validate:"omitempty"`
 	}
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
 	}
 
 	var (
@@ -47,14 +49,14 @@ func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
 	if req.FromDate != "" {
 		fromDate, err = time.Parse(time.DateOnly, req.FromDate)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, err.Error())
+			return c.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
 		}
 	}
 
 	if req.ToDate != "" {
 		toDate, err = time.Parse(time.DateOnly, req.ToDate)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, err.Error())
+			return c.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
 		}
 	}
 
@@ -69,7 +71,12 @@ func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
 		PerPage:       req.PerPage,
 	})
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		switch status.Code(err) {
+		case codes.NotFound:
+			return c.JSON(http.StatusNotFound, Err("Client not found", err.Error()))
+		default:
+			return c.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
+		}
 	}
 
 	// Рассчитываем общее количество страниц
@@ -87,29 +94,33 @@ func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
 func (h Handlers) GetEventsId(c echo.Context, id int64) error {
 	event, err := h.eventsUC.GetEvent(c.Request().Context(), id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		switch status.Code(err) {
+		case codes.NotFound:
+			return c.JSON(http.StatusNotFound, Err("Event not found", err.Error()))
+		default:
+			return c.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
+		}
 	}
 
-	return c.JSON(http.StatusOK, Event{
-		Id:                event.ID,
-		TimeSlotServiceId: event.TimeSlotServiceID,
-		Capacity:          event.Capacity,
-		Datetime:          event.Datetime,
-		ServiceTypeId:     event.ServiceTypeID,
-	})
+	return c.JSON(http.StatusOK, convertEventToResponse(event))
 }
 
 func (h Handlers) PutEventsId(c echo.Context, id int64) error {
 	var req events.UpdateEventRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
 	}
 
 	req.ID = id
 
 	event, err := h.eventsUC.UpdateEvent(c.Request().Context(), &req)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		switch status.Code(err) {
+		case codes.NotFound:
+			return c.JSON(http.StatusNotFound, Err("Event not found", err.Error()))
+		default:
+			return c.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
+		}
 	}
 
 	return c.JSON(http.StatusOK, convertEventToResponse(event))
@@ -118,23 +129,35 @@ func (h Handlers) PutEventsId(c echo.Context, id int64) error {
 func (h Handlers) DeleteEventsId(c echo.Context, id int64) error {
 	err := h.eventsUC.DeleteEvent(c.Request().Context(), id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		switch status.Code(err) {
+		case codes.NotFound:
+			return c.JSON(http.StatusNotFound, Err("Event not found", err.Error()))
+		default:
+			return c.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
+		}
 	}
 
-	return c.NoContent(http.StatusNoContent)
+	return c.NoContent(http.StatusOK)
 }
 
 func (h Handlers) PutEventsIdParticipants(c echo.Context, id int64) error {
 	var req events.AddParticipantToEventRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
 	}
 
 	req.EventID = id
 
 	err := h.eventsUC.AddParticipantToEvent(c.Request().Context(), &req)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		switch status.Code(err) {
+		case codes.NotFound:
+			return c.JSON(http.StatusNotFound, Err("Event not found", err.Error()))
+		case codes.ResourceExhausted:
+			return c.JSON(http.StatusConflict, Err("Event is full", err.Error()))
+		default:
+			return c.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
+		}
 	}
 
 	return c.NoContent(http.StatusNoContent)
@@ -143,14 +166,19 @@ func (h Handlers) PutEventsIdParticipants(c echo.Context, id int64) error {
 func (h Handlers) GetEventsIdParticipants(c echo.Context, id int64, params GetEventsIdParticipantsParams) error {
 	var req events.GetEventsIdParticipantsParams
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
 	}
 
 	req.EventID = id
 
 	participants, total, err := h.eventsUC.GetParticipantsByEventId(c.Request().Context(), &req)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		switch status.Code(err) {
+		case codes.NotFound:
+			return c.JSON(http.StatusNotFound, Err("Event not found", ""))
+		default:
+			return c.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
+		}
 	}
 
 	return c.JSON(http.StatusOK, GetParticipantsResponse{
@@ -165,14 +193,14 @@ func (h Handlers) GetEventsIdParticipants(c echo.Context, id int64, params GetEv
 func (h Handlers) GetEventsServicesId(c echo.Context, id int64, params GetEventsServicesIdParams) error {
 	var req events.GetEventsServicesIdParams
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
 	}
 
 	req.ServiceID = id
 
 	events, total, err := h.eventsUC.GetEventsByServiceId(c.Request().Context(), &req)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
 	}
 
 	return c.JSON(http.StatusOK, GetEventsResponse{
@@ -187,14 +215,19 @@ func (h Handlers) GetEventsServicesId(c echo.Context, id int64, params GetEvents
 func (h Handlers) GetClientsIdEvents(ctx echo.Context, id int64, params GetClientsIdEventsParams) error {
 	var req events.GetClientsIdEventsParams
 	if err := ctx.Bind(&req); err != nil {
-		return ctx.JSON(http.StatusBadRequest, err.Error())
+		return ctx.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
 	}
 
 	req.ID = id
 
 	events, total, err := h.eventsUC.GetClientsIdEvents(ctx.Request().Context(), &req)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
+		switch status.Code(err) {
+		case codes.NotFound:
+			return ctx.JSON(http.StatusNotFound, Err("Client not found", err.Error()))
+		default:
+			return ctx.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
+		}
 	}
 
 	return ctx.JSON(http.StatusOK, GetEventsResponse{
@@ -212,7 +245,12 @@ func (h Handlers) DeleteEventsIdParticipantsParticipantId(c echo.Context, id int
 		ParticipantID: participantId,
 	})
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		switch status.Code(err) {
+		case codes.NotFound:
+			return c.JSON(http.StatusNotFound, Err("Client not found", err.Error()))
+		default:
+			return c.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
+		}
 	}
 
 	return c.NoContent(http.StatusNoContent)

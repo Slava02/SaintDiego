@@ -25,7 +25,7 @@ type UseCase struct {
 
 func New(opts Options) (*UseCase, error) {
 	if err := opts.Validate(); err != nil {
-		return nil, fmt.Errorf("validate options: %v", err)
+		return nil, fmt.Errorf("validate options: %w", err)
 	}
 
 	return &UseCase{
@@ -44,7 +44,7 @@ func (u *UseCase) PostVolunteers(ctx context.Context, req *CreateVolunteerReques
 
 	pbRes, err := u.volunteersClient.CreateVolunteer(ctx, pbReq)
 	if err != nil {
-		return nil, fmt.Errorf("create volunteer: %v", err)
+		return nil, fmt.Errorf("create volunteer: %w", err)
 	}
 
 	return &models.Volunteer{
@@ -63,7 +63,7 @@ func (u *UseCase) GetVolunteersTgId(ctx context.Context, tgId int64) (*models.Vo
 
 	pbRes, err := u.volunteersClient.GetVolunteerByTgId(ctx, pbReq)
 	if err != nil {
-		return nil, fmt.Errorf("get volunteer by tg id: %v", err)
+		return nil, fmt.Errorf("get volunteer by tg id: %w", err)
 	}
 
 	return &models.Volunteer{
@@ -85,7 +85,7 @@ func (u *UseCase) PutVolunteersTgId(ctx context.Context, req *UpdateVolunteerReq
 
 	pbRes, err := u.volunteersClient.UpdateVolunteer(ctx, pbReq)
 	if err != nil {
-		return nil, fmt.Errorf("update volunteer: %v", err)
+		return nil, fmt.Errorf("update volunteer: %w", err)
 	}
 
 	return &models.Volunteer{
