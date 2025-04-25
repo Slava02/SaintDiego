@@ -46,9 +46,8 @@ class VolunteerService:
             ) as response:
                 if response.status == 200:
                     return await response.json()
-                # TODO: добавить обработку ошибок
-                elif response.status == 500:
+                elif response.status == 404:
                     return None
-                # Обработка других ошибок
+                
                 error_text = await response.text()
                 raise Exception(f"Failed to get volunteer: {error_text}")
