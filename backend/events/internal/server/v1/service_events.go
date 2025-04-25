@@ -20,6 +20,8 @@ type IEventsUC interface {
 	AddParticipantToEvent(ctx context.Context, params *events.AddParticipantToEventRequest) error
 	GetParticipantsByEventId(ctx context.Context, params *events.GetEventsIdParticipantsParams) ([]*models.Participant, int64, error)
 	GetEventsByServiceId(ctx context.Context, params *events.GetEventsByServiceIdParams) ([]*models.Event, int64, error)
+	DeleteParticipantFromEvent(ctx context.Context, req *events.DeleteParticipantFromEventRequest) error
+	GetClientsIdEvents(ctx context.Context, params *events.GetClientsIdEventsParams) ([]*models.Event, int64, error)
 }
 
 func (s *Implementation) GetEvents(ctx context.Context, req *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
@@ -179,6 +181,52 @@ func (s *Implementation) GetEventsByServiceId(ctx context.Context, req *pb.GetEv
 	}
 
 	return &pb.GetEventsByServiceIdResponse{
+		Events: pbEvents,
+		Total:  total,
+	}, nil
+}
+
+func (s *Implementation) DeleteParticipantFromEvent(ctx context.Context, req *pb.DeleteParticipantFromEventRequest) (*pb.DeleteParticipantFromEventResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "DeleteParticipantFromEvent")
+	defer span.Finish()
+
+	span.SetTag("event_id", req.EventId)
+	span.SetTag("participant_id", req.ParticipantId)
+
+	err := s.eventsUC.DeleteParticipantFromEvent(ctx, &events.DeleteParticipantFromEventRequest{
+		EventID:       req.EventId,
+		ParticipantID: req.ParticipantId,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to delete participant from event: %v", err)
+	}
+
+	return &pb.DeleteParticipantFromEventResponse{
+		Success: true,
+	}, nil
+}
+
+func (s *Implementation) GetClientsIdEvents(ctx context.Context, req *pb.GetClientsIdEventsRequest) (*pb.GetClientsIdEventsResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "GetClientsIdEvents")
+	defer span.Finish()
+
+	span.SetTag("id", req.Id)
+
+	events, total, err := s.eventsUC.GetClientsIdEvents(ctx, &events.GetClientsIdEventsParams{
+		ID:      req.Id,
+		Page:    req.Page,
+		PerPage: req.PerPage,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get clients id events: %v", err)
+	}
+
+	pbEvents := make([]*pb.Event, len(events))
+	for i, event := range events {
+		pbEvents[i] = convertModelEventToPB(event)
+	}
+
+	return &pb.GetClientsIdEventsResponse{
 		Events: pbEvents,
 		Total:  total,
 	}, nil

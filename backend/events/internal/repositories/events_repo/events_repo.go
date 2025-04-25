@@ -47,8 +47,7 @@ func (r *EventRepository) GetEvents(ctx context.Context, params *GetEventsParams
 
 	// TODO: потестить
 	if params.ParticipantID != nil {
-		query = query.Join("JOIN event_client ec ON e.id = ec.event_id").
-			Where("ec.client_id = ?", *params.ParticipantID)
+		query = query.Where("ec.client_id = ?", *params.ParticipantID)
 	}
 
 	if params.Upcoming {
@@ -240,4 +239,35 @@ func (r *EventRepository) GetTimeSlotWithParticipantCount(ctx context.Context, t
 	}
 
 	return &timeSlot, nil
+}
+
+func (r *EventRepository) DeleteParticipantFromEvent(ctx context.Context, eventID, participantID int64) error {
+	_, err := r.db.Delete(ctx, &models.EventClient{
+		EventID:  eventID,
+		ClientID: participantID,
+	}).Where("event_id = ? AND client_id = ?", eventID, participantID).Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("delete participant from event: %w", err)
+	}
+	return nil
+}
+
+func (r *EventRepository) GetClientsIdEvents(ctx context.Context, clientID int64, page int64, perPage int64) ([]*models.Event, int64, error) {
+	var events []*models.Event
+
+	offset := (page - 1) * perPage
+
+	total, err := r.db.Select(ctx, &events).
+		ColumnExpr("e.*, COUNT(ec.id) as participants_count").
+		Join("LEFT JOIN event_client ec ON e.id = ec.event_id").
+		Where("ec.client_id = ?", clientID).
+		Limit(int(perPage)).
+		Offset(int(offset)).
+		ScanAndCount(ctx, &events)
+
+	if err != nil {
+		return nil, 0, fmt.Errorf("get clients id events: %w", err)
+	}
+
+	return events, int64(total), nil
 }

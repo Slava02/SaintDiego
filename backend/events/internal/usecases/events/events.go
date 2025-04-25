@@ -18,6 +18,8 @@ type IEventRepository interface {
 	GetEventsByServiceId(ctx context.Context, serviceID int64, page int64, perPage int64) ([]*models.Event, int64, error)
 	GetParticipantsByEventId(ctx context.Context, eventID int64, page int64, perPage int64) ([]*models.Participant, int64, error)
 	GetTimeSlotIDByEventID(ctx context.Context, eventID int64) (int64, error)
+	DeleteParticipantFromEvent(ctx context.Context, eventID, participantID int64) error
+	GetClientsIdEvents(ctx context.Context, clientID int64, page int64, perPage int64) ([]*models.Event, int64, error)
 	// TODO: вынести в timeslot service
 	GetTimeSlotWithParticipantCount(ctx context.Context, timeSlotServiceID int64) (*models.TimeSlotWithParticipantCount, error)
 }
@@ -108,4 +110,12 @@ func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEvent
 
 func (u *UseCase) GetEventsByServiceId(ctx context.Context, params *GetEventsByServiceIdParams) ([]*models.Event, int64, error) {
 	return u.eventRepository.GetEventsByServiceId(ctx, params.ServiceID, params.Page, params.PerPage)
+}
+
+func (u *UseCase) DeleteParticipantFromEvent(ctx context.Context, params *DeleteParticipantFromEventRequest) error {
+	return u.eventRepository.DeleteParticipantFromEvent(ctx, params.EventID, params.ParticipantID)
+}
+
+func (u *UseCase) GetClientsIdEvents(ctx context.Context, params *GetClientsIdEventsParams) ([]*models.Event, int64, error) {
+	return u.eventRepository.GetClientsIdEvents(ctx, params.ID, params.Page, params.PerPage)
 }

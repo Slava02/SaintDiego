@@ -36,3 +36,14 @@ type AddParticipantToEventRequest struct {
 	ParticipantID int64 `json:"participant_id"`
 	VolunteerID   int64 `json:"volunteer_id"`
 }
+
+type GetClientsIdEventsParams struct {
+	ID      int64 `json:"id"`
+	Page    int64 `json:"page"`
+	PerPage int64 `json:"per_page"`
+}
+
+type DeleteParticipantFromEventRequest struct {
+	EventID       int64 `json:"event_id"`
+	ParticipantID int64 `json:"participant_id"`
+}
