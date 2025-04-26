@@ -26,6 +26,10 @@ type IServicesClient interface {
 	GetServiceTypeById(ctx context.Context, id int64) (*models.ServiceTypes, error)
 }
 
+type IEventsClient interface {
+	GetEventsByServiceId(ctx context.Context, serviceID int64) ([]*models.Event, error)
+}
+
 const (
 	ReinterviewClientAvailableServiceTypeID      = 20
 	PrimaryInterviewClientAvailableServiceTypeID = 15
@@ -40,11 +44,13 @@ var (
 type Options struct {
 	ClientsRepository IClientsRepository `option:"mandatory" validate:"required"`
 	ServicesClient    IServicesClient    `option:"mandatory" validate:"required"`
+	EventsClient      IEventsClient      `option:"mandatory" validate:"required"`
 }
 
 type UseCase struct {
 	clientsRepository IClientsRepository
 	servicesClient    IServicesClient
+	eventsClient      IEventsClient
 }
 
 func New(opts Options) (*UseCase, error) {
@@ -55,6 +61,7 @@ func New(opts Options) (*UseCase, error) {
 	return &UseCase{
 		clientsRepository: opts.ClientsRepository,
 		servicesClient:    opts.ServicesClient,
+		eventsClient:      opts.EventsClient,
 	}, nil
 }
 
@@ -123,6 +130,7 @@ func (u *UseCase) BlockClient(ctx context.Context, req *BlockClientReq) (*models
 	return client, nil
 }
 
+// TODO: нужно вовзращать только услуги, на которые есть события для записи
 func (u *UseCase) GetClientServices(ctx context.Context, req *GetClientServicesReq) ([]*models.ServiceTypes, int64, error) {
 
 	client, err := u.clientsRepository.GetClientByID(ctx, req.ClientID)
@@ -168,7 +176,35 @@ func (u *UseCase) GetClientServices(ctx context.Context, req *GetClientServicesR
 		return nil, 0, fmt.Errorf("get client services: %w", err)
 	}
 
-	return services, total, nil
+	availableServices := make([]*models.ServiceTypes, 0)
+	var busyServices int64
+
+	for _, service := range services {
+		events, err := u.eventsClient.GetEventsByServiceId(ctx, service.Id)
+		if err != nil {
+			return nil, 0, fmt.Errorf("get events by service id: %w", err)
+		}
+
+		// Проверяем, есть ли хотя бы одно событие со свободными местами
+		hasAvailableSpots := false
+		for _, event := range events {
+			if event.ParticipantsCount < event.Capacity {
+				hasAvailableSpots = true
+				break
+			}
+		}
+
+		// Добавляем услугу только если есть хотя бы одно событие со свободными местами
+		if hasAvailableSpots {
+			availableServices = append(availableServices, service)
+		} else {
+			busyServices++
+		}
+	}
+
+	// TODO: неправильно считается общее количество услуг
+
+	return availableServices, total - busyServices, nil
 }
 
 func clientIsNew(client *models.Client) bool {

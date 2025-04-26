@@ -104,6 +104,7 @@ class BookingService:
                 
                 if response.status == 204:
                     return True
+                # TODO: выводить сообщение о том, что мест уже нет, если 409
                 self.logger.error(f"Failed to book event: {response_text}")
                 return False
 

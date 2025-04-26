@@ -21,6 +21,7 @@ if missing_vars:
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
+from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram_dialog import setup_dialogs
 
 from config import settings
@@ -29,23 +30,23 @@ from src.handlers.menu import router as menu_router
 from src.services.client import ClientService
 from src.menu import menu_dialog
 from src.menu.dialogs import new_client_dialog
+from src.menu.handlers.inline import router as inline_router
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Инициализация бота и диспетчера
-bot = Bot(
-    token=settings.bot_token.get_secret_value(),
-    default=DefaultBotProperties(parse_mode=ParseMode.HTML)
-)
-dp = Dispatcher()
-
-# Инициализация сервисов
-client_service = ClientService()
+bot = Bot(token=settings.bot_token.get_secret_value())
+storage = MemoryStorage()
+dp = Dispatcher(storage=storage)
 
 # Регистрация роутеров
+dp.include_router(inline_router)  # Регистрируем inline-роутер первым
 dp.include_router(registration_router)
 dp.include_router(menu_router)
+
+# Регистрация диалогов
 dp.include_router(menu_dialog)
 dp.include_router(new_client_dialog)
 
@@ -55,10 +56,12 @@ setup_dialogs(dp)
 # Запуск бота
 async def main():
     # Запускаем сервис клиентов
+    client_service = ClientService()
     await client_service.start()
     
     try:
         # Запускаем бота
+        logger.info("Starting bot...")
         await dp.start_polling(bot)
     finally:
         # Останавливаем сервис клиентов при завершении

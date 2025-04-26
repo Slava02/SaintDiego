@@ -6,10 +6,11 @@ import (
 )
 
 type Config struct {
-	Global   GlobalConfig   `toml:"global"`
-	Log      LogConfig      `toml:"log"`
-	Database DatabaseConfig `toml:"database"`
-	Server   ServerConfig   `toml:"server"`
+	Global     GlobalConfig     `toml:"global"`
+	Log        LogConfig        `toml:"log"`
+	Database   DatabaseConfig   `toml:"database"`
+	Server     ServerConfig     `toml:"server"`
+	GRPCClient GRPCClientConfig `toml:"grpc_client"`
 }
 
 type GlobalConfig struct {
@@ -45,4 +46,22 @@ func (c DatabaseConfig) Conn() string {
 	res := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", c.User, c.Password, c.Host, c.Port, c.DBName)
 	fmt.Println(res)
 	return res
+}
+
+type GRPCClientConfig struct {
+	Services   ServicesConfig   `toml:"services" validate:"required"`
+	Volunteers VolunteersConfig `toml:"volunteers" validate:"required"`
+	Clients    ClientsConfig    `toml:"clients" validate:"required"`
+}
+
+type ServicesConfig struct {
+	Addr string `toml:"addr" validate:"required,hostname_port"`
+}
+
+type VolunteersConfig struct {
+	Addr string `toml:"addr" validate:"required,hostname_port"`
+}
+
+type ClientsConfig struct {
+	Addr string `toml:"addr" validate:"required,hostname_port"`
 }

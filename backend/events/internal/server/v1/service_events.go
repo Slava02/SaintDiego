@@ -20,7 +20,7 @@ type IEventsUC interface {
 	DeleteEvent(ctx context.Context, eventID int64) error
 	AddParticipantToEvent(ctx context.Context, params *events.AddParticipantToEventRequest) error
 	GetParticipantsByEventId(ctx context.Context, params *events.GetEventsIdParticipantsParams) ([]*models.Participant, int64, error)
-	GetEventsByServiceId(ctx context.Context, params *events.GetEventsByServiceIdParams) ([]*models.Event, int64, error)
+	GetAvailableEventsByServiceId(ctx context.Context, params *events.GetEventsByServiceIdParams) ([]*models.Event, int64, error)
 	DeleteParticipantFromEvent(ctx context.Context, req *events.DeleteParticipantFromEventRequest) error
 	GetClientsIdEvents(ctx context.Context, params *events.GetClientsIdEventsParams) ([]*models.Event, int64, error)
 }
@@ -203,7 +203,7 @@ func (s *Implementation) GetEventsByServiceId(ctx context.Context, req *pb.GetEv
 
 	span.SetTag("service_id", req.ServiceId)
 
-	events, total, err := s.eventsUC.GetEventsByServiceId(ctx, &events.GetEventsByServiceIdParams{
+	events, total, err := s.eventsUC.GetAvailableEventsByServiceId(ctx, &events.GetEventsByServiceIdParams{
 		ServiceID: req.ServiceId,
 		Page:      req.Page,
 		PerPage:   req.PerPage,

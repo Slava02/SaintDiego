@@ -18,12 +18,25 @@ type IEventRepository interface {
 	AddParticipantToEvent(ctx context.Context, eventID, participantID, volunteerID int64) error
 	GetEventsByServiceId(ctx context.Context, serviceID int64, page int64, perPage int64) ([]*models.Event, int64, error)
 	GetParticipantsByEventId(ctx context.Context, eventID int64, page int64, perPage int64) ([]*models.Participant, int64, error)
-	GetTimeSlotIDByEventID(ctx context.Context, eventID int64) (int64, error)
 	DeleteParticipantFromEvent(ctx context.Context, eventID, participantID int64) error
 	GetClientsIdEvents(ctx context.Context, clientID int64, page int64, perPage int64) ([]*models.Event, int64, error)
-	GetClient(ctx context.Context, clientID int64) (*models.Client, error)
-	// TODO: вынести в timeslot service
-	GetTimeSlotWithParticipantCount(ctx context.Context, timeSlotServiceID int64) (*models.TimeSlotWithParticipantCount, error)
+	GetTimeSlotWithParticipantCountByEventID(ctx context.Context, eventID int64) (*models.TimeSlotWithParticipantCount, error)
+}
+
+type Transactor interface {
+	WithinTransaction(ctx context.Context, tFunc func(ctx context.Context) error) error
+}
+
+type IServicesClient interface {
+	GetServiceTypeById(ctx context.Context, id int64) error
+}
+
+type IClientsClient interface {
+	GetClientById(ctx context.Context, id int64) error
+}
+
+type IVolunteersClient interface {
+	GetVolunteerByTgId(ctx context.Context, tgId int64) error
 }
 
 var (
@@ -35,11 +48,19 @@ var (
 
 //go:generate options-gen -out-filename=events_options.gen.go -from-struct=Options
 type Options struct {
-	EventRepository IEventRepository `option:"mandatory" validate:"required"`
+	EventRepository  IEventRepository  `option:"mandatory" validate:"required"`
+	Transactor       Transactor        `option:"mandatory" validate:"required"`
+	ServicesClient   IServicesClient   `option:"mandatory" validate:"required"`
+	ClientsClient    IClientsClient    `option:"mandatory" validate:"required"`
+	VolunteersClient IVolunteersClient `option:"mandatory" validate:"required"`
 }
 
 type UseCase struct {
-	eventRepository IEventRepository
+	eventRepository  IEventRepository
+	transactor       Transactor
+	servicesClient   IServicesClient
+	clientsClient    IClientsClient
+	volunteersClient IVolunteersClient
 }
 
 func New(opts Options) (*UseCase, error) {
@@ -48,7 +69,11 @@ func New(opts Options) (*UseCase, error) {
 	}
 
 	return &UseCase{
-		eventRepository: opts.EventRepository,
+		eventRepository:  opts.EventRepository,
+		transactor:       opts.Transactor,
+		servicesClient:   opts.ServicesClient,
+		clientsClient:    opts.ClientsClient,
+		volunteersClient: opts.VolunteersClient,
 	}, nil
 }
 
@@ -72,9 +97,9 @@ func (u *UseCase) GetEvents(ctx context.Context, params *GetEventsParams) ([]*mo
 	}
 
 	if params.ParticipantID != nil {
-		_, err := u.eventRepository.GetClient(ctx, *params.ParticipantID)
+		err := u.clientsClient.GetClientById(ctx, *params.ParticipantID)
 		if err != nil {
-			return nil, 0, fmt.Errorf("get client: %w", err)
+			return nil, 0, fmt.Errorf("get client by id: %w", err)
 		}
 	}
 
@@ -132,43 +157,48 @@ func (u *UseCase) DeleteEvent(ctx context.Context, id int64) error {
 	return nil
 }
 
-// TODO: по-хорошему, еще бы проверит наличие волонтера и вынести вообще всю логику клиента как-будто у нас другая бд
 func (u *UseCase) AddParticipantToEvent(ctx context.Context, params *AddParticipantToEventRequest) error {
-	event, err := u.GetEvent(ctx, params.EventID)
+	err := u.volunteersClient.GetVolunteerByTgId(ctx, params.VolunteerID)
 	if err != nil {
-		return fmt.Errorf("get event: %w", err)
+		return fmt.Errorf("get volunteer by tg id: %w", err)
 	}
 
-	if event.ParticipantsCount >= event.Capacity {
-		return fmt.Errorf("%w", ErrEventIsFull)
+	err = u.clientsClient.GetClientById(ctx, params.ParticipantID)
+	if err != nil {
+		return fmt.Errorf("get client by id: %w", err)
 	}
 
-	timeSlotID, err := u.eventRepository.GetTimeSlotIDByEventID(ctx, event.ID)
-	if err != nil {
-		if errors.Is(err, events_repo.ErrEventNotFound) {
-			return fmt.Errorf("%w", ErrEventNotFound)
+	err = u.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
+		event, err := u.GetEvent(ctx, params.EventID)
+		if err != nil {
+			return fmt.Errorf("get event: %w", err)
 		}
-		return fmt.Errorf("get time slot id: %v", err)
-	}
 
-	timeSlot, err := u.eventRepository.GetTimeSlotWithParticipantCount(ctx, timeSlotID)
-	if err != nil {
-		return fmt.Errorf("get time slot: %v", err)
-	}
-
-	if timeSlot.ParticipantCount >= timeSlot.Capacity {
-		return fmt.Errorf("%w", ErrTimeSlotIsFull)
-	}
-
-	err = u.eventRepository.AddParticipantToEvent(ctx, params.EventID, params.ParticipantID, params.VolunteerID)
-	if err != nil {
-		if errors.Is(err, events_repo.ErrClientNotFound) {
-			return fmt.Errorf("%w", ErrClientNotFound)
+		if event.ParticipantsCount >= event.Capacity {
+			return fmt.Errorf("%w", ErrEventIsFull)
 		}
-		return fmt.Errorf("add participant to event: %v", err)
-	}
 
-	return nil
+		timeSlot, err := u.eventRepository.GetTimeSlotWithParticipantCountByEventID(ctx, params.EventID)
+		if err != nil {
+			return fmt.Errorf("get time slot: %v", err)
+		}
+
+		if timeSlot.ParticipantCount >= timeSlot.Capacity {
+			return fmt.Errorf("%w", ErrTimeSlotIsFull)
+		}
+
+		err = u.eventRepository.AddParticipantToEvent(ctx, params.EventID, params.ParticipantID, params.VolunteerID)
+		if err != nil {
+			if errors.Is(err, events_repo.ErrClientNotFound) {
+				return fmt.Errorf("%w", ErrClientNotFound)
+			}
+			return fmt.Errorf("add participant to event: %v", err)
+		}
+
+		return nil
+	})
+
+	return err
 }
 
 func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEventsIdParticipantsParams) ([]*models.Participant, int64, error) {
@@ -190,25 +220,53 @@ func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEvent
 	return participants, total, nil
 }
 
-// TODO: тут надо проверять существование сервиса
-func (u *UseCase) GetEventsByServiceId(ctx context.Context, params *GetEventsByServiceIdParams) ([]*models.Event, int64, error) {
+func (u *UseCase) GetAvailableEventsByServiceId(ctx context.Context, params *GetEventsByServiceIdParams) ([]*models.Event, int64, error) {
+	err := u.servicesClient.GetServiceTypeById(ctx, params.ServiceID)
+	if err != nil {
+		return nil, 0, fmt.Errorf("get service type by id: %w", err)
+	}
+
 	events, total, err := u.eventRepository.GetEventsByServiceId(ctx, params.ServiceID, params.Page, params.PerPage)
 	if err != nil {
 		return nil, 0, fmt.Errorf("get events: %v", err)
 	}
 
-	return events, total, nil
+	eventsResponse := make([]*models.Event, 0)
+	var fullEventCnt int64
+
+	for _, event := range events {
+		if event.ParticipantsCount >= event.Capacity {
+			fullEventCnt++
+			continue
+		}
+
+		timeSlot, err := u.eventRepository.GetTimeSlotWithParticipantCountByEventID(ctx, event.ID)
+		if err != nil {
+			return nil, 0, fmt.Errorf("get time slot with participant count: %w", err)
+		}
+
+		if timeSlot.ParticipantCount >= timeSlot.Capacity {
+			fullEventCnt++
+			continue
+		}
+
+		eventsResponse = append(eventsResponse, event)
+	}
+
+	// TODO: тут неверно рассчитывается total, так как не учитываютя события, которые не прошли по заполненности таймслота и не вернулись по LIMIT и OFFSET
+
+	return eventsResponse, total - fullEventCnt, nil
 }
 
 func (u *UseCase) DeleteParticipantFromEvent(ctx context.Context, params *DeleteParticipantFromEventRequest) error {
-	_, err := u.GetEvent(ctx, params.EventID)
+	err := u.clientsClient.GetClientById(ctx, params.ParticipantID)
 	if err != nil {
-		return fmt.Errorf("get event: %w", err)
+		return fmt.Errorf("get client by id: %w", err)
 	}
 
-	_, err = u.eventRepository.GetClient(ctx, params.ParticipantID)
+	_, err = u.GetEvent(ctx, params.EventID)
 	if err != nil {
-		return fmt.Errorf("get client: %w", err)
+		return fmt.Errorf("get event: %w", err)
 	}
 
 	err = u.eventRepository.DeleteParticipantFromEvent(ctx, params.EventID, params.ParticipantID)
@@ -222,11 +280,10 @@ func (u *UseCase) DeleteParticipantFromEvent(ctx context.Context, params *Delete
 	return nil
 }
 
-// TODO: везде где getClient, надо обращаться в сервис клиентов, а не в бд
 func (u *UseCase) GetClientsIdEvents(ctx context.Context, params *GetClientsIdEventsParams) ([]*models.Event, int64, error) {
-	_, err := u.eventRepository.GetClient(ctx, params.ID)
+	err := u.clientsClient.GetClientById(ctx, params.ID)
 	if err != nil {
-		return nil, 0, fmt.Errorf("get client: %w", err)
+		return nil, 0, fmt.Errorf("get client by id: %w", err)
 	}
 
 	events, total, err := u.eventRepository.GetClientsIdEvents(ctx, params.ID, params.Page, params.PerPage)

@@ -3,7 +3,8 @@ module github.com/Slava02/SaintDiego/backend/clients
 go 1.24.2
 
 require (
-	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250416142604-541f09ede4f2
+	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250417054842-cb97ca719f45
+	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250425142917-915a210a0acd
 	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250419102259-266701d3ccea
 	github.com/go-sql-driver/mysql v1.9.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0

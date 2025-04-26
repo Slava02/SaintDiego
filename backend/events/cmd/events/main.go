@@ -24,6 +24,7 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
+	grpc_services "github.com/Slava02/SaintDiego/backend/events/internal/clients/grpc-services"
 	v1 "github.com/Slava02/SaintDiego/backend/events/internal/server/v1"
 )
 
@@ -64,6 +65,18 @@ func run() error {
 
 	tracing.Init(lg, serviceName)
 
+	// Clients
+
+	manager, err := grpc_services.NewManager(grpc_services.ManagerOptions{
+		ServicesAddr:  cfg.GRPCClient.Services.Addr,
+		ClientAddr:    cfg.GRPCClient.Clients.Addr,
+		VolunteerAddr: cfg.GRPCClient.Volunteers.Addr,
+	})
+	if err != nil {
+		return fmt.Errorf("init manager: %v", err)
+	}
+	closer.Add(manager.Close)
+
 	// Storage
 
 	sqldb, err := sql.Open("mysql", cfg.Database.Conn())
@@ -92,7 +105,13 @@ func run() error {
 
 	// Usecases
 
-	eventsUsecase, err := events.New(events.NewOptions(eventsRepo))
+	eventsUsecase, err := events.New(events.NewOptions(
+		eventsRepo,
+		db,
+		manager.Services(),
+		manager.Clients(),
+		manager.Volunteers(),
+	))
 	if err != nil {
 		lg.Error("init events usecase", zap.Error(err))
 		return fmt.Errorf("init events usecase: %v", err)

@@ -21,7 +21,7 @@ class CustomCalendarDaysView(CalendarDaysView):
             callback_generator,
             date_text=Case(
                 {
-                    True: Format("✅ {date:%d}"),
+                    True: Format("✅{date:%d}"),
                     False: Format("{date:%d}"),
                 },
                 selector=self._is_date_available_selector,

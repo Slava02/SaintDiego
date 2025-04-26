@@ -22,3 +22,6 @@ port = "39410"
 [grpc_client]
 [grpc_client.client_services]
 addr = ":50052"
+
+[grpc_client.events]
+addr = ":50053"

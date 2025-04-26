@@ -97,7 +97,7 @@ ADD COLUMN IF NOT EXISTS `registration_available` boolean NOT NULL DEFAULT false
 --bun:split
 UPDATE `service_type`
 SET `registration_available` = true
-WHERE `id` IN (2, 3, 15, 20, 25, 30);
+WHERE `id` IN (2, 3, 25, 30);
 --bun:split
 ALTER TABLE `service_type`
 ADD COLUMN IF NOT EXISTS `min_period_days` int NOT NULL DEFAULT 0;

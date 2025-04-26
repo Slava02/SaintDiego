@@ -7,7 +7,8 @@ from src.menu.getters.data import (
     get_main_menu_data,
     get_profile_data,
     get_services_data,
-    get_events_data
+    get_events_data,
+    get_client_profile_data
 )
 from src.menu.handlers.buttons import (
     on_profile_click,
@@ -21,14 +22,20 @@ from src.menu.handlers.buttons import (
     process_new_client_result
 )
 from src.menu.widgets.calendar import CustomCalendar
+from src.menu.widgets.inline import SwitchInlineQueryCurrentChat
 
 # Main menu window
 main_menu = Window(
     Format("👋 Главное меню\n\nВыберите действие:"),
     Column(
         Button(Const("👤 Мой профиль"), id="profile", on_click=on_profile_click),
+        SwitchInlineQueryCurrentChat(
+            Const("🔍 Найти посетителя"),
+            id="search_client",
+            switch_inline_query=Const("")
+        ),
         Start(
-            Const("➕ Записать нового посетителя"),
+            Const("👤 Новый посетитель"),
             id="new_client",
             state=NewClientSG.input_name
         ),
@@ -46,6 +53,16 @@ profile_window = Window(
     Button(Const("◀️ Назад"), id="back", on_click=on_back_to_main),
     state=MainMenu.profile,
     getter=get_profile_data
+)
+
+# Client profile window
+client_profile_window = Window(
+    Format("👤 Профиль посетителя\n\n"
+           "ФИО: {full_name}\n"
+           "Дата рождения: {birth_date}"),
+    Button(Const("◀️ Назад"), id="back", on_click=on_back_to_main),
+    state=MainMenu.client_profile,
+    getter=get_client_profile_data
 )
 
 # Service selection window
@@ -113,6 +130,7 @@ confirm_booking_window = Window(
 menu_dialog = Dialog(
     main_menu,
     profile_window,
+    client_profile_window,
     select_service_window,
     select_date_window,
     select_time_window,

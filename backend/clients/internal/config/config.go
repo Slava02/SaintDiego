@@ -50,8 +50,13 @@ func (c DatabaseConfig) Conn() string {
 
 type GRPCClientConfig struct {
 	ClientServices ServicesConfig `toml:"client_services" validate:"required"`
+	Events         EventsConfig   `toml:"events" validate:"required"`
 }
 
 type ServicesConfig struct {
+	Addr string `toml:"addr" validate:"required,hostname_port"`
+}
+
+type EventsConfig struct {
 	Addr string `toml:"addr" validate:"required,hostname_port"`
 }

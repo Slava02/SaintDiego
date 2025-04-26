@@ -9,7 +9,6 @@ import (
 
 	"github.com/Slava02/SaintDiego/backend/common/storage"
 	"github.com/Slava02/SaintDiego/backend/events/internal/models"
-	"github.com/uptrace/bun"
 )
 
 var (
@@ -210,47 +209,21 @@ func (r *EventRepository) GetEventsByServiceId(ctx context.Context, serviceID in
 	return events, int64(total), nil
 }
 
-func (r *EventRepository) GetTimeSlotIDByEventID(ctx context.Context, eventID int64) (int64, error) {
-	_, err := r.GetEvent(ctx, eventID)
-	if err != nil {
-		if errors.Is(err, ErrEventNotFound) {
-			return 0, fmt.Errorf("%w", ErrEventNotFound)
-		}
-
-		return 0, fmt.Errorf("get event: %w", err)
-	}
-
-	type TimeSlotID struct {
-		bun.BaseModel `bun:"table:time_slot,alias:ts"`
-		ID            int64 `bun:"id"`
-	}
-
-	var timeSlotID TimeSlotID
-	err = r.db.Select(ctx, &timeSlotID).
-		ColumnExpr("ts.id").
-		Join("JOIN time_slot_service tss ON ts.id = tss.time_slot_id").
-		Join("JOIN event e ON tss.id = e.time_slot_service_id").
-		Where("e.id = ?", eventID).
-		Scan(ctx)
-	if err != nil {
-		return 0, fmt.Errorf("get time slot id: %w", err)
-	}
-
-	return timeSlotID.ID, nil
-}
-
-func (r *EventRepository) GetTimeSlotWithParticipantCount(ctx context.Context, timeSlotServiceID int64) (*models.TimeSlotWithParticipantCount, error) {
+func (r *EventRepository) GetTimeSlotWithParticipantCountByEventID(ctx context.Context, eventID int64) (*models.TimeSlotWithParticipantCount, error) {
 	var timeSlot models.TimeSlotWithParticipantCount
 	err := r.db.Select(ctx, &timeSlot).
 		ColumnExpr("ts.id, ts.capacity, COUNT(ec.id) as participant_count").
 		Join("JOIN time_slot_service tss ON ts.id = tss.time_slot_id").
 		Join("JOIN event e ON tss.id = e.time_slot_service_id").
 		Join("LEFT JOIN event_client ec ON e.id = ec.event_id").
-		Where("ts.id = ?", timeSlotServiceID).
+		Where("e.id = ?", eventID).
 		Group("ts.id").
 		Scan(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("get time slot: %w", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%w", ErrEventNotFound)
+		}
+		return nil, fmt.Errorf("get time slot with participant count: %w", err)
 	}
 
 	return &timeSlot, nil

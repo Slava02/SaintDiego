@@ -50,3 +50,9 @@ type Service struct {
 	CreatedAt time.Time `bun:"created_at" json:"created_at"`
 	UpdatedAt time.Time `bun:"updated_at" json:"updated_at"`
 }
+
+type Event struct {
+	Id                int64 ` json:"id"`
+	Capacity          int32 ` json:"capacity"`
+	ParticipantsCount int32 `json:"participants_count"`
+}

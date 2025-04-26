@@ -1,8 +1,9 @@
 import logging
 from datetime import datetime
-from aiogram_dialog import DialogManager
+from aiogram_dialog import DialogManager, StartMode
 from src.services.volunteer import VolunteerService
 from src.services.booking import BookingService
+from src.states.menu import MainMenu
 
 logger = logging.getLogger(__name__)
 
@@ -102,4 +103,26 @@ async def get_events_data(dialog_manager: DialogManager, **kwargs):
         "selected_date": dialog_manager.dialog_data.get("selected_date", ""),
         "service_name": dialog_manager.dialog_data.get("service_name", ""),
         "event_time": dialog_manager.dialog_data.get("event_time", "")
-    } 
+    }
+
+async def get_client_profile_data(dialog_manager: DialogManager, **kwargs):
+    """Get data for client profile window"""
+    logger.info("Getting client profile data")
+    # Try to get selected_client from dialog_data first, then from kwargs
+    client_data = dialog_manager.dialog_data.get("selected_client") or kwargs.get("selected_client")
+    logger.info(f"Retrieved client data from dialog_data: {client_data}")
+    
+    if not client_data:
+        logger.warning("No client data found in dialog_data, returning blanks")
+        # Return default placeholders to avoid KeyError
+        return {
+            "full_name": "Не указано",
+            "birth_date": "Не указана"
+        }
+    
+    profile_data = {
+        "full_name": client_data.get("full_name", "Не указано"),
+        "birth_date": client_data.get("birth_date", "Не указана")
+    }
+    logger.info(f"Returning profile data: {profile_data}")
+    return profile_data 

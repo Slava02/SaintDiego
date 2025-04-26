@@ -4,8 +4,10 @@ filippo.io/edwards25519 v1.1.0/go.mod h1:BxyFTGdWcka3PhytdK4V28tE5sGfRvvvRV7EaN4
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/HdrHistogram/hdrhistogram-go v1.1.2 h1:5IcZpTvzydCQeHzK4Ef/D5rrSqwxob0t8PQPMybUNFM=
 github.com/HdrHistogram/hdrhistogram-go v1.1.2/go.mod h1:yDgFjdqOqDEKOvasDdhWNXYg9BVp4O+o5f6V/ehm6Oo=
-github.com/Slava02/SaintDiego/backend/common v0.0.0-20250416142604-541f09ede4f2 h1:NKxyYYND3xPkea7KooUB2jjjGvQbAcxk+O3DJeiyku0=
-github.com/Slava02/SaintDiego/backend/common v0.0.0-20250416142604-541f09ede4f2/go.mod h1:8oSaCQ4JmfnNdyIJNgdFICVGcN86zsrkqv2mHbELzhY=
+github.com/Slava02/SaintDiego/backend/common v0.0.0-20250417054842-cb97ca719f45 h1:e81H1cphvlK0u8gFf4FAt9vCSqJVAj8UUmTvpJyNrB4=
+github.com/Slava02/SaintDiego/backend/common v0.0.0-20250417054842-cb97ca719f45/go.mod h1:8oSaCQ4JmfnNdyIJNgdFICVGcN86zsrkqv2mHbELzhY=
+github.com/Slava02/SaintDiego/backend/events v0.0.0-20250425142917-915a210a0acd h1:KoxRzrU+55x3Nnh/inLgEEbaBTbPqzDWCsckuDj2hdU=
+github.com/Slava02/SaintDiego/backend/events v0.0.0-20250425142917-915a210a0acd/go.mod h1:ZlIpIbJGpDROjFhGHkpA32o8M3f+y1n1rJIGOkDZEBI=
 github.com/Slava02/SaintDiego/backend/services v0.0.0-20250419102259-266701d3ccea h1:SfEvkleYMfZzsauQ7kppqKHuK6tgOFSjiBXv+0gITZs=
 github.com/Slava02/SaintDiego/backend/services v0.0.0-20250419102259-266701d3ccea/go.mod h1:bgsoxzYz+zbnVe/E5iCEdM4ulaYfab4eooO2B2rKwQE=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=

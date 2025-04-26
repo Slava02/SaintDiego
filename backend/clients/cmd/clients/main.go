@@ -85,6 +85,7 @@ func run() error {
 
 	servicesClient, err := grpc_services.NewManager(grpc_services.ManagerOptions{
 		ServicesAddr: cfg.GRPCClient.ClientServices.Addr,
+		EventsAddr:   cfg.GRPCClient.Events.Addr,
 	})
 	if err != nil {
 		return fmt.Errorf("init services client: %v", err)
@@ -92,7 +93,7 @@ func run() error {
 
 	// Usecases
 
-	usecase, err := clients.New(clients.NewOptions(clientsRepo, servicesClient.Services()))
+	usecase, err := clients.New(clients.NewOptions(clientsRepo, servicesClient.Services(), servicesClient.Events()))
 	if err != nil {
 		lg.Error("init clients usecase", zap.Error(err))
 		return fmt.Errorf("init clients usecase: %v", err)

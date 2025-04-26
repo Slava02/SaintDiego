@@ -16,6 +16,7 @@ service EventsService {
   rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse) {}
   rpc AddParticipantToEvent(AddParticipantToEventRequest) returns (AddParticipantToEventResponse) {}
   rpc GetParticipantsByEventId(GetParticipantsByEventIdRequest) returns (GetParticipantsByEventIdResponse) {}
+  // TODO: переименовать в GetAvailableEventsByServiceId
   rpc GetEventsByServiceId(GetEventsByServiceIdRequest) returns (GetEventsByServiceIdResponse) {}
   rpc DeleteParticipantFromEvent(DeleteParticipantFromEventRequest) returns (DeleteParticipantFromEventResponse) {}
   rpc GetClientsIdEvents(GetClientsIdEventsRequest) returns (GetClientsIdEventsResponse) {}

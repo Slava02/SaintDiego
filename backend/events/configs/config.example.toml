@@ -19,3 +19,13 @@ db_name = "33"
 password = "33"
 user = "33"
 port = "33"
+
+[grpc_client]
+[grpc_client.services]
+addr = ":50052"
+
+[grpc_client.volunteers]
+addr = ":50054"
+
+[grpc_client.clients]
+addr = ":50055"

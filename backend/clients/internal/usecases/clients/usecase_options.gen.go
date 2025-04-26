@@ -13,6 +13,7 @@ type OptOptionsSetter func(o *Options)
 func NewOptions(
 	ClientsRepository IClientsRepository,
 	ServicesClient IServicesClient,
+	EventsClient IEventsClient,
 	options ...OptOptionsSetter,
 ) Options {
 	o := Options{}
@@ -22,6 +23,8 @@ func NewOptions(
 	o.ClientsRepository = ClientsRepository
 
 	o.ServicesClient = ServicesClient
+
+	o.EventsClient = EventsClient
 
 	for _, opt := range options {
 		opt(&o)
@@ -33,6 +36,7 @@ func (o *Options) Validate() error {
 	errs := new(errors461e464ebed9.ValidationErrors)
 	errs.Add(errors461e464ebed9.NewValidationError("ClientsRepository", _validate_Options_ClientsRepository(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("ServicesClient", _validate_Options_ServicesClient(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("EventsClient", _validate_Options_EventsClient(o)))
 	return errs.AsError()
 }
 
@@ -46,6 +50,13 @@ func _validate_Options_ClientsRepository(o *Options) error {
 func _validate_Options_ServicesClient(o *Options) error {
 	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.ServicesClient, "required"); err != nil {
 		return fmt461e464ebed9.Errorf("field `ServicesClient` did not pass the test: %w", err)
+	}
+	return nil
+}
+
+func _validate_Options_EventsClient(o *Options) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.EventsClient, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `EventsClient` did not pass the test: %w", err)
 	}
 	return nil
 }
