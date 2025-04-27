@@ -16,7 +16,7 @@ type IEventRepository interface {
 	UpdateEvent(ctx context.Context, id int64, capacity int32, datetime time.Time) (*models.Event, error)
 	DeleteEvent(ctx context.Context, id int64) error
 	AddParticipantToEvent(ctx context.Context, eventID, participantID, volunteerID int64) error
-	GetEventsByServiceId(ctx context.Context, serviceID int64, page int64, perPage int64) ([]*models.Event, int64, error)
+	GetAvailableEventsForClientByServiceId(ctx context.Context, serviceID int64, clientID int64, page int64, perPage int64) ([]*models.Event, int64, error)
 	GetParticipantsByEventId(ctx context.Context, eventID int64, page int64, perPage int64) ([]*models.Participant, int64, error)
 	DeleteParticipantFromEvent(ctx context.Context, eventID, participantID int64) error
 	GetClientsIdEvents(ctx context.Context, clientID int64, page int64, perPage int64) ([]*models.Event, int64, error)
@@ -84,6 +84,8 @@ func (u *UseCase) GetEvents(ctx context.Context, params *GetEventsParams) ([]*mo
 		ServiceID:     params.ServiceID,
 		FromDate:      params.FromDate,
 		ToDate:        params.ToDate,
+		PerPage:       int32(params.PerPage),
+		Page:          int32(params.Page),
 	}
 
 	if params.Status != nil {
@@ -220,13 +222,14 @@ func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEvent
 	return participants, total, nil
 }
 
-func (u *UseCase) GetAvailableEventsByServiceId(ctx context.Context, params *GetEventsByServiceIdParams) ([]*models.Event, int64, error) {
+// TODO: добавить проверку на то не записан ли клиент на услугу
+func (u *UseCase) GetAvailableEventsForClientByServiceId(ctx context.Context, params *GetAvailableEventsForClientByServiceIdParams) ([]*models.Event, int64, error) {
 	err := u.servicesClient.GetServiceTypeById(ctx, params.ServiceID)
 	if err != nil {
 		return nil, 0, fmt.Errorf("get service type by id: %w", err)
 	}
 
-	events, total, err := u.eventRepository.GetEventsByServiceId(ctx, params.ServiceID, params.Page, params.PerPage)
+	events, total, err := u.eventRepository.GetAvailableEventsForClientByServiceId(ctx, params.ServiceID, params.ClientID, params.Page, params.PerPage)
 	if err != nil {
 		return nil, 0, fmt.Errorf("get events: %v", err)
 	}

@@ -19,8 +19,9 @@ type GetEventsParams struct {
 	PerPage       int64      `json:"per_page"`
 }
 
-type GetEventsByServiceIdParams struct {
+type GetAvailableEventsForClientByServiceIdParams struct {
 	ServiceID int64 `json:"service_id"`
+	ClientID  int64 `json:"client_id"`
 	Page      int64 `json:"page"`
 	PerPage   int64 `json:"per_page"`
 }

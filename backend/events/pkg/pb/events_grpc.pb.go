@@ -19,15 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	EventsService_GetEvents_FullMethodName                  = "/events.EventsService/GetEvents"
-	EventsService_GetEventById_FullMethodName               = "/events.EventsService/GetEventById"
-	EventsService_UpdateEvent_FullMethodName                = "/events.EventsService/UpdateEvent"
-	EventsService_DeleteEvent_FullMethodName                = "/events.EventsService/DeleteEvent"
-	EventsService_AddParticipantToEvent_FullMethodName      = "/events.EventsService/AddParticipantToEvent"
-	EventsService_GetParticipantsByEventId_FullMethodName   = "/events.EventsService/GetParticipantsByEventId"
-	EventsService_GetEventsByServiceId_FullMethodName       = "/events.EventsService/GetEventsByServiceId"
-	EventsService_DeleteParticipantFromEvent_FullMethodName = "/events.EventsService/DeleteParticipantFromEvent"
-	EventsService_GetClientsIdEvents_FullMethodName         = "/events.EventsService/GetClientsIdEvents"
+	EventsService_GetEvents_FullMethodName                              = "/events.EventsService/GetEvents"
+	EventsService_GetEventById_FullMethodName                           = "/events.EventsService/GetEventById"
+	EventsService_UpdateEvent_FullMethodName                            = "/events.EventsService/UpdateEvent"
+	EventsService_DeleteEvent_FullMethodName                            = "/events.EventsService/DeleteEvent"
+	EventsService_AddParticipantToEvent_FullMethodName                  = "/events.EventsService/AddParticipantToEvent"
+	EventsService_GetParticipantsByEventId_FullMethodName               = "/events.EventsService/GetParticipantsByEventId"
+	EventsService_GetAvailableEventsForClientByServiceId_FullMethodName = "/events.EventsService/GetAvailableEventsForClientByServiceId"
+	EventsService_DeleteParticipantFromEvent_FullMethodName             = "/events.EventsService/DeleteParticipantFromEvent"
+	EventsService_GetClientsIdEvents_FullMethodName                     = "/events.EventsService/GetClientsIdEvents"
 )
 
 // EventsServiceClient is the client API for EventsService service.
@@ -43,7 +43,7 @@ type EventsServiceClient interface {
 	DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...grpc.CallOption) (*DeleteEventResponse, error)
 	AddParticipantToEvent(ctx context.Context, in *AddParticipantToEventRequest, opts ...grpc.CallOption) (*AddParticipantToEventResponse, error)
 	GetParticipantsByEventId(ctx context.Context, in *GetParticipantsByEventIdRequest, opts ...grpc.CallOption) (*GetParticipantsByEventIdResponse, error)
-	GetEventsByServiceId(ctx context.Context, in *GetEventsByServiceIdRequest, opts ...grpc.CallOption) (*GetEventsByServiceIdResponse, error)
+	GetAvailableEventsForClientByServiceId(ctx context.Context, in *GetAvailableEventsForClientByServiceIdRequest, opts ...grpc.CallOption) (*GetAvailableEventsForClientByServiceIdResponse, error)
 	DeleteParticipantFromEvent(ctx context.Context, in *DeleteParticipantFromEventRequest, opts ...grpc.CallOption) (*DeleteParticipantFromEventResponse, error)
 	GetClientsIdEvents(ctx context.Context, in *GetClientsIdEventsRequest, opts ...grpc.CallOption) (*GetClientsIdEventsResponse, error)
 }
@@ -116,10 +116,10 @@ func (c *eventsServiceClient) GetParticipantsByEventId(ctx context.Context, in *
 	return out, nil
 }
 
-func (c *eventsServiceClient) GetEventsByServiceId(ctx context.Context, in *GetEventsByServiceIdRequest, opts ...grpc.CallOption) (*GetEventsByServiceIdResponse, error) {
+func (c *eventsServiceClient) GetAvailableEventsForClientByServiceId(ctx context.Context, in *GetAvailableEventsForClientByServiceIdRequest, opts ...grpc.CallOption) (*GetAvailableEventsForClientByServiceIdResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetEventsByServiceIdResponse)
-	err := c.cc.Invoke(ctx, EventsService_GetEventsByServiceId_FullMethodName, in, out, cOpts...)
+	out := new(GetAvailableEventsForClientByServiceIdResponse)
+	err := c.cc.Invoke(ctx, EventsService_GetAvailableEventsForClientByServiceId_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +159,7 @@ type EventsServiceServer interface {
 	DeleteEvent(context.Context, *DeleteEventRequest) (*DeleteEventResponse, error)
 	AddParticipantToEvent(context.Context, *AddParticipantToEventRequest) (*AddParticipantToEventResponse, error)
 	GetParticipantsByEventId(context.Context, *GetParticipantsByEventIdRequest) (*GetParticipantsByEventIdResponse, error)
-	GetEventsByServiceId(context.Context, *GetEventsByServiceIdRequest) (*GetEventsByServiceIdResponse, error)
+	GetAvailableEventsForClientByServiceId(context.Context, *GetAvailableEventsForClientByServiceIdRequest) (*GetAvailableEventsForClientByServiceIdResponse, error)
 	DeleteParticipantFromEvent(context.Context, *DeleteParticipantFromEventRequest) (*DeleteParticipantFromEventResponse, error)
 	GetClientsIdEvents(context.Context, *GetClientsIdEventsRequest) (*GetClientsIdEventsResponse, error)
 	mustEmbedUnimplementedEventsServiceServer()
@@ -190,8 +190,8 @@ func (UnimplementedEventsServiceServer) AddParticipantToEvent(context.Context, *
 func (UnimplementedEventsServiceServer) GetParticipantsByEventId(context.Context, *GetParticipantsByEventIdRequest) (*GetParticipantsByEventIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetParticipantsByEventId not implemented")
 }
-func (UnimplementedEventsServiceServer) GetEventsByServiceId(context.Context, *GetEventsByServiceIdRequest) (*GetEventsByServiceIdResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetEventsByServiceId not implemented")
+func (UnimplementedEventsServiceServer) GetAvailableEventsForClientByServiceId(context.Context, *GetAvailableEventsForClientByServiceIdRequest) (*GetAvailableEventsForClientByServiceIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAvailableEventsForClientByServiceId not implemented")
 }
 func (UnimplementedEventsServiceServer) DeleteParticipantFromEvent(context.Context, *DeleteParticipantFromEventRequest) (*DeleteParticipantFromEventResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteParticipantFromEvent not implemented")
@@ -328,20 +328,20 @@ func _EventsService_GetParticipantsByEventId_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
-func _EventsService_GetEventsByServiceId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetEventsByServiceIdRequest)
+func _EventsService_GetAvailableEventsForClientByServiceId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAvailableEventsForClientByServiceIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(EventsServiceServer).GetEventsByServiceId(ctx, in)
+		return srv.(EventsServiceServer).GetAvailableEventsForClientByServiceId(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: EventsService_GetEventsByServiceId_FullMethodName,
+		FullMethod: EventsService_GetAvailableEventsForClientByServiceId_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EventsServiceServer).GetEventsByServiceId(ctx, req.(*GetEventsByServiceIdRequest))
+		return srv.(EventsServiceServer).GetAvailableEventsForClientByServiceId(ctx, req.(*GetAvailableEventsForClientByServiceIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -414,8 +414,8 @@ var EventsService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _EventsService_GetParticipantsByEventId_Handler,
 		},
 		{
-			MethodName: "GetEventsByServiceId",
-			Handler:    _EventsService_GetEventsByServiceId_Handler,
+			MethodName: "GetAvailableEventsForClientByServiceId",
+			Handler:    _EventsService_GetAvailableEventsForClientByServiceId_Handler,
 		},
 		{
 			MethodName: "DeleteParticipantFromEvent",

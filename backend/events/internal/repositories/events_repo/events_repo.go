@@ -185,7 +185,7 @@ func (r *EventRepository) GetParticipantsByEventId(ctx context.Context, eventID 
 }
 
 // Список событий по serviceID, с учетом окна бронирования и количества участников
-func (r *EventRepository) GetEventsByServiceId(ctx context.Context, serviceID int64, page int64, perPage int64) ([]*models.Event, int64, error) {
+func (r *EventRepository) GetAvailableEventsForClientByServiceId(ctx context.Context, serviceID int64, clientID int64, page int64, perPage int64) ([]*models.Event, int64, error) {
 	var events []*models.Event
 
 	offset := (page - 1) * perPage
@@ -197,6 +197,7 @@ func (r *EventRepository) GetEventsByServiceId(ctx context.Context, serviceID in
 		Group("e.id").
 		Where("e.service_type_id = ?", serviceID).
 		Where("e.datetime <= DATE_ADD(CURDATE(), INTERVAL tss.booking_window DAY)").
+		Where("NOT EXISTS (SELECT 1 FROM event_client ec2 WHERE ec2.event_id = e.id AND ec2.client_id = ?)", clientID).
 		Having("COUNT(ec.id) < e.capacity").
 		Limit(int(perPage)).
 		Offset(int(offset)).
