@@ -254,6 +254,7 @@ LoopForEvents:
 			continue
 		}
 
+		// Провяеряем не является ли уже участником события клиент
 		for _, client := range event.Clients {
 			if client.ID == params.ClientID {
 				filteredEventCnt++
