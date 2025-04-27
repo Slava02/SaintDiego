@@ -93,14 +93,23 @@ async def on_confirm_booking(callback, button, manager: DialogManager):
     
     await manager.switch_to(MainMenu.main)
 
-async def process_new_client_result(data: dict, manager: DialogManager):
+async def process_new_client_result(start_data: dict, result: dict, manager: DialogManager):
     """Process result of new client dialog"""
-    client_id = data.get("client_id")
+    client_id = result.get("client_id")
     if client_id:
         # Save client ID in dialog_data
         manager.dialog_data["client_id"] = client_id
-        # Switch to service selection
-        await manager.switch_to(MainMenu.select_service)
+        
+        # Get client data for profile
+        selected_client = result.get("selected_client")
+        if selected_client:
+            manager.dialog_data["selected_client"] = selected_client
+            logger.info(f"Navigating to client profile with data: {selected_client}")
+        else:
+            logger.warning("No client data found in result, only ID available")
+            
+        # Switch to client profile instead of service selection
+        await manager.switch_to(MainMenu.client_profile)
 
 # Новые обработчики для истории записей клиента
 
@@ -113,6 +122,12 @@ async def on_view_client_history(callback: CallbackQuery, button: Button, manage
 async def on_back_to_client_profile(callback: CallbackQuery, button: Button, manager: DialogManager):
     """Handle back to client profile button click"""
     await manager.switch_to(MainMenu.client_profile)
+
+async def on_book_service(callback: CallbackQuery, button: Button, manager: DialogManager):
+    """Handle book service button click"""
+    # Reset service page counter
+    manager.dialog_data["service_page"] = 1
+    await manager.switch_to(MainMenu.select_service)
 
 async def on_next_history_page(callback: CallbackQuery, button: Button, manager: DialogManager):
     """Handle next history page button click"""

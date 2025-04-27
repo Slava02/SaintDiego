@@ -27,6 +27,14 @@ async def get_services_data(dialog_manager: DialogManager, **kwargs):
     client_id = dialog_manager.dialog_data.get("client_id")
     page = dialog_manager.dialog_data.get("service_page", 1)
     
+    if not client_id:
+        logger.error("No client_id found in dialog_data")
+        return {
+            "services": [],
+            "current_page": page,
+            "total_pages": 1
+        }
+    
     logger.info(f"Getting services data for client_id={client_id}, page={page}")
     
     services_data = await booking_service.get_available_services(client_id, page=page)
@@ -109,8 +117,15 @@ async def get_client_profile_data(dialog_manager: DialogManager, **kwargs):
     """Get data for client profile window"""
     logger.info("Getting client profile data")
     # Try to get selected_client from start_data first, then from dialog_data
-    client_data = dialog_manager.start_data.get("selected_client")
-    source = "start_data"
+    client_data = None
+    source = ""
+    
+    # Safely check start_data first (might be None when using switch_to)
+    if hasattr(dialog_manager, 'start_data') and dialog_manager.start_data is not None:
+        client_data = dialog_manager.start_data.get("selected_client")
+        source = "start_data"
+        
+    # Fallback to dialog_data if not found or start_data is None
     if not client_data:
         # Fallback to dialog_data
         client_data = dialog_manager.dialog_data.get("selected_client")
@@ -127,9 +142,14 @@ async def get_client_profile_data(dialog_manager: DialogManager, **kwargs):
         }
     
     profile_data = {
+        "client_id": client_data.get("id", 0),
         "full_name": client_data.get("full_name", "Не указано"),
         "birth_date": client_data.get("birth_date", "Не указана")
     }
+    
+    # Save client_id in dialog_data for other getters
+    dialog_manager.dialog_data["client_id"] = profile_data["client_id"]
+    
     logger.info(f"Returning profile data: {profile_data}")
     return profile_data
 

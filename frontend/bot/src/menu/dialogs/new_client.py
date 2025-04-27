@@ -93,9 +93,16 @@ async def on_confirm(callback, button, manager: DialogManager):
     
     if client:
         logger.info(f"Client created successfully: {client}")
+        # Prepare client data for profile window
+        client_data = {
+            "id": client.id,
+            "full_name": client.full_name,
+            "birth_date": client.birth_date.strftime("%d.%m.%Y") if client.birth_date else "Не указана"
+        }
         # Save client ID in dialog_data
         manager.dialog_data["client_id"] = client.id
-        await manager.done({"client_id": client.id})
+        manager.dialog_data["selected_client"] = client_data
+        await manager.done({"client_id": client.id, "selected_client": client_data})
     else:
         logger.error("Failed to create client")
         await callback.message.answer("❌ Произошла ошибка при создании клиента")
@@ -103,8 +110,10 @@ async def on_confirm(callback, button, manager: DialogManager):
 
 async def on_create_new(callback: CallbackQuery, button: Button, manager: DialogManager):
     """Обработчик нажатия кнопки создания нового клиента"""
-    # Переходим к вводу имени
-    await manager.switch_to(NewClientSG.input_name)
+    # Переходим к подтверждению введенных данных
+    logger.info("Going to confirmation from 'create new' button")
+    logger.info(f"Dialog data at this point: {manager.dialog_data}")
+    await manager.switch_to(NewClientSG.confirm)
 
 async def on_existing_client_selected(callback: CallbackQuery, select: Select, manager: DialogManager, item_id: str):
     """Обработчик выбора существующего клиента из списка"""
@@ -124,6 +133,10 @@ async def on_existing_client_selected(callback: CallbackQuery, select: Select, m
         return
     
     logger.info(f"Selected existing client: {selected_client}")
+    
+    # Сохраняем данные клиента в dialog_data для доступа через get_client_profile_data
+    manager.dialog_data["selected_client"] = selected_client
+    
     # Открываем окно профиля клиента
     await manager.start(
         state=MainMenu.client_profile,

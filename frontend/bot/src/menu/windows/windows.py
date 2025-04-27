@@ -24,7 +24,8 @@ from src.menu.handlers.buttons import (
     on_view_client_history,
     on_back_to_client_profile,
     on_next_history_page,
-    on_prev_history_page
+    on_prev_history_page,
+    on_book_service
 )
 from src.menu.widgets.calendar import CustomCalendar
 from src.menu.widgets.inline import SwitchInlineQueryCurrentChat
@@ -68,6 +69,7 @@ client_profile_window = Window(
            "Дата рождения: {birth_date}"),
     Column(
         Button(Const("📋 История записей"), id="client_history", on_click=on_view_client_history),
+        Button(Const("📝 Записать"), id="book_service", on_click=on_book_service),
         Button(Const("◀️ Назад"), id="back", on_click=on_back_to_main),
     ),
     state=MainMenu.client_profile,
@@ -140,7 +142,7 @@ select_service_window = Window(
         on_click=on_service_selected
     ),
     Row(
-        Button(Const("◀️ Назад"), id="back", on_click=on_back_to_main),
+        Button(Const("◀️ Назад"), id="back", on_click=on_back_to_client_profile),
     ),
     state=MainMenu.select_service,
     getter=get_services_data
