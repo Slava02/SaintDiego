@@ -155,6 +155,8 @@ func (h Handlers) PutEventsIdParticipants(c echo.Context, id int64) error {
 			return c.JSON(http.StatusNotFound, Err("Event not found", err.Error()))
 		case codes.ResourceExhausted:
 			return c.JSON(http.StatusConflict, Err("Event is full", err.Error()))
+		case codes.AlreadyExists:
+			return c.JSON(http.StatusUnprocessableEntity, Err("Client already participant", err.Error()))
 		default:
 			return c.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
 		}
@@ -190,6 +192,31 @@ func (h Handlers) GetEventsIdParticipants(c echo.Context, id int64, params GetEv
 	})
 }
 
+// TODO: move to clients (only handler)
+func (h Handlers) GetClientsIdServicesServiceIdEvents(c echo.Context, id int64, serviceId int64) error {
+	var req events.GetEventsServicesIdParams
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
+	}
+
+	req.ServiceID = serviceId
+	req.ClientID = id
+
+	events, total, err := h.eventsUC.GetEventsByServiceId(c.Request().Context(), &req)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, GetEventsResponse{
+		Items:      convertEventsToResponse(events),
+		Total:      int32(total),
+		Page:       req.Page,
+		PerPage:    req.PerPage,
+		TotalPages: int32(math.Ceil(float64(total) / float64(req.PerPage))),
+	})
+}
+
+// TODO: DEPRECATED USE get clients/{id}/services/{service_id}/events
 func (h Handlers) GetEventsServicesId(c echo.Context, id int64, params GetEventsServicesIdParams) error {
 	var req events.GetEventsServicesIdParams
 	if err := c.Bind(&req); err != nil {

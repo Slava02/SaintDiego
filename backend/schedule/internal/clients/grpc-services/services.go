@@ -33,7 +33,6 @@ func NewServicesClient(opts ServicesClientOptions) (*ServicesClient, error) {
 	// Create gRPC connection with tracing interceptor and blocking mode
 	conn, err := grpc.DialContext(ctx, opts.ServicesServerAddr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(), // Wait for connection to be established
 		grpc.WithUnaryInterceptor(retry.UnaryClientInterceptor(
 			retry.WithMax(3),
 			retry.WithPerRetryTimeout(2*time.Second),

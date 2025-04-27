@@ -4,8 +4,8 @@ go 1.24.2
 
 require (
 	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250417054842-cb97ca719f45
-	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250425142917-915a210a0acd
-	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250419102259-266701d3ccea
+	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250427084852-4e1049a21478
+	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250425142917-915a210a0acd
 	github.com/go-sql-driver/mysql v1.9.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.1

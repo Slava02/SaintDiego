@@ -156,6 +156,8 @@ func (s *Implementation) AddParticipantToEvent(ctx context.Context, req *pb.AddP
 			return nil, status.Errorf(codes.ResourceExhausted, "event is full")
 		case errors.Is(err, events.ErrTimeSlotIsFull):
 			return nil, status.Errorf(codes.ResourceExhausted, "time slot is full")
+		case errors.Is(err, events.ErrClientAlreadyParticipant):
+			return nil, status.Errorf(codes.AlreadyExists, "client already participant")
 		default:
 			return nil, status.Errorf(codes.Internal, "failed to add participant to event: %v", err)
 		}

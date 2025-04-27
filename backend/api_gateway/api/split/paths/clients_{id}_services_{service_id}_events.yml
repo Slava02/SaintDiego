@@ -1,0 +1,52 @@
+get:
+  tags:
+    - clients
+  summary: Получение списка событий доступных клиенту по услуге
+  parameters:
+    - name: id
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+    - name: service_id
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '200':
+      description: Успешный ответ
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/GetEventsResponse.yml
+    '400':
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '401':
+      description: Access denied
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '404':
+      description: Клиент не найден
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml

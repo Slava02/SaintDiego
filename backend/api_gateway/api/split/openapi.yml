@@ -45,6 +45,8 @@ paths:
     $ref: paths/clients_{id}_events.yml
   /clients/{id}/services:
     $ref: paths/clients_{id}_services.yml
+  /clients/{id}/services/{service_id}/events:
+    $ref: paths/clients_{id}_services_{service_id}_events.yml
   /volunteers:
     $ref: paths/volunteers.yml
   /volunteers/{tg_id}:

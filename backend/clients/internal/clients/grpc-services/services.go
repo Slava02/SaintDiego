@@ -37,7 +37,6 @@ func NewServicesClient(opts ServicesClientOptions) (*ServicesClient, error) {
 			retry.WithPerRetryTimeout(2*time.Second),
 		)),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(), // Wait for connection to be established
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to Services service: %w", err)

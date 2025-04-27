@@ -27,7 +27,7 @@ type IServicesClient interface {
 }
 
 type IEventsClient interface {
-	GetEventsByServiceId(ctx context.Context, serviceID int64) ([]*models.Event, error)
+	GetAvailableEventsForClientByServiceId(ctx context.Context, serviceID int64, clientID int64) ([]*models.Event, error)
 }
 
 const (
@@ -180,7 +180,7 @@ func (u *UseCase) GetClientServices(ctx context.Context, req *GetClientServicesR
 	var busyServices int64
 
 	for _, service := range services {
-		events, err := u.eventsClient.GetEventsByServiceId(ctx, service.Id)
+		events, err := u.eventsClient.GetAvailableEventsForClientByServiceId(ctx, service.Id, client.Id)
 		if err != nil {
 			return nil, 0, fmt.Errorf("get events by service id: %w", err)
 		}

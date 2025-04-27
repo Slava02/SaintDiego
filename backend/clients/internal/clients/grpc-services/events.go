@@ -53,18 +53,19 @@ func (c *EventsClient) Close() error {
 	return c.conn.Close()
 }
 
-func (c *EventsClient) GetEventsByServiceId(ctx context.Context, serviceID int64) ([]*models.Event, error) {
+func (c *EventsClient) GetAvailableEventsForClientByServiceId(ctx context.Context, serviceID int64, clientID int64) ([]*models.Event, error) {
 	var allEvents []*models.Event
 	page := int64(1)
 	perPage := int64(100)
 
 	for {
-		params := &api.GetEventsByServiceIdRequest{
+		params := &api.GetAvailableEventsForClientByServiceIdRequest{
 			ServiceId: serviceID,
+			ClientId:  clientID,
 			Page:      page,
 			PerPage:   perPage,
 		}
-		resp, err := c.EventsServiceClient.GetEventsByServiceId(ctx, params)
+		resp, err := c.EventsServiceClient.GetAvailableEventsForClientByServiceId(ctx, params)
 		if err != nil {
 			return nil, err
 		}

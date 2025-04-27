@@ -1,7 +1,8 @@
 get:
   tags:
     - clients
-  summary: Получение списка событий клиента
+  summary: USE get events?participant_id={id}
+  deprecated: true
   parameters:
     - name: id
       in: path

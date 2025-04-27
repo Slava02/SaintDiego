@@ -40,10 +40,11 @@ type IVolunteersClient interface {
 }
 
 var (
-	ErrEventNotFound  = errors.New("event not found")
-	ErrClientNotFound = errors.New("client not found")
-	ErrEventIsFull    = errors.New("event is full")
-	ErrTimeSlotIsFull = errors.New("time slot is full")
+	ErrEventNotFound            = errors.New("event not found")
+	ErrClientNotFound           = errors.New("client not found")
+	ErrEventIsFull              = errors.New("event is full")
+	ErrTimeSlotIsFull           = errors.New("time slot is full")
+	ErrClientAlreadyParticipant = errors.New("client already participant")
 )
 
 //go:generate options-gen -out-filename=events_options.gen.go -from-struct=Options
@@ -170,7 +171,35 @@ func (u *UseCase) AddParticipantToEvent(ctx context.Context, params *AddParticip
 		return fmt.Errorf("get client by id: %w", err)
 	}
 
+	// Проверяем не является ли клиент уже участником события
+	pageParticipants := int64(1)
+	perPageParticipants := int64(100)
+
+	for {
+		participants, _, err := u.GetParticipantsByEventId(ctx, &GetEventsIdParticipantsParams{
+			EventID: params.EventID,
+			Page:    pageParticipants,
+			PerPage: perPageParticipants,
+		})
+		if err != nil {
+			return fmt.Errorf("get participants: %v", err)
+		}
+
+		for _, participant := range participants {
+			if participant.ID == params.ParticipantID {
+				return fmt.Errorf("%w", ErrClientAlreadyParticipant)
+			}
+		}
+
+		if len(participants) < int(perPageParticipants) {
+			break
+		}
+
+		pageParticipants++
+	}
+
 	err = u.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
+
 		event, err := u.GetEvent(ctx, params.EventID)
 		if err != nil {
 			return fmt.Errorf("get event: %w", err)

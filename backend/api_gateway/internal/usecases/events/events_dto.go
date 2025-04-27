@@ -35,6 +35,7 @@ type GetEventsServicesIdParams struct {
 	Page      int32 `query:"page" json:"page" validate:"required,min=1"`
 	PerPage   int32 `query:"per_page" json:"per_page" validate:"required,min=1,max=100"`
 	ServiceID int64 `query:"service_id" json:"service_id" validate:"required,min=1"`
+	ClientID  int64 `query:"client_id" json:"client_id" validate:"required,min=1"`
 }
 
 type GetClientsIdEventsParams struct {

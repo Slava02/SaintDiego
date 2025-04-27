@@ -17,7 +17,7 @@ type IEventsClient interface {
 	DeleteEvent(ctx context.Context, req *pb.DeleteEventRequest) (*pb.DeleteEventResponse, error)
 	AddParticipantToEvent(ctx context.Context, req *pb.AddParticipantToEventRequest) (*pb.AddParticipantToEventResponse, error)
 	GetParticipantsByEventId(ctx context.Context, req *pb.GetParticipantsByEventIdRequest) (*pb.GetParticipantsByEventIdResponse, error)
-	GetEventsByServiceId(ctx context.Context, req *pb.GetEventsByServiceIdRequest) (*pb.GetEventsByServiceIdResponse, error)
+	GetAvailableEventsForClientByServiceId(ctx context.Context, req *pb.GetAvailableEventsForClientByServiceIdRequest) (*pb.GetAvailableEventsForClientByServiceIdResponse, error)
 	DeleteParticipantFromEvent(ctx context.Context, req *pb.DeleteParticipantFromEventRequest) (*pb.DeleteParticipantFromEventResponse, error)
 	GetClientsIdEvents(ctx context.Context, req *pb.GetClientsIdEventsRequest) (*pb.GetClientsIdEventsResponse, error)
 }
@@ -160,13 +160,14 @@ func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEvent
 }
 
 func (u *UseCase) GetEventsByServiceId(ctx context.Context, params *GetEventsServicesIdParams) ([]*models.Event, int32, error) {
-	pbReq := &pb.GetEventsByServiceIdRequest{
+	pbReq := &pb.GetAvailableEventsForClientByServiceIdRequest{
 		ServiceId: params.ServiceID,
+		ClientId:  params.ClientID,
 		Page:      int64(params.Page),
 		PerPage:   int64(params.PerPage),
 	}
 
-	pbRes, err := u.eventsClient.GetEventsByServiceId(ctx, pbReq)
+	pbRes, err := u.eventsClient.GetAvailableEventsForClientByServiceId(ctx, pbReq)
 	if err != nil {
 		return nil, 0, fmt.Errorf("get events by service id: %w", err)
 	}

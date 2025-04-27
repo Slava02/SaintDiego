@@ -106,6 +106,12 @@ put:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
+    "422":
+      description: Client already participant
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
     "500":
       description: Internal server error
       content:

@@ -4,12 +4,12 @@ go 1.24.2
 
 require (
 	github.com/Slava02/SaintDiego/backend/auth v0.0.0-20250423111436-6cd4c9e44ba8
-	github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250419102259-266701d3ccea
+	github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250425142917-915a210a0acd
 	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250421132310-f418824f9975
-	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250425083717-1c5d048f1fc4
+	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250427084852-4e1049a21478
 	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250416101532-01831f40d320
-	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250416101532-01831f40d320
-	github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250417082830-2c52583760c7
+	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250425142917-915a210a0acd
+	github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250425142917-915a210a0acd
 	github.com/getkin/kin-openapi v0.131.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.1
