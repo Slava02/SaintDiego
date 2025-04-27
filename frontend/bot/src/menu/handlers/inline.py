@@ -75,11 +75,12 @@ async def create_new_client(message: Message, dialog_manager: DialogManager):
         await message.delete()
     except Exception:
         pass
-    await dialog_manager.start(NewClientSG.input_name, mode=StartMode.NORMAL)
+    await dialog_manager.start(NewClientSG.input_name)
 
 @router.message(F.text.startswith("/client_"))
 async def handle_client_selection(message: Message, dialog_manager: DialogManager):
     """Handle client selection via /client_<id> command from inline query."""
+    logger.info(f"Initial dialog_data: {dialog_manager.dialog_data}")
     # Delete the service message
     try:
         await message.delete()
@@ -109,10 +110,9 @@ async def handle_client_selection(message: Message, dialog_manager: DialogManage
         "full_name": client.full_name,
         "birth_date": client.birth_date.strftime("%d.%m.%Y") if client.birth_date else "Не указана"
     }
-    # Start client profile dialog, passing selected_client in data to getter
-    logger.info(f"Starting client profile dialog with data: {client_data}")
+    # Start client profile dialog with start_data
+    logger.info(f"Starting client profile dialog with start_data: {client_data}")
     await dialog_manager.start(
-        MainMenu.client_profile,
-        mode=StartMode.NORMAL,
+        state=MainMenu.client_profile,
         data={"selected_client": client_data}
     ) 

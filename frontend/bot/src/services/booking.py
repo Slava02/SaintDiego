@@ -108,3 +108,56 @@ class BookingService:
                 self.logger.error(f"Failed to book event: {response_text}")
                 return False
 
+    async def get_client_events(self, client_id: int, history_limit: int = 5, page: int = 1, per_page: int = 10) -> Dict:
+        """Получение списка событий клиента (предстоящих и прошедших)"""
+        url = f"{self.api_url}/events"
+        params = {
+            "participant_id": client_id,
+            "status": "upcoming",  # Сначала получаем предстоящие события
+            "page": page, 
+            "per_page": per_page
+        }
+        
+        self.logger.info(f"Requesting client events: {url} with params {params}")
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params, headers=self.headers) as response:
+                response_text = await response.text()
+                self.logger.info(f"Response from {url}: {response.status} - {response_text}")
+                
+                if response.status == 200:
+                    data = await response.json()
+                    # Преобразуем список событий в объекты Event
+                    upcoming_events = [Event.from_dict(event) for event in data.get("items", [])]
+                    
+                    # Получаем прошедшие события
+                    params["status"] = "past"
+                    async with session.get(url, params=params, headers=self.headers) as past_response:
+                        if past_response.status == 200:
+                            past_data = await past_response.json()
+                            past_events = [Event.from_dict(event) for event in past_data.get("items", [])]
+                        else:
+                            self.logger.error(f"Failed to get past events: {await past_response.text()}")
+                            past_events = []
+                    
+                    return {
+                        "upcoming_events": upcoming_events,
+                        "past_events": past_events,
+                        "all_events": upcoming_events + past_events,
+                        "total": data.get("total", 0),
+                        "page": page,
+                        "per_page": per_page,
+                        "total_pages": data.get("total_pages", 0)
+                    }
+                
+                self.logger.error(f"Failed to get client events: {response_text}")
+                return {
+                    "upcoming_events": [],
+                    "past_events": [],
+                    "all_events": [],
+                    "total": 0,
+                    "page": page,
+                    "per_page": per_page,
+                    "total_pages": 0
+                }
+

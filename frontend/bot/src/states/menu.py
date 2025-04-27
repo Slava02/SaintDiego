@@ -11,4 +11,5 @@ class MainMenu(StatesGroup):
     select_date = State()  # Выбор даты
     select_time = State()  # Выбор времени
     confirm_booking = State()  # Подтверждение записи
-    client_profile = State()  # Новое состояние для профиля клиента 
+    client_profile = State()  # Новое состояние для профиля клиента
+    client_booking_history = State()  # История записей клиента 

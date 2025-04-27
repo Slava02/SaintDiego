@@ -1,14 +1,15 @@
 import logging
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import Message
-from aiogram_dialog import Dialog, Window, DialogManager
+from aiogram.types import Message, CallbackQuery
+from aiogram_dialog import Dialog, Window, DialogManager, StartMode
 from aiogram_dialog.widgets.text import Const, Format
 from aiogram_dialog.widgets.kbd import Button, Row, Back, Select, Column
-from aiogram_dialog.widgets.input import MessageInput
+from aiogram_dialog.widgets.input import MessageInput, TextInput
 
 from src.utils.validators import validate_full_name
 from src.services.client import ClientService
 from src.models.client import Client
+from src.states.menu import MainMenu
 
 logger = logging.getLogger(__name__)
 
@@ -100,9 +101,34 @@ async def on_confirm(callback, button, manager: DialogManager):
         await callback.message.answer("❌ Произошла ошибка при создании клиента")
         await manager.done()
 
-async def on_create_new(callback, button, manager: DialogManager):
-    """Handle create new client button click"""
-    await manager.switch_to(NewClientSG.confirm)
+async def on_create_new(callback: CallbackQuery, button: Button, manager: DialogManager):
+    """Обработчик нажатия кнопки создания нового клиента"""
+    # Переходим к вводу имени
+    await manager.switch_to(NewClientSG.input_name)
+
+async def on_existing_client_selected(callback: CallbackQuery, select: Select, manager: DialogManager, item_id: str):
+    """Обработчик выбора существующего клиента из списка"""
+    # Находим выбранного клиента по ID
+    clients = manager.dialog_data.get("existing_clients", [])
+    selected_client = None
+    for client in clients:
+        if str(client["id"]) == item_id:
+            selected_client = client
+            break
+    
+    if not selected_client:
+        # Если клиент не найден (что странно), возвращаемся к началу
+        logger.error(f"Client with ID {item_id} not found in dialog_data")
+        logger.debug(f"Available clients: {clients}")
+        await manager.done()
+        return
+    
+    logger.info(f"Selected existing client: {selected_client}")
+    # Открываем окно профиля клиента
+    await manager.start(
+        state=MainMenu.client_profile,
+        data={"selected_client": selected_client}
+    )
 
 # Name input dialog
 new_client_dialog = Dialog(
@@ -123,7 +149,7 @@ new_client_dialog = Dialog(
                 id="existing_clients",
                 item_id_getter=lambda x: str(x["id"]),
                 items="clients",
-                on_click=lambda c, b, m: None  # TODO: Add handler for existing client selection
+                on_click=on_existing_client_selected
             ),
         ),
         Row(

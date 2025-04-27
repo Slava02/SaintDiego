@@ -2,6 +2,8 @@ import logging
 from aiogram_dialog import DialogManager
 from src.services.booking import BookingService
 from src.states.menu import MainMenu
+from aiogram.types import CallbackQuery
+from aiogram_dialog.widgets.kbd import Button
 
 logger = logging.getLogger(__name__)
 
@@ -9,12 +11,12 @@ async def on_profile_click(callback, button, manager: DialogManager):
     """Handle profile button click"""
     await manager.switch_to(MainMenu.profile)
 
-async def on_back_to_main(callback, button, manager: DialogManager):
-    """Handle back to main menu button click"""
+async def on_back_to_main(callback: CallbackQuery, button: Button, manager: DialogManager):
+    """Handle back to main button click"""
     await manager.switch_to(MainMenu.main)
 
-async def on_back_to_service(callback, button, manager: DialogManager):
-    """Handle back to service selection window"""
+async def on_back_to_service(callback: CallbackQuery, button: Button, manager: DialogManager):
+    """Handle back to service selection button click"""
     await manager.switch_to(MainMenu.select_service)
 
 async def on_back_to_date(callback, button, manager: DialogManager):
@@ -91,8 +93,42 @@ async def on_confirm_booking(callback, button, manager: DialogManager):
     
     await manager.switch_to(MainMenu.main)
 
-async def process_new_client_result(start_data, result, manager: DialogManager):
-    """Handle new client creation result"""
-    if result:
-        manager.dialog_data["client_id"] = result["client_id"]
-        await manager.switch_to(MainMenu.select_service) 
+async def process_new_client_result(data: dict, manager: DialogManager):
+    """Process result of new client dialog"""
+    client_id = data.get("client_id")
+    if client_id:
+        # Save client ID in dialog_data
+        manager.dialog_data["client_id"] = client_id
+        # Switch to service selection
+        await manager.switch_to(MainMenu.select_service)
+
+# Новые обработчики для истории записей клиента
+
+async def on_view_client_history(callback: CallbackQuery, button: Button, manager: DialogManager):
+    """Handle view client history button click"""
+    # Reset page counter
+    manager.dialog_data["history_page"] = 1
+    await manager.switch_to(MainMenu.client_booking_history)
+
+async def on_back_to_client_profile(callback: CallbackQuery, button: Button, manager: DialogManager):
+    """Handle back to client profile button click"""
+    await manager.switch_to(MainMenu.client_profile)
+
+async def on_next_history_page(callback: CallbackQuery, button: Button, manager: DialogManager):
+    """Handle next history page button click"""
+    current_page = manager.dialog_data.get("history_page", 1)
+    total_pages = manager.dialog_data.get("total_pages", 1)
+    
+    if current_page < total_pages:
+        manager.dialog_data["history_page"] = current_page + 1
+    
+    await manager.switch_to(MainMenu.client_booking_history)
+
+async def on_prev_history_page(callback: CallbackQuery, button: Button, manager: DialogManager):
+    """Handle previous history page button click"""
+    current_page = manager.dialog_data.get("history_page", 1)
+    
+    if current_page > 1:
+        manager.dialog_data["history_page"] = current_page - 1
+    
+    await manager.switch_to(MainMenu.client_booking_history) 

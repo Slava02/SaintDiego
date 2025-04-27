@@ -1,14 +1,15 @@
 from aiogram_dialog import Window, Dialog
-from aiogram_dialog.widgets.text import Format, Const
+from aiogram_dialog.widgets.text import Format, Const, Multi, Case
 from aiogram_dialog.widgets.kbd import Button, Row, Column, Select, Start
 from src.states.menu import MainMenu
-from src.menu.dialogs.new_client import NewClientSG, new_client_dialog
+from src.menu.dialogs.new_client import NewClientSG
 from src.menu.getters.data import (
     get_main_menu_data,
     get_profile_data,
     get_services_data,
     get_events_data,
-    get_client_profile_data
+    get_client_profile_data,
+    get_client_booking_history
 )
 from src.menu.handlers.buttons import (
     on_profile_click,
@@ -19,10 +20,15 @@ from src.menu.handlers.buttons import (
     on_date_selected,
     on_time_selected,
     on_confirm_booking,
-    process_new_client_result
+    process_new_client_result,
+    on_view_client_history,
+    on_back_to_client_profile,
+    on_next_history_page,
+    on_prev_history_page
 )
 from src.menu.widgets.calendar import CustomCalendar
 from src.menu.widgets.inline import SwitchInlineQueryCurrentChat
+from aiogram.enums import ParseMode
 
 # Main menu window
 main_menu = Window(
@@ -60,9 +66,67 @@ client_profile_window = Window(
     Format("👤 Профиль посетителя\n\n"
            "ФИО: {full_name}\n"
            "Дата рождения: {birth_date}"),
-    Button(Const("◀️ Назад"), id="back", on_click=on_back_to_main),
+    Column(
+        Button(Const("📋 История записей"), id="client_history", on_click=on_view_client_history),
+        Button(Const("◀️ Назад"), id="back", on_click=on_back_to_main),
+    ),
     state=MainMenu.client_profile,
     getter=get_client_profile_data
+)
+
+# Client booking history window
+client_booking_history_window = Window(
+    Format("📋 История записей посетителя\n👤 {full_name}\n\n"),
+    Case(
+        {
+            True: Const("📆 <b>ПРЕДСТОЯЩИЕ ЗАПИСИ:</b>"),
+            False: Const("")
+        },
+        selector=lambda data, case, manager: data.get("has_upcoming", False)
+    ),
+    Case(
+        {
+            True: Format("\n{upcoming_list}"),
+            False: Const("")
+        },
+        selector=lambda data, case, manager: data.get("upcoming_list", "") != ""
+    ),
+    Case(
+        {
+            True: Const("\n\n📚 <b>ПРОШЕДШИЕ ЗАПИСИ:</b>"),
+            False: Const("")
+        },
+        selector=lambda data, case, manager: data.get("has_past", False)
+    ),
+    Case(
+        {
+            True: Format("\n{past_list}"),
+            False: Const("")
+        },
+        selector=lambda data, case, manager: data.get("past_list", "") != ""
+    ),
+    Case(
+        {
+            True: Const("\n\nУ посетителя нет записей"),
+            False: Const("")
+        },
+        selector=lambda data, case, manager: not data.get("has_upcoming", False) and not data.get("has_past", False)
+    ),
+    Row(
+        Button(Const("⬅️"), id="prev_page", on_click=on_prev_history_page, when="page > 1"),
+        Button(Const("◀️ Назад"), id="back", on_click=on_back_to_client_profile),
+        Button(Const("➡️"), id="next_page", on_click=on_next_history_page, when="page < total_pages"),
+    ),
+    Case(
+        {
+            True: Format("Страница {page} из {total_pages}"),
+            False: Const("")
+        },
+        selector=lambda data, case, manager: data.get("page", 1) > 1 or data.get("page", 1) < data.get("total_pages", 1)
+    ),
+    parse_mode=ParseMode.HTML,
+    state=MainMenu.client_booking_history,
+    getter=get_client_booking_history
 )
 
 # Service selection window
@@ -131,6 +195,7 @@ menu_dialog = Dialog(
     main_menu,
     profile_window,
     client_profile_window,
+    client_booking_history_window,
     select_service_window,
     select_date_window,
     select_time_window,
