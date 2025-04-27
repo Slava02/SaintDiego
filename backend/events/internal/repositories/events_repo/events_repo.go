@@ -197,7 +197,6 @@ func (r *EventRepository) GetAvailableEventsForClientByServiceId(ctx context.Con
 		Group("e.id").
 		Where("e.service_type_id = ?", serviceID).
 		Where("e.datetime <= DATE_ADD(CURDATE(), INTERVAL tss.booking_window DAY)").
-		Where("NOT EXISTS (SELECT 1 FROM event_client ec2 WHERE ec2.event_id = e.id AND ec2.client_id = ?)", clientID).
 		Having("COUNT(ec.id) < e.capacity").
 		Limit(int(perPage)).
 		Offset(int(offset)).

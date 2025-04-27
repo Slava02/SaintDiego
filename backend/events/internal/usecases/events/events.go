@@ -235,11 +235,12 @@ func (u *UseCase) GetAvailableEventsForClientByServiceId(ctx context.Context, pa
 	}
 
 	eventsResponse := make([]*models.Event, 0)
-	var fullEventCnt int64
+	var filteredEventCnt int64
 
+LoopForEvents:
 	for _, event := range events {
 		if event.ParticipantsCount >= event.Capacity {
-			fullEventCnt++
+			filteredEventCnt++
 			continue
 		}
 
@@ -249,8 +250,15 @@ func (u *UseCase) GetAvailableEventsForClientByServiceId(ctx context.Context, pa
 		}
 
 		if timeSlot.ParticipantCount >= timeSlot.Capacity {
-			fullEventCnt++
+			filteredEventCnt++
 			continue
+		}
+
+		for _, client := range event.Clients {
+			if client.ID == params.ClientID {
+				filteredEventCnt++
+				continue LoopForEvents
+			}
 		}
 
 		eventsResponse = append(eventsResponse, event)
@@ -258,7 +266,7 @@ func (u *UseCase) GetAvailableEventsForClientByServiceId(ctx context.Context, pa
 
 	// TODO: тут неверно рассчитывается total, так как не учитываютя события, которые не прошли по заполненности таймслота и не вернулись по LIMIT и OFFSET
 
-	return eventsResponse, total - fullEventCnt, nil
+	return eventsResponse, total - filteredEventCnt, nil
 }
 
 func (u *UseCase) DeleteParticipantFromEvent(ctx context.Context, params *DeleteParticipantFromEventRequest) error {
