@@ -11,22 +11,23 @@ from aiogram_dialog.widgets.kbd.calendar_kbd import (
     DialogManager,
     Calendar,
 )
-from aiogram_dialog.widgets.text import Format, Case
+from aiogram_dialog.widgets.text import Format, Case, Const
 
 logger = logging.getLogger(__name__)
 
 class CustomCalendarDaysView(CalendarDaysView):
-    def __init__(self, callback_generator, config):
+    def __init__(self, callback_generator, config, today_text=None):
         super().__init__(
             callback_generator,
             date_text=Case(
                 {
-                    True: Format("✅{date:%d}"),
-                    False: Format("{date:%d}"),
+                    True: Format("{date:%d}"),
+                    False: Const(" "),  # Пустой символ вместо "-"
                 },
                 selector=self._is_date_available_selector,
             ),
             header_text=Format("> {date: %B %Y} <"),
+            today_text=today_text,
         )
         self.logger = logging.getLogger(__name__)
 
@@ -49,10 +50,6 @@ class CustomCalendarDaysView(CalendarDaysView):
         
         if not events:
             self.logger.info("No events available")
-            return False
-        
-        if date_to_check < datetime.now().date():
-            self.logger.info(f"Date {date_to_check} is in the past")
             return False
         
         try:
@@ -108,6 +105,7 @@ class CustomCalendar(Calendar):
             CalendarScope.DAYS: CustomCalendarDaysView(
                 self._item_callback_data,
                 self.config,
+                today_text=Format("📍"),
             ),
             CalendarScope.MONTHS: CalendarMonthView(
                 self._item_callback_data,
@@ -129,15 +127,30 @@ class CustomCalendar(Calendar):
         self.logger.info(f"Getting user config with {len(events)} events")
         self.logger.info(f"Events data in config: {events}")
         
-        min_date = datetime.now().date()
-        max_date = max(
-            (event["datetime"].date() for event in events),
-            default=min_date
-        )
+        # Находим первую и последнюю доступную дату
+        event_dates = []
+        for event in events:
+            try:
+                if isinstance(event["datetime"], str):
+                    event_date = datetime.fromisoformat(event["datetime"]).date()
+                else:
+                    event_date = event["datetime"].date()
+                event_dates.append(event_date)
+            except (AttributeError, TypeError) as e:
+                self.logger.error(f"Error processing event date: {e}, event: {event}")
+                continue
+        
+        if not event_dates:
+            min_date = datetime.now().date()
+            max_date = min_date
+        else:
+            min_date = min(event_dates)
+            max_date = max(event_dates)
+        
         self.logger.info(f"Calendar date range: {min_date} to {max_date}")
         
         return CalendarUserConfig(
             firstweekday=1,  # Monday as first day of week
-            min_date=min_date,  # Minimum date - today
+            min_date=min_date,  # Minimum date - first available date
             max_date=max_date,  # Maximum date - last available date
         ) 

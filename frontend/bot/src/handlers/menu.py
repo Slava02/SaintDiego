@@ -19,7 +19,7 @@ async def cmd_menu(message: types.Message, dialog_manager: DialogManager):
     
     if not volunteer:
         logger.warning(f"Unauthorized access attempt: user_id={message.from_user.id}")
-        await message.answer("❌ У вас нет доступа к этому боту. Пожалуйста, обратитесь к администратору.")
+        await message.answer("❌ У вас нет доступа к функционалу записи.")
         return
     
     logger.info(f"Opening menu for volunteer: {volunteer}")
