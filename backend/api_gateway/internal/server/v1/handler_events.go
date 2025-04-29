@@ -193,7 +193,7 @@ func (h Handlers) GetEventsIdParticipants(c echo.Context, id int64, params GetEv
 }
 
 // TODO: move to clients (only handler)
-func (h Handlers) GetClientsIdServicesServiceIdEvents(c echo.Context, id int64, serviceId int64) error {
+func (h Handlers) GetClientsIdServicesServiceIdEvents(c echo.Context, id int64, serviceId int64, params GetClientsIdServicesServiceIdEventsParams) error {
 	var req events.GetEventsServicesIdParams
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
@@ -201,6 +201,8 @@ func (h Handlers) GetClientsIdServicesServiceIdEvents(c echo.Context, id int64, 
 
 	req.ServiceID = serviceId
 	req.ClientID = id
+	req.Page = params.Page
+	req.PerPage = params.PerPage
 
 	events, total, err := h.eventsUC.GetEventsByServiceId(c.Request().Context(), &req)
 	if err != nil {

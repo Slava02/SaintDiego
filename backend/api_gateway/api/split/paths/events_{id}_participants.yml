@@ -29,25 +29,25 @@ get:
         maximum: 100
         default: 20
   responses:
-    "200":
+    '200':
       description: Успешный ответ
       content:
         application/json:
           schema:
             $ref: ../components/schemas/GetParticipantsResponse.yml
-    "400":
+    '400':
       description: Ошибка валидации
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    "401":
+    '401':
       description: Access denied
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    "404":
+    '404':
       description: Событие не найдено
       content:
         application/json:
@@ -72,7 +72,7 @@ put:
         schema:
           $ref: ../components/schemas/AddParticipantToEventRequest.yml
   responses:
-    "204":
+    '204':
       description: Успешный ответ
       content:
         application/json:
@@ -82,37 +82,37 @@ put:
               success:
                 type: boolean
                 example: true
-    "400":
+    '400':
       description: Ошибка валидации
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    "401":
+    '401':
       description: Access denied
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    "404":
+    '404':
       description: Not found
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    "409":
+    '409':
       description: Not enough capacity
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    "422":
+    '422':
       description: Client already participant
       content:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
-    "500":
+    '500':
       description: Internal server error
       content:
         application/json:

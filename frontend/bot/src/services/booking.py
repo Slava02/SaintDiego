@@ -1,6 +1,6 @@
 import aiohttp
 from datetime import datetime
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 import logging
 import json
 
@@ -36,7 +36,7 @@ class BookingService:
                     
                     # Преобразуем список услуг в объекты Service
                     services = []
-                    for item in data.get("items", []):
+                    for item in data.get("services", []):
                         service = Service(
                             id=item["id"],
                             name=item["name"],
@@ -53,7 +53,8 @@ class BookingService:
                         "total": data.get("total", 0),
                         "page": page,
                         "per_page": per_page,
-                        "total_pages": data.get("total_pages", 0)
+                        "total_pages": data.get("total_pages", 0),
+                        "status": data.get("status")
                     }
                     self.logger.info(f"Returning result: {result}")
                     return result
@@ -61,33 +62,50 @@ class BookingService:
                 self.logger.error(f"Failed to get services: {response_text}")
                 return {"services": [], "total": 0, "page": page, "per_page": per_page, "total_pages": 0}
 
-    async def get_service_events(self, service_id: int, page: int = 1, per_page: int = 10) -> Dict:
+    async def get_service_events(self, client_id: int, service_id: int, page: int = 1, per_page: int = 10) -> Dict:
         """Получение списка событий для услуги"""
-        url = f"{self.api_url}/events/services/{service_id}"
+        url = f"{self.api_url}/clients/{client_id}/services/{service_id}/events"
         params = {"page": page, "per_page": per_page}
         
         self.logger.info(f"Requesting service events: {url} with params {params}")
+        self.logger.info(f"Headers: {self.headers}")
         
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, params=params, headers=self.headers) as response:
-                response_text = await response.text()
-                self.logger.info(f"Response from {url}: {response.status} - {response_text}")
-                
-                if response.status == 200:
-                    data = await response.json()
-                    # Преобразуем список событий в объекты Event
-                    events = [Event.from_dict(event) for event in data.get("items", [])]
-                    return {
-                        "items": events,
-                        "total": data.get("total", 0),
-                        "page": page,
-                        "per_page": per_page,
-                        "total_pages": data.get("total_pages", 0)
-                    }
-                self.logger.error(f"Failed to get events: {response_text}")
+            try:
+                async with session.get(url, params=params, headers=self.headers) as response:
+                    response_text = await response.text()
+                    self.logger.info(f"Response from {url}: {response.status} - {response_text}")
+                    
+                    if response.status == 200:
+                        data = await response.json()
+                        self.logger.info(f"Parsed response data: {data}")
+                        # Преобразуем список событий в объекты Event
+                        events = []
+                        for event in data.get("items", []):
+                            try:
+                                event_obj = Event.from_dict(event)
+                                events.append(event_obj)
+                                self.logger.info(f"Created event object: {event_obj}")
+                            except Exception as e:
+                                self.logger.error(f"Error creating event object from {event}: {str(e)}", exc_info=True)
+                        
+                        result = {
+                            "items": events,
+                            "total": data.get("total", 0),
+                            "page": page,
+                            "per_page": per_page,
+                            "total_pages": data.get("total_pages", 0)
+                        }
+                        self.logger.info(f"Returning result: {result}")
+                        return result
+                    
+                    self.logger.error(f"Failed to get events: {response_text}")
+                    return {"items": [], "total": 0, "page": page, "per_page": per_page, "total_pages": 0}
+            except Exception as e:
+                self.logger.error(f"Error in get_service_events: {str(e)}", exc_info=True)
                 return {"items": [], "total": 0, "page": page, "per_page": per_page, "total_pages": 0}
 
-    async def book_event(self, event_id: int, participant_id: int, volunteer_id: int) -> bool:
+    async def book_event(self, event_id: int, participant_id: int, volunteer_id: int) -> Tuple[bool, str]:
         """Запись на событие"""
         url = f"{self.api_url}/events/{event_id}/participants"
         data = {
@@ -103,10 +121,14 @@ class BookingService:
                 self.logger.info(f"Response from {url}: {response.status} - {response_text}")
                 
                 if response.status == 204:
-                    return True
-                # TODO: выводить сообщение о том, что мест уже нет, если 409
+                    return True, "✅ Запись успешно создана"
+                elif response.status == 409:
+                    return False, "❌ К сожалению, все места на это событие уже заняты"
+                elif response.status == 422:
+                    return False, "❌ Клиент уже записан на это событие"
+                
                 self.logger.error(f"Failed to book event: {response_text}")
-                return False
+                return False, "❌ Произошла ошибка при создании записи"
 
     async def get_client_events(self, client_id: int, history_limit: int = 5, page: int = 1, per_page: int = 10) -> Dict:
         """Получение списка событий клиента (предстоящих и прошедших)"""

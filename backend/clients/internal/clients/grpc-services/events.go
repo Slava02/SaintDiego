@@ -88,3 +88,39 @@ func (c *EventsClient) GetAvailableEventsForClientByServiceId(ctx context.Contex
 
 	return allEvents, nil
 }
+
+func (c *EventsClient) GetEventsByCleintIdServiceId(ctx context.Context, clientID int64, serviceID int64) ([]*models.Event, error) {
+	var allEvents []*models.Event
+	page := int64(1)
+	perPage := int64(100)
+
+	for {
+		params := &api.GetEventsRequest{
+			ParticipantId: &clientID,
+			ServiceId:     &serviceID,
+			Page:          page,
+			PerPage:       perPage,
+		}
+		resp, err := c.EventsServiceClient.GetEvents(ctx, params)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, event := range resp.Events {
+			allEvents = append(allEvents, &models.Event{
+				Id:                event.Id,
+				Capacity:          event.Capacity,
+				ParticipantsCount: event.ParticipantsCount,
+			})
+		}
+
+		// Если получили меньше событий, чем perPage, значит это последняя страница
+		if len(resp.Events) < int(perPage) {
+			break
+		}
+
+		page++
+	}
+
+	return allEvents, nil
+}

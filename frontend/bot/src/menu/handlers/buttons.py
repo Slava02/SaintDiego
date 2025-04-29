@@ -73,25 +73,29 @@ async def on_time_selected(callback, button, manager: DialogManager, item):
         logger.error(f"Event not found: id={event_id}")
         await callback.message.answer("❌ Произошла ошибка при выборе времени")
 
-async def on_confirm_booking(callback, button, manager: DialogManager):
-    """Handle booking confirmation"""
-    booking_service = BookingService()
-    event_id = manager.dialog_data["event_id"]
-    client_id = manager.dialog_data["client_id"]
+async def on_confirm_booking(callback: CallbackQuery, button: Button, manager: DialogManager):
+    """Обработчик подтверждения записи"""
+    client_id = manager.dialog_data.get("client_id")
+    event_id = manager.dialog_data.get("event_id")
     volunteer_id = manager.event.from_user.id
     
-    logger.info(f"Confirming booking: event_id={event_id}, client_id={client_id}, volunteer_id={volunteer_id}")
-    
-    success = await booking_service.book_event(
-        event_id=event_id,
-        participant_id=client_id,
-        volunteer_id=volunteer_id
-    )
-    
-    if not success:
+    if not client_id or not event_id:
+        logger.error("No client_id or event_id found in dialog_data")
         await callback.message.answer("❌ Произошла ошибка при создании записи")
+        await manager.switch_to(MainMenu.main)
+        return
     
-    await manager.switch_to(MainMenu.main)
+    logger.info(f"Confirming booking: client_id={client_id}, event_id={event_id}, volunteer_id={volunteer_id}")
+    
+    booking_service = BookingService()
+    success, message = await booking_service.book_event(event_id, client_id, volunteer_id)
+    
+    await callback.message.answer(message)
+    
+    if success:
+        await manager.switch_to(MainMenu.main)
+    else:
+        await manager.switch_to(MainMenu.select_service)
 
 async def process_new_client_result(start_data: dict, result: dict, manager: DialogManager):
     """Process result of new client dialog"""

@@ -19,6 +19,18 @@ get:
       schema:
         type: integer
         format: int64
+    - name: page
+      in: query
+      required: true
+      schema:
+        type: integer
+        format: int32
+    - name: per_page
+      in: query
+      required: true
+      schema:
+        type: integer
+        format: int32
   responses:
     '200':
       description: Успешный ответ

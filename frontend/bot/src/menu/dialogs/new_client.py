@@ -30,7 +30,7 @@ async def name_handler(message: Message, widget: MessageInput, manager: DialogMa
     
     if not is_valid:
         logger.warning(f"Invalid name input: {error_message}")
-        await message.answer(f"❌ {error_message}\nПожалуйста, введите ФИО в формате: Имя Отчество Фамилия")
+        await message.answer(f"❌ {error_message}\nПожалуйста, введите ФИО в формате: Имя Фамилия Отчество")
         return
     
     first_name, middle_name, last_name = name_parts
@@ -75,12 +75,14 @@ async def get_existing_clients_data(dialog_manager: DialogManager, **kwargs):
     }
 
 async def get_name_data(dialog_manager: DialogManager, **kwargs):
-    """Get data for name confirmation window"""
-    return {
+    name_data = {
         "first_name": dialog_manager.dialog_data.get("first_name"),
         "middle_name": dialog_manager.dialog_data.get("middle_name"),
         "last_name": dialog_manager.dialog_data.get("last_name"),
     }
+    logger.info(f"Name data: {name_data}")
+    """Get data for name confirmation window"""
+    return name_data
 
 async def on_confirm(callback, button, manager: DialogManager):
     """Handle confirmation"""
@@ -93,16 +95,13 @@ async def on_confirm(callback, button, manager: DialogManager):
     
     if client:
         logger.info(f"Client created successfully: {client}")
-        # Prepare client data for profile window
-        client_data = {
-            "id": client.id,
-            "full_name": client.full_name,
-            "birth_date": client.birth_date.strftime("%d.%m.%Y") if client.birth_date else "Не указана"
-        }
-        # Save client ID in dialog_data
+        # Save client_id in dialog_data
         manager.dialog_data["client_id"] = client.id
-        manager.dialog_data["selected_client"] = client_data
-        await manager.done({"client_id": client.id, "selected_client": client_data})
+        # Start client profile dialog with start_data
+        await manager.start(
+            state=MainMenu.client_profile,
+            data={"client_id": client.id}
+        )
     else:
         logger.error("Failed to create client")
         await callback.message.answer("❌ Произошла ошибка при создании клиента")
@@ -117,36 +116,22 @@ async def on_create_new(callback: CallbackQuery, button: Button, manager: Dialog
 
 async def on_existing_client_selected(callback: CallbackQuery, select: Select, manager: DialogManager, item_id: str):
     """Обработчик выбора существующего клиента из списка"""
-    # Находим выбранного клиента по ID
-    clients = manager.dialog_data.get("existing_clients", [])
-    selected_client = None
-    for client in clients:
-        if str(client["id"]) == item_id:
-            selected_client = client
-            break
+    client_id = int(item_id)
+    logger.info(f"Selected existing client: {client_id}")
     
-    if not selected_client:
-        # Если клиент не найден (что странно), возвращаемся к началу
-        logger.error(f"Client with ID {item_id} not found in dialog_data")
-        logger.debug(f"Available clients: {clients}")
-        await manager.done()
-        return
-    
-    logger.info(f"Selected existing client: {selected_client}")
-    
-    # Сохраняем данные клиента в dialog_data для доступа через get_client_profile_data
-    manager.dialog_data["selected_client"] = selected_client
+    # Save client_id in dialog_data
+    manager.dialog_data["client_id"] = client_id
     
     # Открываем окно профиля клиента
     await manager.start(
         state=MainMenu.client_profile,
-        data={"selected_client": selected_client}
+        data={"client_id": client_id}
     )
 
 # Name input dialog
 new_client_dialog = Dialog(
     Window(
-        Const("Введите ФИО нового посетителя в формате:\nИмя Отчество Фамилия"),
+        Const("Введите ФИО нового посетителя в формате:\nИмя Фамилия Отчество"),
         MessageInput(
             func=name_handler,
             content_types=["text"]

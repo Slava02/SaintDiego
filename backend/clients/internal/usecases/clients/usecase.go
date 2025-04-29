@@ -28,6 +28,7 @@ type IServicesClient interface {
 
 type IEventsClient interface {
 	GetAvailableEventsForClientByServiceId(ctx context.Context, serviceID int64, clientID int64) ([]*models.Event, error)
+	GetEventsByCleintIdServiceId(ctx context.Context, clientID int64, serviceID int64) ([]*models.Event, error)
 }
 
 const (
@@ -38,6 +39,7 @@ const (
 var (
 	ErrClientNotFound      = errors.New("client not found")
 	ErrServiceTypeNotFound = errors.New("service type not found")
+	ErrAlreadyBookedEvents = errors.New("already booked events")
 )
 
 //go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options
@@ -130,7 +132,7 @@ func (u *UseCase) BlockClient(ctx context.Context, req *BlockClientReq) (*models
 	return client, nil
 }
 
-// TODO: нужно вовзращать только услуги, на которые есть события для записи
+// TODO: нужно возвращать услуги на которые не записан клиент
 func (u *UseCase) GetClientServices(ctx context.Context, req *GetClientServicesReq) ([]*models.ServiceTypes, int64, error) {
 
 	client, err := u.clientsRepository.GetClientByID(ctx, req.ClientID)
@@ -141,10 +143,27 @@ func (u *UseCase) GetClientServices(ctx context.Context, req *GetClientServicesR
 		return nil, 0, fmt.Errorf("get client by id: %w", err)
 	}
 
+	// TODO: надо как-т возврщать инфу о том, что клиент не был давно или заблокирован
 	// Если клиент заблокирован или не посещал центр более года, то ему доступна услуга "Повторное собеседование"
+	// TODO: Тут возвращаются услуги безотносительно того, есть ли события для записи
 	if pointer.Indirect(client.IsBlocked) || clientLastVisitMoreThanYearAgo(client) {
+		events, err := u.eventsClient.GetEventsByCleintIdServiceId(ctx, client.Id, ReinterviewClientAvailableServiceTypeID)
+		if err != nil {
+			return nil, 0, fmt.Errorf("get events by client id and service id: %w", err)
+		}
+
+		if len(events) > 0 {
+			return nil, 0, fmt.Errorf("get events by client id and service id: %w", ErrAlreadyBookedEvents)
+		}
+
 		serviceType, err := u.servicesClient.GetServiceTypeById(ctx, ReinterviewClientAvailableServiceTypeID)
 		if err != nil {
+			if e, ok := status.FromError(err); ok {
+				switch e.Code() {
+				case codes.NotFound:
+					return nil, 0, fmt.Errorf("get service type by id: %w", ErrServiceTypeNotFound)
+				}
+			}
 			return nil, 0, fmt.Errorf("get service type by id: %w", err)
 		}
 
@@ -152,7 +171,17 @@ func (u *UseCase) GetClientServices(ctx context.Context, req *GetClientServicesR
 	}
 
 	// Если клиент новый, то ему доступна услуга "Первичное собеседование"
+	// TODO: Тут возвращаются услуги безотносительно того, есть ли события для записи
 	if clientIsNew(client) {
+		events, err := u.eventsClient.GetEventsByCleintIdServiceId(ctx, client.Id, PrimaryInterviewClientAvailableServiceTypeID)
+		if err != nil {
+			return nil, 0, fmt.Errorf("get events by client id and service id: %w", err)
+		}
+
+		if len(events) > 0 {
+			return nil, 0, fmt.Errorf("get events by client id and service id: %w", ErrAlreadyBookedEvents)
+		}
+
 		serviceType, err := u.servicesClient.GetServiceTypeById(ctx, PrimaryInterviewClientAvailableServiceTypeID)
 		if err != nil {
 			if e, ok := status.FromError(err); ok {
@@ -177,9 +206,19 @@ func (u *UseCase) GetClientServices(ctx context.Context, req *GetClientServicesR
 	}
 
 	availableServices := make([]*models.ServiceTypes, 0)
-	var busyServices int64
+	var filteredServices int64
 
 	for _, service := range services {
+		alreadyBookedEvents, err := u.eventsClient.GetEventsByCleintIdServiceId(ctx, client.Id, service.Id)
+		if err != nil {
+			return nil, 0, fmt.Errorf("get events by client id and service id: %w", err)
+		}
+
+		if len(alreadyBookedEvents) > 0 {
+			filteredServices++
+			continue
+		}
+
 		events, err := u.eventsClient.GetAvailableEventsForClientByServiceId(ctx, service.Id, client.Id)
 		if err != nil {
 			return nil, 0, fmt.Errorf("get events by service id: %w", err)
@@ -198,13 +237,13 @@ func (u *UseCase) GetClientServices(ctx context.Context, req *GetClientServicesR
 		if hasAvailableSpots {
 			availableServices = append(availableServices, service)
 		} else {
-			busyServices++
+			filteredServices++
 		}
 	}
 
 	// TODO: неправильно считается общее количество услуг
 
-	return availableServices, total - busyServices, nil
+	return availableServices, total - filteredServices, nil
 }
 
 func clientIsNew(client *models.Client) bool {

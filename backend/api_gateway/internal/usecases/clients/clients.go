@@ -2,6 +2,7 @@ package clients
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
@@ -16,6 +17,18 @@ type IClientsClient interface {
 	BlockClient(ctx context.Context, req *pb.BlockClientRequest) (*pb.Client, error)
 	GetClientServices(ctx context.Context, req *pb.GetClientServicesRequest) (*pb.GetClientServicesResponse, error)
 }
+
+const (
+	ReinterviewClientAvailableServiceTypeID      = 20
+	PrimaryInterviewClientAvailableServiceTypeID = 15
+	BlockedClientStatus                          = "BLOCKED"
+	TooLongAgoClientStatus                       = "TOO_LONG_AGO"
+)
+
+var (
+	ErrClientIsBlocked  = errors.New("client is blocked")
+	ErrClientTooLongAgo = errors.New("client too long ago")
+)
 
 //go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options
 type Options struct {
@@ -98,7 +111,7 @@ func (u *UseCase) PutClientsId(ctx context.Context, req *BlockClientRequest) (*m
 	return convertClientToResponse(pbRes), nil
 }
 
-func (u *UseCase) GetClientsIdServices(ctx context.Context, params *GetClientsIdServicesParams) ([]*models.ServiceType, int32, error) {
+func (u *UseCase) GetClientsIdServices(ctx context.Context, params *GetClientsIdServicesParams) ([]*models.ServiceType, int32, string, error) {
 	pbReq := &pb.GetClientServicesRequest{
 		Id:      params.ID,
 		Page:    int64(params.Page),
@@ -107,7 +120,7 @@ func (u *UseCase) GetClientsIdServices(ctx context.Context, params *GetClientsId
 
 	pbRes, err := u.clientsClient.GetClientServices(ctx, pbReq)
 	if err != nil {
-		return nil, 0, fmt.Errorf("get client services: %w", err)
+		return nil, 0, "", fmt.Errorf("get client services: %w", err)
 	}
 
 	services := make([]*models.ServiceType, len(pbRes.Services))
@@ -120,7 +133,14 @@ func (u *UseCase) GetClientsIdServices(ctx context.Context, params *GetClientsId
 		}
 	}
 
-	return services, int32(pbRes.Total), nil
+	// TODO: это надо попрпавить, вынести на уровень сервис и поменять протом, пока просто возвращааю toolng и чекаю потом не blovked ли
+	if len(services) == 1 {
+		if services[0].ID == ReinterviewClientAvailableServiceTypeID {
+			return services, int32(pbRes.Total), TooLongAgoClientStatus, nil
+		}
+	}
+
+	return services, int32(pbRes.Total), "", nil
 }
 
 func convertClientToResponse(client *pb.Client) *models.Client {

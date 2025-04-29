@@ -17,7 +17,7 @@ type IClientUC interface {
 	PostClients(ctx context.Context, req *clients.CreateClientRequest) (*models.Client, error)
 	GetClientsId(ctx context.Context, id int64) (*models.Client, error)
 	PutClientsId(ctx context.Context, req *clients.BlockClientRequest) (*models.Client, error)
-	GetClientsIdServices(ctx context.Context, params *clients.GetClientsIdServicesParams) ([]*models.ServiceType, int32, error)
+	GetClientsIdServices(ctx context.Context, params *clients.GetClientsIdServicesParams) ([]*models.ServiceType, int32, string, error)
 }
 
 func (h Handlers) GetClients(ctx echo.Context, params GetClientsParams) error {
@@ -91,6 +91,7 @@ func (h Handlers) PutClientsId(ctx echo.Context, id int64) error {
 	return ctx.JSON(http.StatusOK, convertClientToResponse(client))
 }
 
+// TODO: надо добавить обработку ситуации, когда клиент уже записан на единственно доступную услугу (в сервисе уже есть)
 func (h Handlers) GetClientsIdServices(ctx echo.Context, id int64, params GetClientsIdServicesParams) error {
 	var req clients.GetClientsIdServicesParams
 	if err := ctx.Bind(&req); err != nil {
@@ -99,7 +100,7 @@ func (h Handlers) GetClientsIdServices(ctx echo.Context, id int64, params GetCli
 
 	req.ID = id
 
-	services, total, err := h.clientUC.GetClientsIdServices(ctx.Request().Context(), &req)
+	services, total, clientStatus, err := h.clientUC.GetClientsIdServices(ctx.Request().Context(), &req)
 	if err != nil {
 		switch status.Code(err) {
 		case codes.NotFound:
@@ -109,13 +110,19 @@ func (h Handlers) GetClientsIdServices(ctx echo.Context, id int64, params GetCli
 		}
 	}
 
-	return ctx.JSON(http.StatusOK, GetServicesResponse{
-		Items:      convertServicesToResponse(services),
+	resp := GetAvailableServicesResponse{
+		Services:   convertServicesToResponse(services),
 		Total:      int32(total),
 		Page:       req.Page,
 		PerPage:    req.PerPage,
 		TotalPages: int32(math.Ceil(float64(total) / float64(req.PerPage))),
-	})
+	}
+
+	if clientStatus != "" {
+		resp.Status = GetAvailableServicesResponseStatus(clientStatus)
+	}
+
+	return ctx.JSON(http.StatusOK, resp)
 }
 
 func convertClientsToResponse(clients []*models.Client) []Client {

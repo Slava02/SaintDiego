@@ -154,7 +154,7 @@ class ClientService:
         data = {
             "first_name": first_name,
             "middle_name": middle_name,
-            "last_name": last_name
+            "last_name": last_name,
         }
         
         self.logger.info(f"Creating client: {url} with data {json.dumps(data)}")
@@ -167,10 +167,13 @@ class ClientService:
                 if response.status == 201:
                     data = await response.json()
                     client = Client.from_dict(data)
+                    # Устанавливаем is_new=True для нового клиента
+                    client.is_new = True
                     # Добавляем клиента в локальное хранилище
                     self.clients[client.id] = client
                     # Очищаем кэш поиска
                     self._search_cache.clear()
+                    self.logger.info(f"Created new client with is_new=True: {client}")
                     return client
                 self.logger.error(f"Failed to create client: {response_text}")
                 return None 

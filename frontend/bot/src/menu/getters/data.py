@@ -4,6 +4,7 @@ from aiogram_dialog import DialogManager
 from src.services.volunteer import VolunteerService
 from src.services.booking import BookingService
 from src.states.menu import MainMenu
+from src.services.client import ClientService
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +38,18 @@ async def get_services_data(dialog_manager: DialogManager, **kwargs):
     
     logger.info(f"Getting services data for client_id={client_id}, page={page}")
     
+    # Получаем данные клиента из ClientService
+    client_service = ClientService()
+    client = client_service.get_client_by_id(client_id)
+    
+    if not client:
+        logger.error(f"Client not found in ClientService: id={client_id}")
+        return {
+            "services": [],
+            "current_page": page,
+            "total_pages": 1
+        }
+    
     services_data = await booking_service.get_available_services(client_id, page=page)
     logger.info(f"Received services data: {services_data}")
     
@@ -58,18 +71,32 @@ async def get_services_data(dialog_manager: DialogManager, **kwargs):
     return {
         "services": services,
         "current_page": page,
-        "total_pages": services_data.get("total_pages", 1)
+        "total_pages": services_data.get("total_pages", 1),
+        "status": services_data.get("status"),
+        "is_blocked": client.is_blocked,
+        "blocked_at": client.blocked_at,
+        "blocked_reason": client.blocked_reason,
+        "is_new": client.is_new
     }
 
 async def get_events_data(dialog_manager: DialogManager, **kwargs):
     """Get data for events selection window"""
     booking_service = BookingService()
     service_id = dialog_manager.dialog_data.get("service_id")
+    client_id = dialog_manager.dialog_data.get("client_id")
     page = dialog_manager.dialog_data.get("event_page", 1)
     
-    logger.info(f"Getting events data for service_id={service_id}, page={page}")
+    if not service_id or not client_id:
+        logger.error("No service_id or client_id found in dialog_data")
+        return {
+            "events": [],
+            "current_page": page,
+            "total_pages": 1
+        }
     
-    events_data = await booking_service.get_service_events(service_id, page=page)
+    logger.info(f"Getting events data for service_id={service_id}, client_id={client_id}, page={page}")
+    
+    events_data = await booking_service.get_service_events(client_id, service_id, page=page)
     logger.info(f"Received events data: {events_data}")
     
     events = []
@@ -104,51 +131,80 @@ async def get_events_data(dialog_manager: DialogManager, **kwargs):
     else:
         filtered_events = events
     
+    # Получаем данные клиента из ClientService
+    client_service = ClientService()
+    client = client_service.get_client_by_id(client_id)
+    
+    if not client:
+        logger.error(f"Client not found in ClientService: id={client_id}")
+        return {
+            "events": filtered_events,
+            "current_page": page,
+            "total_pages": events_data.get("total_pages", 1),
+            "selected_date": dialog_manager.dialog_data.get("selected_date", ""),
+            "service_name": dialog_manager.dialog_data.get("service_name", ""),
+            "event_time": dialog_manager.dialog_data.get("event_time", ""),
+            "client_full_name": "Не указано"
+        }
+    
     return {
         "events": filtered_events,
         "current_page": page,
         "total_pages": events_data.get("total_pages", 1),
         "selected_date": dialog_manager.dialog_data.get("selected_date", ""),
         "service_name": dialog_manager.dialog_data.get("service_name", ""),
-        "event_time": dialog_manager.dialog_data.get("event_time", "")
+        "event_time": dialog_manager.dialog_data.get("event_time", ""),
+        "client_full_name": client.full_name
     }
 
 async def get_client_profile_data(dialog_manager: DialogManager, **kwargs):
     """Get data for client profile window"""
     logger.info("Getting client profile data")
-    # Try to get selected_client from start_data first, then from dialog_data
-    client_data = None
+    # Try to get client_id from start_data first, then from dialog_data
+    client_id = None
     source = ""
     
     # Safely check start_data first (might be None when using switch_to)
     if hasattr(dialog_manager, 'start_data') and dialog_manager.start_data is not None:
-        client_data = dialog_manager.start_data.get("selected_client")
+        client_id = dialog_manager.start_data.get("client_id")
         source = "start_data"
         
     # Fallback to dialog_data if not found or start_data is None
-    if not client_data:
+    if not client_id:
         # Fallback to dialog_data
-        client_data = dialog_manager.dialog_data.get("selected_client")
+        client_id = dialog_manager.dialog_data.get("client_id")
         source = "dialog_data"
 
-    logger.info(f"Retrieved client_data from {source}: {client_data}")
+    logger.info(f"Retrieved client_id from {source}: {client_id}")
     
-    if not client_data:
-        logger.warning("No client data found, returning blanks")
+    if not client_id:
+        logger.warning("No client_id found, returning blanks")
         # Return default placeholders to avoid KeyError
         return {
             "full_name": "Не указано",
             "birth_date": "Не указана"
         }
     
-    profile_data = {
-        "client_id": client_data.get("id", 0),
-        "full_name": client_data.get("full_name", "Не указано"),
-        "birth_date": client_data.get("birth_date", "Не указана")
-    }
+    # Сохраняем client_id в dialog_data
+    dialog_manager.dialog_data["client_id"] = client_id
     
-    # Save client_id in dialog_data for other getters
-    dialog_manager.dialog_data["client_id"] = profile_data["client_id"]
+    # Получаем данные клиента из ClientService
+    client_service = ClientService()
+    client = client_service.get_client_by_id(client_id)
+    
+    if not client:
+        logger.error(f"Client not found in ClientService: id={client_id}")
+        return {
+            "full_name": "Не указано",
+            "birth_date": "Не указана"
+        }
+    
+    profile_data = {
+        "client_id": client.id,
+        "full_name": client.full_name,
+        "birth_date": client.birth_date.strftime("%d.%m.%Y") if not client.is_new else "Не указана",
+        "is_new": client.is_new
+    }
     
     logger.info(f"Returning profile data: {profile_data}")
     return profile_data
@@ -157,12 +213,12 @@ async def get_client_booking_history(dialog_manager: DialogManager, **kwargs):
     """Get data for client booking history window"""
     logger.info("Getting client booking history")
     booking_service = BookingService()
+    client_service = ClientService()
     
-    # Retrieve client data from dialog_data or start_data
-    client_data = dialog_manager.dialog_data.get("selected_client") or dialog_manager.start_data.get("selected_client") or {}
-    if not client_data or not isinstance(client_data, dict):
-        client_data = {}
-        logger.warning("No client data found in dialog_data, returning empty history")
+    # Get client_id from dialog_data
+    client_id = dialog_manager.dialog_data.get("client_id")
+    if not client_id:
+        logger.warning("No client_id found in dialog_data, returning empty history")
         return {
             "client_id": None,
             "full_name": "Не указано",
@@ -172,22 +228,29 @@ async def get_client_booking_history(dialog_manager: DialogManager, **kwargs):
             "total_pages": 0
         }
     
-    # Safely extract client info
-    client_id = client_data.get("id") if isinstance(client_data, dict) else None
-    full_name = client_data.get("full_name", "Не указано") if isinstance(client_data, dict) else "Не указано"
+    # Get client data from ClientService
+    client = client_service.get_client_by_id(client_id)
+    if not client:
+        logger.error(f"Client not found in ClientService: id={client_id}")
+        return {
+            "client_id": client_id,
+            "full_name": "Не указано",
+            "upcoming_events": [],
+            "past_events": [],
+            "page": 1,
+            "total_pages": 0
+        }
     
     # Get page from dialog_data
     page = dialog_manager.dialog_data.get("history_page", 1)
     
-    # Get client events (only if we have a valid client_id)
-    events_data = {}
-    if client_id:
-        events_data = await booking_service.get_client_events(
-            client_id=client_id,
-            history_limit=5,
-            page=page,
-            per_page=10
-        )
+    # Get client events
+    events_data = await booking_service.get_client_events(
+        client_id=client_id,
+        history_limit=5,
+        page=page,
+        per_page=10
+    )
     
     # Format event data for display
     upcoming_events = []
@@ -208,8 +271,8 @@ async def get_client_booking_history(dialog_manager: DialogManager, **kwargs):
     
     # Make sure all required keys are present
     result = {
-        "client_id": client_id or 0, 
-        "full_name": full_name or "Не указано",
+        "client_id": client_id,
+        "full_name": client.full_name,
         "upcoming_events": upcoming_events or [],
         "past_events": past_events or [],
         "upcoming_list": upcoming_list or "",

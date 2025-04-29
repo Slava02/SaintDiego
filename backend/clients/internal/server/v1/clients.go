@@ -119,6 +119,8 @@ func (i *Implementation) GetClientServices(ctx context.Context, req *pb.GetClien
 			return nil, status.Errorf(codes.NotFound, "client not found")
 		case errors.Is(err, clients.ErrServiceTypeNotFound):
 			return nil, status.Errorf(codes.NotFound, "service type not found")
+		case errors.Is(err, clients.ErrAlreadyBookedEvents):
+			return nil, status.Errorf(codes.AlreadyExists, "client already booked events")
 		default:
 			return nil, status.Errorf(codes.Internal, "failed to get client services: %v", err)
 		}

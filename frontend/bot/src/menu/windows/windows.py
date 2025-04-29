@@ -30,6 +30,9 @@ from src.menu.handlers.buttons import (
 from src.menu.widgets.calendar import CustomCalendar
 from src.menu.widgets.inline import SwitchInlineQueryCurrentChat
 from aiogram.enums import ParseMode
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Main menu window
 main_menu = Window(
@@ -37,12 +40,12 @@ main_menu = Window(
     Column(
         Button(Const("👤 Мой профиль"), id="profile", on_click=on_profile_click),
         SwitchInlineQueryCurrentChat(
-            Const("🔍 Найти посетителя"),
+            Const("🔍 Записать посетителя"),
             id="search_client",
             switch_inline_query=Const("")
         ),
         Start(
-            Const("👤 Новый посетитель"),
+            Const("➕ Новый посетитель"),
             id="new_client",
             state=NewClientSG.input_name
         ),
@@ -131,18 +134,64 @@ client_booking_history_window = Window(
     getter=get_client_booking_history
 )
 
+# Селекторы для select_service_window
+def is_too_long_ago(data, case, manager):
+    """Проверяет, есть ли статус TOO_LONG_AGO"""
+    status = data.get("status", "")
+    result = status == "TOO_LONG_AGO"
+    logger.info(f"is_too_long_ago: status={status}, result={result}")
+    return result
+
+def is_client_blocked(data, case, manager):
+    """Проверяет, заблокирован ли клиент"""
+    is_blocked = data.get("is_blocked", False)
+    result = is_blocked == True
+    logger.info(f"is_client_blocked: is_blocked={is_blocked}, result={result}")
+    return result
+
+def is_new_client(data, case, manager):
+    """Проверяет, является ли клиент новым"""
+    is_new = data.get("is_new", False)
+    result = is_new == True
+    logger.info(f"is_new_client: is_new={is_new}, result={result}")
+    return result
+
+
 # Service selection window
 select_service_window = Window(
     Format("Выберите услугу:"),
-    Select(
-        Format("{item[name]}"),
-        id="services",
-        item_id_getter=lambda x: str(x["id"]),
-        items="services",
-        on_click=on_service_selected
+    Case(
+        {
+            True: Format("⚠️ Клиент слишком давно не был у нас!\nДоступно только повторное собеседование.\n(Если не отображается - клиент уже записан)"),
+            False: Const("")
+        },
+        selector=is_too_long_ago
     ),
-    Row(
-        Button(Const("◀️ Назад"), id="back", on_click=on_back_to_client_profile),
+    Case(
+        {
+            True: Format("🚫 Клиент заблокирован.\nПричина: {blocked_reason}\nДата блокировки: {blocked_at}.\nДоступно только повторное собеседование.\n(Если не отображается - клиент уже записан)"),
+            False: Const("")
+        },
+        selector=is_client_blocked
+    ),
+    Case(
+        {
+            True: Format("👋 Новый посетитель!\nДоступно только первичное собеседование.\n(Если не отображается - клиент уже записан)"),
+            False: Const("")
+        },
+        selector=is_new_client
+    ),
+    Column(
+        Select(
+            Format("{item[name]}"),
+            id="services",
+            item_id_getter=lambda x: str(x["id"]),
+            items="services",
+            on_click=on_service_selected
+        ),
+        Row(
+            Button(Const("◀️ Назад"), id="back", on_click=on_back_to_client_profile),
+        ),
     ),
     state=MainMenu.select_service,
     getter=get_services_data
@@ -172,7 +221,6 @@ select_time_window = Window(
     ),
     Row(
         Button(Const("◀️ Назад"), id="back", on_click=on_back_to_date),
-        Button(Const("▶️ Вперед"), id="next", on_click=lambda c, b, m: m.switch_to(MainMenu.select_time))
     ),
     state=MainMenu.select_time,
     getter=get_events_data
@@ -181,9 +229,10 @@ select_time_window = Window(
 # Booking confirmation window
 confirm_booking_window = Window(
     Format("Подтвердите запись:\n\n"
-           "Услуга: {service_name}\n"
-           "Дата: {selected_date}\n"
-           "Время: {event_time}"),
+           "👤 Клиент: {client_full_name}\n"
+           "📋 Услуга: {service_name}\n"
+           "📅 Дата: {selected_date}\n"
+           "🕒 Время: {event_time}"),
     Column(
         Button(Const("✅ Подтвердить"), id="confirm", on_click=on_confirm_booking),
         Button(Const("❌ Отмена"), id="cancel", on_click=on_back_to_main)

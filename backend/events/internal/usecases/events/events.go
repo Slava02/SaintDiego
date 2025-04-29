@@ -251,7 +251,6 @@ func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEvent
 	return participants, total, nil
 }
 
-// TODO: добавить проверку на то не записан ли клиент на услугу
 func (u *UseCase) GetAvailableEventsForClientByServiceId(ctx context.Context, params *GetAvailableEventsForClientByServiceIdParams) ([]*models.Event, int64, error) {
 	err := u.servicesClient.GetServiceTypeById(ctx, params.ServiceID)
 	if err != nil {
@@ -266,7 +265,6 @@ func (u *UseCase) GetAvailableEventsForClientByServiceId(ctx context.Context, pa
 	eventsResponse := make([]*models.Event, 0)
 	var filteredEventCnt int64
 
-LoopForEvents:
 	for _, event := range events {
 		if event.ParticipantsCount >= event.Capacity {
 			filteredEventCnt++
@@ -283,12 +281,14 @@ LoopForEvents:
 			continue
 		}
 
-		// Провяеряем не является ли уже участником события клиент
-		for _, client := range event.Clients {
-			if client.ID == params.ClientID {
-				filteredEventCnt++
-				continue LoopForEvents
-			}
+		isClientAlreadyParticipant, err := u.ClientAlreadyParticipant(ctx, event.ID, params.ClientID)
+		if err != nil {
+			return nil, 0, fmt.Errorf("client already participant: %v", err)
+		}
+
+		if isClientAlreadyParticipant {
+			filteredEventCnt++
+			continue
 		}
 
 		eventsResponse = append(eventsResponse, event)
@@ -336,4 +336,34 @@ func (u *UseCase) GetClientsIdEvents(ctx context.Context, params *GetClientsIdEv
 	}
 
 	return events, total, nil
+}
+
+func (u *UseCase) ClientAlreadyParticipant(ctx context.Context, eventID int64, clientID int64) (bool, error) {
+	pageParticipants := int64(1)
+	perPageParticipants := int64(100)
+
+	for {
+		participants, _, err := u.GetParticipantsByEventId(ctx, &GetEventsIdParticipantsParams{
+			EventID: eventID,
+			Page:    pageParticipants,
+			PerPage: perPageParticipants,
+		})
+		if err != nil {
+			return false, fmt.Errorf("get participants: %v", err)
+		}
+
+		for _, participant := range participants {
+			if participant.ID == clientID {
+				return true, nil
+			}
+		}
+
+		if len(participants) < int(perPageParticipants) {
+			break
+		}
+
+		pageParticipants++
+	}
+
+	return false, nil
 }

@@ -51,7 +51,7 @@ async def process_inline_query(inline_query: InlineQuery):
                     input_message_content=InputTextMessageContent(
                         message_text=f"/client_{client.id}"
                     ),
-                    description=f"Дата рождения: {client.birth_date.strftime('%d.%m.%Y') if client.birth_date else 'Не указана'}"
+                    description=f"Дата рождения: {client.birth_date.strftime('%d.%m.%Y') if not client.is_new else 'Не указана'}"
                 )
             )
         # Кнопка создания нового клиента
@@ -98,21 +98,11 @@ async def handle_client_selection(message: Message, dialog_manager: DialogManage
     if not client_service.clients:
         logger.info("Client cache empty, reloading from API.")
         await client_service.update_clients()
-    # Try to get client
-    client = client_service.get_client_by_id(client_id)
-    if not client:
-        logger.error(f"Client not found: {client_id}")
-        await message.answer("❌ Клиент не найден.")
-        return
-    # Prepare data for profile and start dialog with it
-    client_data = {
-        "id": client.id,
-        "full_name": client.full_name,
-        "birth_date": client.birth_date.strftime("%d.%m.%Y") if client.birth_date else "Не указана"
-    }
+   
+   
     # Start client profile dialog with start_data
-    logger.info(f"Starting client profile dialog with start_data: {client_data}")
+    logger.info(f"Starting client profile dialog with start_data: {client_id}")
     await dialog_manager.start(
         state=MainMenu.client_profile,
-        data={"selected_client": client_data}
+        data={"client_id": client_id}
     ) 
