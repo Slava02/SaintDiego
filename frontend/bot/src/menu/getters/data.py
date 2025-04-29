@@ -182,7 +182,7 @@ async def get_client_profile_data(dialog_manager: DialogManager, **kwargs):
         # Return default placeholders to avoid KeyError
         return {
             "full_name": "Не указано",
-            "birth_date": "Не указана"
+            "client_id": "Не указан"
         }
     
     # Сохраняем client_id в dialog_data
@@ -196,13 +196,12 @@ async def get_client_profile_data(dialog_manager: DialogManager, **kwargs):
         logger.error(f"Client not found in ClientService: id={client_id}")
         return {
             "full_name": "Не указано",
-            "birth_date": "Не указана"
+            "client_id": "Не указан"
         }
     
     profile_data = {
         "client_id": client.id,
         "full_name": client.full_name,
-        "birth_date": client.birth_date.strftime("%d.%m.%Y") if not client.is_new else "Не указана",
         "is_new": client.is_new
     }
     

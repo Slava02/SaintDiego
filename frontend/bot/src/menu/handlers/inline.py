@@ -51,7 +51,7 @@ async def process_inline_query(inline_query: InlineQuery):
                     input_message_content=InputTextMessageContent(
                         message_text=f"/client_{client.id}"
                     ),
-                    description=f"Дата рождения: {client.birth_date.strftime('%d.%m.%Y') if not client.is_new else 'Не указана'}"
+                    description=f"ID: {client.id}"
                 )
             )
         # Кнопка создания нового клиента

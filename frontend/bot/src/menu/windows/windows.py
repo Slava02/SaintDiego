@@ -69,7 +69,7 @@ profile_window = Window(
 client_profile_window = Window(
     Format("👤 Профиль посетителя\n\n"
            "ФИО: {full_name}\n"
-           "Дата рождения: {birth_date}"),
+           "ID: {client_id}"),
     Column(
         Button(Const("📋 История записей"), id="client_history", on_click=on_view_client_history),
         Button(Const("📝 Записать"), id="book_service", on_click=on_book_service),
@@ -143,7 +143,7 @@ def is_too_long_ago(data, case, manager):
     return result
 
 def is_client_blocked(data, case, manager):
-    """Проверяет, заблокирован ли клиент"""
+    """Проверяет, заблокирован ли посетитель"""
     is_blocked = data.get("is_blocked", False)
     result = is_blocked == True
     logger.info(f"is_client_blocked: is_blocked={is_blocked}, result={result}")
@@ -162,21 +162,21 @@ select_service_window = Window(
     Format("Выберите услугу:"),
     Case(
         {
-            True: Format("⚠️ Клиент слишком давно не был у нас!\nДоступно только повторное собеседование.\n(Если не отображается - клиент уже записан)"),
+            True: Format("⚠️ Посетитель слишком давно не был у нас!\nДоступно только повторное собеседование.\n(Если не отображается - уже есть запись)"),
             False: Const("")
         },
         selector=is_too_long_ago
     ),
     Case(
         {
-            True: Format("🚫 Клиент заблокирован.\nПричина: {blocked_reason}\nДата блокировки: {blocked_at}.\nДоступно только повторное собеседование.\n(Если не отображается - клиент уже записан)"),
+            True: Format("🚫 Посетитель заблокирован.\nПричина: {blocked_reason}\nДата блокировки: {blocked_at}.\nДоступно только повторное собеседование.\n(Если не отображается - уже есть запись)"),
             False: Const("")
         },
         selector=is_client_blocked
     ),
     Case(
         {
-            True: Format("👋 Новый посетитель!\nДоступно только первичное собеседование.\n(Если не отображается - клиент уже записан)"),
+            True: Format("👋 Новый посетитель!\nДоступно только первичное собеседование.\n(Если не отображается - уже есть запись)"),
             False: Const("")
         },
         selector=is_new_client
@@ -229,7 +229,7 @@ select_time_window = Window(
 # Booking confirmation window
 confirm_booking_window = Window(
     Format("Подтвердите запись:\n\n"
-           "👤 Клиент: {client_full_name}\n"
+           "👤 Посетитель: {client_full_name}\n"
            "📋 Услуга: {service_name}\n"
            "📅 Дата: {selected_date}\n"
            "🕒 Время: {event_time}"),

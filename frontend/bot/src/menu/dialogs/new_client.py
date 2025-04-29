@@ -104,7 +104,7 @@ async def on_confirm(callback, button, manager: DialogManager):
         )
     else:
         logger.error("Failed to create client")
-        await callback.message.answer("❌ Произошла ошибка при создании клиента")
+        await callback.message.answer("❌ Произошла ошибка при создании посетителя ")
         await manager.done()
 
 async def on_create_new(callback: CallbackQuery, button: Button, manager: DialogManager):
@@ -139,8 +139,8 @@ new_client_dialog = Dialog(
         state=NewClientSG.input_name,
     ),
     Window(
-        Format("Найдены похожие клиенты:\n\n"
-               "Выберите существующего клиента или создайте нового:"),
+        Format("Найдены похожие посетители:\n\n"
+               "Выберите существующего посетителя или создайте нового:"),
         Column(
             Select(
                 Format("{item[full_name]} ({item[birth_date]})"),
