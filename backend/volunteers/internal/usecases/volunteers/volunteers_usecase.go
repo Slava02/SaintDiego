@@ -39,11 +39,6 @@ func New(opts Options) (*UseCase, error) {
 }
 
 func (u *UseCase) CreateVolunteer(ctx context.Context, volunteer *models.Volunteer) (*models.Volunteer, error) {
-	_, err := u.volunteersRepository.GetVolunteerByTgId(ctx, volunteer.TGID)
-	if err != nil {
-		return nil, fmt.Errorf("get volunteer by tg id: %w", err)
-	}
-
 	return u.volunteersRepository.CreateVolunteer(ctx, volunteer)
 }
 
