@@ -16,7 +16,7 @@ from aiogram_dialog.widgets.text import Format, Case, Const
 logger = logging.getLogger(__name__)
 
 class CustomCalendarDaysView(CalendarDaysView):
-    def __init__(self, callback_generator, config, today_text=None):
+    def __init__(self, callback_generator, today_text=None):
         super().__init__(
             callback_generator,
             date_text=Case(
@@ -47,6 +47,12 @@ class CustomCalendarDaysView(CalendarDaysView):
     def _is_date_available(self, date_to_check: date, events: list) -> bool:
         """Checks if the date is available for booking (main logic)"""
         self.logger.info(f"_is_date_available checking date: {date_to_check}")
+        
+        # Check if date is in the past
+        current_date = datetime.now().date()
+        if date_to_check < current_date:
+            self.logger.info(f"Date {date_to_check} is in the past")
+            return False
         
         if not events:
             self.logger.info("No events available")
@@ -104,16 +110,13 @@ class CustomCalendar(Calendar):
         return {
             CalendarScope.DAYS: CustomCalendarDaysView(
                 self._item_callback_data,
-                self.config,
                 today_text=Format("📍"),
             ),
             CalendarScope.MONTHS: CalendarMonthView(
                 self._item_callback_data,
-                self.config,
             ),
             CalendarScope.YEARS: CalendarYearsView(
                 self._item_callback_data,
-                self.config,
             ),
         }
 

@@ -21,6 +21,7 @@ if missing_vars:
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram_dialog import setup_dialogs
+from src.middlewares.auth import AuthMiddleware
 
 from config import settings
 from src.handlers.registration import router as registration_router
@@ -31,7 +32,10 @@ from src.menu.dialogs import new_client_dialog
 from src.menu.handlers.inline import router as inline_router
 
 # Настройка логирования
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 # Инициализация бота и диспетчера
@@ -39,10 +43,14 @@ bot = Bot(token=settings.bot_token.get_secret_value())
 storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 
+# Регистрация мидлварей
+# dp.message.middleware(AuthMiddleware()) # <-- Убираем глобальную регистрацию
+menu_router.message.middleware(AuthMiddleware()) # <-- Добавляем мидлварь только к роутеру меню
+
 # Регистрация роутеров
 dp.include_router(inline_router)  # Регистрируем inline-роутер первым
-dp.include_router(registration_router)
-dp.include_router(menu_router)
+dp.include_router(registration_router) # Роутер регистрации БЕЗ мидлвари
+dp.include_router(menu_router)         # Роутер меню С мидлварью
 
 # Регистрация диалогов
 dp.include_router(menu_dialog)

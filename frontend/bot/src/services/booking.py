@@ -54,13 +54,30 @@ class BookingService:
                         "page": page,
                         "per_page": per_page,
                         "total_pages": data.get("total_pages", 0),
-                        "status": data.get("status")
+                        "status": data.get("status"),
+                        "is_already_booked": False
                     }
                     self.logger.info(f"Returning result: {result}")
                     return result
+                elif response.status == 409:
+                    return {
+                        "services": [],
+                        "total": 0,
+                        "page": page,
+                        "per_page": per_page,
+                        "total_pages": 0,
+                        "is_already_booked": True
+                    }
                     
                 self.logger.error(f"Failed to get services: {response_text}")
-                return {"services": [], "total": 0, "page": page, "per_page": per_page, "total_pages": 0}
+                return {
+                    "services": [],
+                    "total": 0,
+                    "page": page,
+                    "per_page": per_page,
+                    "total_pages": 0,
+                    "is_already_booked": False
+                }
 
     async def get_service_events(self, client_id: int, service_id: int, page: int = 1, per_page: int = 10) -> Dict:
         """Получение списка событий для услуги"""

@@ -1,6 +1,7 @@
 import aiohttp
 from datetime import datetime
 from typing import Optional
+from src.models.volunteer import Volunteer
 
 from config import settings
 
@@ -19,7 +20,7 @@ class VolunteerService:
         first_name: str,
         middle_name: str,
         last_name: str,
-    ) -> dict:
+    ) -> Volunteer:
         """Создание нового волонтера"""
         async with aiohttp.ClientSession() as session:
             async with session.post(
@@ -34,10 +35,11 @@ class VolunteerService:
                 headers=self.headers
             ) as response:
                 if response.status == 201:
-                    return await response.json()
+                    data = await response.json()
+                    return Volunteer.from_dict(data)
                 raise Exception(f"Failed to create volunteer: {await response.text()}")
 
-    async def get_volunteer(self, tg_id: int) -> Optional[dict]:
+    async def get_volunteer(self, tg_id: int) -> Optional[Volunteer]:
         """Получение волонтера по tg_id"""
         async with aiohttp.ClientSession() as session:
             async with session.get(
@@ -45,7 +47,8 @@ class VolunteerService:
                 headers=self.headers
             ) as response:
                 if response.status == 200:
-                    return await response.json()
+                    data = await response.json()
+                    return Volunteer.from_dict(data)
                 elif response.status == 404:
                     return None
                 

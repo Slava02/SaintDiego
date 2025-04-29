@@ -87,9 +87,6 @@ async def process_birth_date(message: types.Message, state: FSMContext, dialog_m
             "Используйте /menu для доступа к основным функциям."
         )
         
-        # Открываем главное меню
-        await dialog_manager.start(MainMenu.main, mode=StartMode.RESET_STACK)
-        
     except Exception as e:
         await message.answer(
             "❌ Произошла ошибка при регистрации. Пожалуйста, попробуйте позже или обратитесь к администратору."

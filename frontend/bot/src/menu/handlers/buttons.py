@@ -82,7 +82,7 @@ async def on_confirm_booking(callback: CallbackQuery, button: Button, manager: D
     if not client_id or not event_id:
         logger.error("No client_id or event_id found in dialog_data")
         await callback.message.answer("❌ Произошла ошибка при создании записи")
-        await manager.switch_to(MainMenu.main)
+        await manager.switch_to(MainMenu.client_profile)
         return
     
     logger.info(f"Confirming booking: client_id={client_id}, event_id={event_id}, volunteer_id={volunteer_id}")
@@ -93,9 +93,9 @@ async def on_confirm_booking(callback: CallbackQuery, button: Button, manager: D
     await callback.message.answer(message)
     
     if success:
-        await manager.switch_to(MainMenu.main)
+        await manager.switch_to(MainMenu.client_profile)
     else:
-        await manager.switch_to(MainMenu.select_service)
+        await manager.switch_to(MainMenu.client_profile)
 
 async def process_new_client_result(start_data: dict, result: dict, manager: DialogManager):
     """Process result of new client dialog"""

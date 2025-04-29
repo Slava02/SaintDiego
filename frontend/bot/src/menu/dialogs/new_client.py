@@ -33,7 +33,7 @@ async def name_handler(message: Message, widget: MessageInput, manager: DialogMa
         await message.answer(f"❌ {error_message}\nПожалуйста, введите ФИО в формате: Имя Фамилия Отчество")
         return
     
-    first_name, middle_name, last_name = name_parts
+    middle_name, first_name, last_name = name_parts
     logger.info(f"Valid name parts: first_name={first_name}, middle_name={middle_name}, last_name={last_name}")
     
     # Save data in dialog_data
@@ -131,7 +131,7 @@ async def on_existing_client_selected(callback: CallbackQuery, select: Select, m
 # Name input dialog
 new_client_dialog = Dialog(
     Window(
-        Const("Введите ФИО нового посетителя в формате:\nИмя Фамилия Отчество"),
+        Const("Введите ФИО нового посетителя в формате:\nФамилия Имя Отчество"),
         MessageInput(
             func=name_handler,
             content_types=["text"]

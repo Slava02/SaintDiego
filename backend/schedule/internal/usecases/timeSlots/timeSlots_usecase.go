@@ -319,10 +319,24 @@ func (u UseCase) generateEvents(timeSlot *models.TimeSlot, services []*models.Ti
 	currentDate := timeSlot.StartDate
 	for currentDate.Before(endDate) {
 		for _, service := range services {
+			// Получаем время из service
+			serviceTime := service.Time
+			// Комбинируем дату из currentDate и время из service
+			eventDateTime := time.Date(
+				currentDate.Year(),
+				currentDate.Month(),
+				currentDate.Day(),
+				serviceTime.Hour(),
+				serviceTime.Minute(),
+				serviceTime.Second(),
+				0,
+				currentDate.Location(),
+			)
+
 			event := &models.Event{
 				TimeSlotServiceID: service.ID,
 				Capacity:          service.Capacity,
-				DateTime:          currentDate,
+				DateTime:          eventDateTime,
 				ServiceTypeID:     service.ServiceTypeID,
 				ServiceName:       serviceTypes[service.ServiceTypeID].Name,
 			}

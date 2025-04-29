@@ -24,15 +24,25 @@ async def process_inline_query(inline_query: InlineQuery):
     
     results = []
     if not query:
-        # Если запрос пустой, показываем только кнопку создания нового клиента
+        # Если запрос пустой, показываем текст с инструкцией и кнопку создания нового клиента
+        results.append(
+            InlineQueryResultArticle(
+                id="instruction",
+                title="✍️ Введите ФИО посетителя",
+                input_message_content=InputTextMessageContent(
+                    message_text="Введите ФИО посетителя"
+                ),
+                description="Вводить можно с ошибками"
+            )
+        )
         results.append(
             InlineQueryResultArticle(
                 id="new_client",
-                title="➕ Создать нового посетителя",
+                title="➕ Нажмите, если посетитель не найден",
                 input_message_content=InputTextMessageContent(
                     message_text="/new_client"
                 ),
-                description="Нажмите, чтобы создать нового посетителя"
+                description="Создать нового посетителя"
             )
         )
     else:

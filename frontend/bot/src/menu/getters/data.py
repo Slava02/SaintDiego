@@ -18,8 +18,21 @@ async def get_profile_data(dialog_manager: DialogManager, **kwargs):
     """Get data for profile window"""
     volunteer_service = VolunteerService()
     volunteer = await volunteer_service.get_volunteer(dialog_manager.event.from_user.id)
+    
+    if not volunteer:
+        logger.error(f"Volunteer not found for user_id={dialog_manager.event.from_user.id}")
+        return {
+            "volunteer": {
+                "tg_id": dialog_manager.event.from_user.id,
+                "tg_login": dialog_manager.event.from_user.username or "Не указан",
+                "first_name": "Не найден",
+                "middle_name": "Не найден",
+                "last_name": "Не найден"
+            }
+        }
+    
     return {
-        "volunteer": volunteer
+        "volunteer": volunteer.to_dict()
     }
 
 async def get_services_data(dialog_manager: DialogManager, **kwargs):
@@ -76,7 +89,8 @@ async def get_services_data(dialog_manager: DialogManager, **kwargs):
         "is_blocked": client.is_blocked,
         "blocked_at": client.blocked_at,
         "blocked_reason": client.blocked_reason,
-        "is_new": client.is_new
+        "is_new": client.is_new,
+        "is_already_booked": services_data.get("is_already_booked", False)
     }
 
 async def get_events_data(dialog_manager: DialogManager, **kwargs):

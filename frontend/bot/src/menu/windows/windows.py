@@ -156,30 +156,43 @@ def is_new_client(data, case, manager):
     logger.info(f"is_new_client: is_new={is_new}, result={result}")
     return result
 
+def is_already_booked(data, case, manager):
+    """Проверяет, записан ли клиент на все доступные услуги"""
+    is_booked = data.get("is_already_booked", False)
+    result = is_booked == True
+    logger.info(f"is_already_booked: is_booked={is_booked}, result={result}")
+    return result
 
 # Service selection window
 select_service_window = Window(
     Format("Выберите услугу:"),
     Case(
         {
-            True: Format("⚠️ Посетитель слишком давно не был у нас!\nДоступно только повторное собеседование.\n(Если не отображается - уже есть запись)"),
+            True: Format("⚠️ Посетитель слишком давно не был у нас!\n\nДоступно только повторное собеседование.\n(Если не отображается - уже есть запись)"),
             False: Const("")
         },
         selector=is_too_long_ago
     ),
     Case(
         {
-            True: Format("🚫 Посетитель заблокирован.\nПричина: {blocked_reason}\nДата блокировки: {blocked_at}.\nДоступно только повторное собеседование.\n(Если не отображается - уже есть запись)"),
+            True: Format("🚫 Посетитель заблокирован.\nПричина: {blocked_reason}\n\nДоступно только повторное собеседование.\n(Если не отображается - уже есть запись)"),
             False: Const("")
         },
         selector=is_client_blocked
     ),
     Case(
         {
-            True: Format("👋 Новый посетитель!\nДоступно только первичное собеседование.\n(Если не отображается - уже есть запись)"),
+            True: Format("👋 Новый посетитель!\n\nДоступно только первичное собеседование.\n(Если не отображается - уже есть запись)"),
             False: Const("")
         },
         selector=is_new_client
+    ),
+    Case(
+        {
+            True: Format("ℹ️ Клиент уже записан на все доступные услуги"),
+            False: Const("")
+        },
+        selector=is_already_booked
     ),
     Column(
         Select(
@@ -212,15 +225,17 @@ select_date_window = Window(
 # Time selection window
 select_time_window = Window(
     Format("Выберите время на {selected_date}:"),
-    Select(
-        Format("{item[datetime]:%Y-%m-%d %H:%M:%S}"),
-        id="times",
-        item_id_getter=lambda x: str(x["id"]),
-        items="events",
-        on_click=on_time_selected
-    ),
-    Row(
-        Button(Const("◀️ Назад"), id="back", on_click=on_back_to_date),
+    Column(
+        Select(
+            Format("{item[datetime]:%Y-%m-%d %H:%M:%S}"),
+            id="times",
+            item_id_getter=lambda x: str(x["id"]),
+            items="events",
+            on_click=on_time_selected
+        ),
+        Row(
+            Button(Const("◀️ Назад"), id="back", on_click=on_back_to_date),
+        ),
     ),
     state=MainMenu.select_time,
     getter=get_events_data

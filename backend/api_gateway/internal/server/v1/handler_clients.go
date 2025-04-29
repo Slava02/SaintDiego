@@ -105,6 +105,8 @@ func (h Handlers) GetClientsIdServices(ctx echo.Context, id int64, params GetCli
 		switch status.Code(err) {
 		case codes.NotFound:
 			return ctx.JSON(http.StatusNotFound, Err("Client not found", err.Error()))
+		case codes.AlreadyExists:
+			return ctx.JSON(http.StatusConflict, Err("Client already booked events", err.Error()))
 		default:
 			return ctx.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
 		}

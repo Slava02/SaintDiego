@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     # URL API
     api_url: str
 
+    # ID чата волонтеров
+    volunteers_chat_id: int
+
     # Настройки для загрузки переменных окружения
     model_config = SettingsConfigDict(
         env_file=".env",
