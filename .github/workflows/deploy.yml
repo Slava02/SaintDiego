@@ -1,0 +1,54 @@
+name: Deploy Application
+
+on:
+  workflow_dispatch: # Позволяет запускать workflow вручную
+
+jobs:
+  deploy:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add SSH host key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -t rsa ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Set permissions on start_all.sh
+        run: chmod +x start_all.sh
+
+      - name: Create deployment directory on server
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }} "mkdir -p ${{ secrets.DEPLOY_PATH }}"
+
+      - name: Copy files to server
+        run: |
+          rsync -avz --delete \
+            --exclude 'node_modules' \
+            --exclude '.git' \
+            --exclude '.github' \
+            ./ ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.DEPLOY_PATH }}
+
+      - name: Deploy application
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }} "cd ${{ secrets.DEPLOY_PATH }} && ./start_all.sh"
+
+      - name: Verify deployment
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }} "docker ps | grep 'api\|saint_egidio_bot\|mks-db'"
+
+# Необходимые секреты (настраиваются в GitHub):
+# - SSH_PRIVATE_KEY: Приватный SSH ключ для подключения к серверу
+# - SERVER_HOST: Адрес сервера (IP или домен)
+# - SSH_USER: Имя пользователя для SSH
+# - DEPLOY_PATH: Путь на сервере, куда будут копироваться файлы
