@@ -45,6 +45,10 @@ ADD COLUMN IF NOT EXISTS `blocked_reason` text;
 ALTER TABLE `client`
 ADD COLUMN IF NOT EXISTS `blocked_at` datetime;
 --bun:split
+UPDATE `client`
+SET `is_blocked` = true
+WHERE `id` IN (1, 3, 5, 7, 9);
+--bun:split
 CREATE TABLE IF NOT EXISTS `client_field_value` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `field_id` int(11) DEFAULT NULL,

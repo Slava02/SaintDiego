@@ -17,9 +17,11 @@ class Settings(BaseSettings):
 
     # Настройки для загрузки переменных окружения
     model_config = SettingsConfigDict(
-        env_file=".env",
+        # env_file=".env",  # Убрали явное указание файла
         env_file_encoding="utf-8",
-        extra="allow"  # Разрешаем дополнительные поля
+        extra="allow",  # Разрешаем дополнительные поля
+        env_prefix="",  # Без префикса для переменных окружения
+        validate_default=True,  # Валидируем значения по умолчанию
     )
 
 

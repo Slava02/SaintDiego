@@ -57,7 +57,6 @@ func run() (errReturned error) {
 
 	srv, err := initServer(
 		cfg.Servers.APIGW.Addr,
-		cfg.Servers.APIGW.AllowOrigins,
 		v1Swagger,
 		cfg.Services.Schedule.Addr,
 		cfg.Services.Services.Addr,

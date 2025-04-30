@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   bot:
     build:
@@ -9,8 +7,19 @@ services:
     container_name: saint_egidio_bot
     restart: unless-stopped
     env_file:
-      - ./env
+      - path: ./docker.env
+        required: true
     working_dir: /app
     volumes:
       - ./:/app:ro
+    networks:
+      - default
+      - backend_network
     command: ["python3", "-u", "main.py"]
+
+networks:
+  backend_network:
+    external: true
+    name: backend_default
+  default:
+    driver: bridge

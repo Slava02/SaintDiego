@@ -1,5 +1,5 @@
 from aiogram_dialog import Window, Dialog
-from aiogram_dialog.widgets.text import Format, Const, Multi, Case
+from aiogram_dialog.widgets.text import Format, Const, Multi, Case, Jinja
 from aiogram_dialog.widgets.kbd import Button, Row, Column, Select, Start
 from src.states.menu import MainMenu
 from src.menu.dialogs.new_client import NewClientSG
@@ -163,51 +163,60 @@ def is_already_booked(data, case, manager):
     logger.info(f"is_already_booked: is_booked={is_booked}, result={result}")
     return result
 
-# Service selection window
+# Service selection window using Jinja
+service_selection_template = Jinja("""
+{% if is_new %}
+    <b>👋 Новый посетитель!</b>
+    
+    Доступно только <i>первичное собеседование</i>.
+    {% if not services %}
+        <i>(Клиент уже записан на эту услугу)</i>
+    {% endif %}
+{% elif is_blocked %}
+    <b>🚫 Посетитель заблокирован.</b>
+    Причина: {{ blocked_reason }}
+    
+    Доступно только <i>повторное собеседование</i>.
+    {% if not services %}
+        <i>(Клиент уже записан на эту услугу)</i>
+    {% endif %}
+{% elif status == "TOO_LONG_AGO" %}
+    <b>⚠️ Посетитель слишком давно не был у нас!</b>
+    
+    Доступно только <i>повторное собеседование</i>.
+    {% if not services %}
+        <i>(Клиент уже записан на эту услугу)</i>
+    {% endif %}
+{% elif is_already_booked %}
+    <b>ℹ️ Клиент уже записан на все доступные услуги.</b>
+    
+    Попробуйте проверить историю записей клиента.
+{% elif not services %}
+    <b>ℹ️ В данный момент нет доступных для записи услуг.</b>
+    
+    Попробуйте проверить историю записей клиента.
+{% else %}
+    <b>Выберите услугу:</b>
+{% endif %}
+""")
+
 select_service_window = Window(
-    Format("Выберите услугу:"),
-    Case(
-        {
-            True: Format("⚠️ Посетитель слишком давно не был у нас!\n\nДоступно только повторное собеседование.\n(Если не отображается - уже есть запись)"),
-            False: Const("")
-        },
-        selector=is_too_long_ago
-    ),
-    Case(
-        {
-            True: Format("🚫 Посетитель заблокирован.\nПричина: {blocked_reason}\n\nДоступно только повторное собеседование.\n(Если не отображается - уже есть запись)"),
-            False: Const("")
-        },
-        selector=is_client_blocked
-    ),
-    Case(
-        {
-            True: Format("👋 Новый посетитель!\n\nДоступно только первичное собеседование.\n(Если не отображается - уже есть запись)"),
-            False: Const("")
-        },
-        selector=is_new_client
-    ),
-    Case(
-        {
-            True: Format("ℹ️ Клиент уже записан на все доступные услуги"),
-            False: Const("")
-        },
-        selector=is_already_booked
-    ),
+    service_selection_template, # Jinja template for conditional text
     Column(
-        Select(
+        Select( 
             Format("{item[name]}"),
             id="services",
             item_id_getter=lambda x: str(x["id"]),
             items="services",
-            on_click=on_service_selected
+            on_click=on_service_selected,
         ),
         Row(
             Button(Const("◀️ Назад"), id="back", on_click=on_back_to_client_profile),
         ),
     ),
     state=MainMenu.select_service,
-    getter=get_services_data
+    getter=get_services_data,
+    parse_mode=ParseMode.HTML # Set parse mode for the window
 )
 
 # Date selection window

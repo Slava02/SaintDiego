@@ -16,7 +16,6 @@ type OptOptionsSetter func(o *Options)
 func NewOptions(
 	logger *zap.Logger,
 	serverAddr string,
-	allowOrigins []string,
 	v1Swagger *openapi3.T,
 	v1Handlers v1.ServerInterface,
 	jwtSecret string,
@@ -29,8 +28,6 @@ func NewOptions(
 	o.logger = logger
 
 	o.serverAddr = serverAddr
-
-	o.allowOrigins = allowOrigins
 
 	o.v1Swagger = v1Swagger
 
@@ -48,7 +45,6 @@ func (o *Options) Validate() error {
 	errs := new(errors461e464ebed9.ValidationErrors)
 	errs.Add(errors461e464ebed9.NewValidationError("logger", _validate_Options_logger(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("serverAddr", _validate_Options_serverAddr(o)))
-	errs.Add(errors461e464ebed9.NewValidationError("allowOrigins", _validate_Options_allowOrigins(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("v1Swagger", _validate_Options_v1Swagger(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("v1Handlers", _validate_Options_v1Handlers(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("jwtSecret", _validate_Options_jwtSecret(o)))
@@ -65,13 +61,6 @@ func _validate_Options_logger(o *Options) error {
 func _validate_Options_serverAddr(o *Options) error {
 	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.serverAddr, "required,hostname_port"); err != nil {
 		return fmt461e464ebed9.Errorf("field `serverAddr` did not pass the test: %w", err)
-	}
-	return nil
-}
-
-func _validate_Options_allowOrigins(o *Options) error {
-	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.allowOrigins, "min=1"); err != nil {
-		return fmt461e464ebed9.Errorf("field `allowOrigins` did not pass the test: %w", err)
 	}
 	return nil
 }

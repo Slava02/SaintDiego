@@ -23,7 +23,6 @@ const nameServer = "server-apigw"
 
 func initServer(
 	addr string,
-	allowOrigins []string,
 	v1Swagger *openapi3.T,
 	scheduleAddr string,
 	servicesAddr string,
@@ -85,7 +84,6 @@ func initServer(
 	srv, err := server.New(server.NewOptions(
 		lg,
 		addr,
-		allowOrigins,
 		v1Swagger,
 		v1Handlers,
 		jwtSecret,

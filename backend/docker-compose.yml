@@ -1,5 +1,6 @@
 services:
   api_gateway:
+    container_name: api
     build:
       context: ./api_gateway
       dockerfile: Dockerfile
@@ -15,6 +16,7 @@ services:
       - go-mod-cache:/go/pkg/mod
 
   schedule:
+    container_name: schedule
     build:
       context: ./schedule
       dockerfile: Dockerfile
@@ -29,6 +31,7 @@ services:
       - go-mod-cache:/go/pkg/mod
 
   services:
+    container_name: services
     build:
       context: ./services
       dockerfile: Dockerfile
@@ -43,6 +46,7 @@ services:
       - go-mod-cache:/go/pkg/mod
 
   events:
+    container_name: events
     build:
       context: ./events
       dockerfile: Dockerfile
@@ -57,6 +61,7 @@ services:
       - go-mod-cache:/go/pkg/mod
 
   auth:
+    container_name: auth
     build:
       context: ./auth
       dockerfile: Dockerfile
@@ -71,6 +76,7 @@ services:
       - go-mod-cache:/go/pkg/mod
 
   clients:
+    container_name: clients
     build:
       context: ./clients
       dockerfile: Dockerfile
@@ -85,6 +91,7 @@ services:
       - go-mod-cache:/go/pkg/mod
 
   volunteers:
+    container_name: volunteers
     build:
       context: ./volunteers
       dockerfile: Dockerfile

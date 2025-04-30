@@ -6,6 +6,8 @@ info:
 servers:
   - url: http://localhost:8080/v1
     description: Development server
+  - url: http://host.docker.internal:8080/v1
+    description: Docker-окружение
 security:
   - BearerAuth: []
 paths:
