@@ -26,6 +26,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -t rsa ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
       - name: Set permissions on start_all.sh
         run: chmod +x start_all.sh
@@ -36,24 +37,33 @@ jobs:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
+          # Test SSH connection first
+          echo "Testing SSH connection..."
+          ssh -v -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "echo 'SSH connection successful'"
+
           # Create deployment directory if it doesn't exist
+          echo "Creating deployment directory..."
           ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "mkdir -p $DEPLOY_PATH"
 
           # Copy files to server
+          echo "Copying files to server..."
           rsync -avz --delete \
             --exclude 'node_modules' \
             --exclude '.git' \
             --exclude '.github' \
+            -e "ssh -o StrictHostKeyChecking=no" \
             ./ $SERVER_USER@$SERVER_HOST:$DEPLOY_PATH
 
           # Deploy application
+          echo "Deploying application..."
           ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "cd $DEPLOY_PATH && ./start_all.sh"
 
           # Verify deployment
+          echo "Verifying deployment..."
           ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "docker ps | grep 'api\|saint_egidio_bot\|mks-db'"
 
 # Required secrets (configure in GitHub):
-# - SSH_PRIVATE_KEY: Private SSH key for server access
+# - SSH_PRIVATE_KEY: Private SSH key for server access (should start with -----BEGIN OPENSSH PRIVATE KEY-----)
 # - SERVER_HOST: Server address (IP or domain)
 # - SSH_USER: SSH username
 # - DEPLOY_PATH: Server path for deployment
