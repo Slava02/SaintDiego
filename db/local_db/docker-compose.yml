@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:10.3
+    container_name: mks-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345ghJkbn
+      MYSQL_DATABASE: homeless
+      MYSQL_USER: homeless
+      MYSQL_PASSWORD: 12345ghJkbn
+    ports:
+      - "39410:3306"
+    volumes:
+      - ./backup.sql:/docker-entrypoint-initdb.d/backup.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
