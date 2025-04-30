@@ -36,6 +36,8 @@ jobs:
           SERVER_USER: ${{ secrets.SSH_USER }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           # Test SSH connection first
           echo "Testing SSH connection..."
@@ -54,6 +56,10 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             ./ $SERVER_USER@$SERVER_HOST:$DEPLOY_PATH
 
+          # Login to Docker Hub on the server
+          echo "Logging in to Docker Hub..."
+          ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "echo '$DOCKER_PASSWORD' | docker login -u $DOCKER_USERNAME --password-stdin"
+
           # Deploy application
           echo "Deploying application..."
           ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "cd $DEPLOY_PATH && ./start_all.sh"
@@ -67,3 +73,5 @@ jobs:
 # - SERVER_HOST: Server address (IP or domain)
 # - SSH_USER: SSH username
 # - DEPLOY_PATH: Server path for deployment
+# - DOCKER_USERNAME: Docker Hub username
+# - DOCKER_PASSWORD: Docker Hub password or access token
