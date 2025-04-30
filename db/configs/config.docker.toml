@@ -1,0 +1,6 @@
+[database]
+host = "host.docker.internal"
+db_name = "homeless"
+password = "12345ghJkbn"
+user = "homeless"
+port = "39410"

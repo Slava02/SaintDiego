@@ -1,0 +1,13 @@
+[global]
+name = "events"
+env = "dev"
+
+[log]
+level = "debug"
+
+[database]
+host = "localhost"
+db_name = "homeless"
+password = "12345ghJkbn"
+user = "homeless"
+port = "39410"
