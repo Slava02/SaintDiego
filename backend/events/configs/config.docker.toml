@@ -13,18 +13,18 @@ max_connection_age = 10
 time = 10
 
 [database]
-host = "host.docker.internal"
+host = "mks-db"
 db_name = "homeless"
 password = "12345ghJkbn"
 user = "homeless"
-port = "39410"
+port = "3306"
 
 [grpc_client]
 [grpc_client.services]
-addr = "host.docker.internal:50052"
+addr = "services:50052"
 
 [grpc_client.volunteers]
-addr = "host.docker.internal:50054"
+addr = "volunteers:50054"
 
 [grpc_client.clients]
-addr = "host.docker.internal:50055"
+addr = "clients:50055"

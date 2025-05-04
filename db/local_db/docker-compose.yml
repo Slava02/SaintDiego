@@ -23,5 +23,6 @@ services:
 
 networks:
   saint_egidio_network:
-    driver: bridge
+    external: true
+    name: saint_egidio_network
 

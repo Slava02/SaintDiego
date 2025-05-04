@@ -1,6 +1,13 @@
+[global]
+name = "events"
+env = "dev"
+
+[log]
+level = "debug"
+
 [database]
-host = "mks-db"
+host = "localhost"
 db_name = "homeless"
 password = "12345ghJkbn"
 user = "homeless"
-port = "3306"
+port = "39410"
