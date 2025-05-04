@@ -63,12 +63,21 @@ check_db_availability() {
 # Устанавливаем текущую директорию как корень проекта
 PROJECT_ROOT=$(pwd)
 
+# Создаем сеть Docker если она не существует
+print_message "🌐 Создание Docker сети..." "${CYAN}"
+docker network create saint_egidio_network 2>/dev/null || true
+
 # ШАГ 1: Запуск базы данных
 print_step_header "1" "Запуск контейнера с базой данных"
 cd "$PROJECT_ROOT/db/local_db"
 print_message "📁 Переход в директорию: $(pwd)" "${CYAN}"
 print_message "🚀 Запуск контейнера с базой данных..." "${YELLOW}"
-docker-compose down
+
+# Останавливаем и удаляем существующий контейнер
+docker-compose down -v
+docker rm -f mks-db 2>/dev/null || true
+
+# Запускаем контейнер
 docker-compose up -d
 status=$?
 print_status $status "База данных запущена"
@@ -82,6 +91,9 @@ print_status $db_ready "База данных инициализирована �
 print_step_header "2" "Миграция базы данных"
 cd "$PROJECT_ROOT/db"
 print_message "📁 Переход в директорию: $(pwd)" "${CYAN}"
+
+# Копируем конфиг для Docker
+cp configs/config.docker.toml configs/config.toml
 
 print_message "🔄 Выполнение миграции init..." "${YELLOW}"
 go run migrateCLI/migration.go migrate init
@@ -134,7 +146,7 @@ print_message "║               ПРИЛОЖЕНИЕ УСПЕШНО ЗАПУЩ�
 print_message "╚════════════════════════════════════════════════════════════╝" "${GREEN}"
 echo ""
 print_message "Для просмотра логов контейнеров используйте:" "${CYAN}"
-print_message "  • База данных:  docker logs db" "${CYAN}"
+print_message "  • База данных:  docker logs mks-db" "${CYAN}"
 print_message "  • API Gateway:  docker logs api" "${CYAN}"
 print_message "  • Бот:          docker logs saint_egidio_bot" "${CYAN}"
 echo "" 

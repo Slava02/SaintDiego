@@ -1,6 +1,6 @@
 [database]
-host = "host.docker.internal"
+host = "mks-db"
 db_name = "homeless"
 password = "12345ghJkbn"
 user = "homeless"
-port = "39410"
+port = "3306"

@@ -14,6 +14,8 @@ services:
     restart: on-failure
     volumes:
       - go-mod-cache:/go/pkg/mod
+    networks:
+      - saint_egidio_network
 
   schedule:
     container_name: schedule
@@ -29,6 +31,8 @@ services:
     restart: on-failure
     volumes:
       - go-mod-cache:/go/pkg/mod
+    networks:
+      - saint_egidio_network
 
   services:
     container_name: services
@@ -44,6 +48,8 @@ services:
     restart: on-failure
     volumes:
       - go-mod-cache:/go/pkg/mod
+    networks:
+      - saint_egidio_network
 
   events:
     container_name: events
@@ -59,6 +65,8 @@ services:
     restart: on-failure
     volumes:
       - go-mod-cache:/go/pkg/mod
+    networks:
+      - saint_egidio_network
 
   auth:
     container_name: auth
@@ -74,6 +82,8 @@ services:
     restart: on-failure
     volumes:
       - go-mod-cache:/go/pkg/mod
+    networks:
+      - saint_egidio_network
 
   clients:
     container_name: clients
@@ -89,6 +99,8 @@ services:
     restart: on-failure
     volumes:
       - go-mod-cache:/go/pkg/mod
+    networks:
+      - saint_egidio_network
 
   volunteers:
     container_name: volunteers
@@ -104,6 +116,8 @@ services:
     restart: on-failure
     volumes:
       - go-mod-cache:/go/pkg/mod
+    networks:
+      - saint_egidio_network
 
   jaeger:
     image: jaegertracing/all-in-one:1.48
@@ -115,8 +129,15 @@ services:
       - "16686:16686"
       - "14268:14268"
       - "9411:9411"
+    networks:
+      - saint_egidio_network
 
 volumes:
   go-mod-cache:
+
+networks:
+  saint_egidio_network:
+    external: true
+    name: saint_egidio_network
 
 

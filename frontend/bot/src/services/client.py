@@ -28,7 +28,7 @@ class ClientService:
         self.api_url = settings.api_url
         self.headers = {
             "Authorization": f"Bearer {settings.api_token.get_secret_value()}",
-            #"Host": "localhost:8080"  # Добавляем хост-заголовок
+            "Host": "localhost:8080"  # Добавляем хост-заголовок
         }
         self.clients: Dict[int, Client] = {}  # Кэш клиентов
         self.cron_job = None
