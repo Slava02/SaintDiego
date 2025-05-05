@@ -53,6 +53,12 @@ get:
         application/json:
           schema:
             $ref: ../components/schemas/Error.yml
+    '409':
+      description: Доступная услуга уже забронирована
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Error.yml
     '500':
       description: Internal server error
       content:

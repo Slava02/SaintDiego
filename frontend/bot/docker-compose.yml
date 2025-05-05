@@ -12,11 +12,12 @@ services:
     working_dir: /app
     volumes:
       - ./:/app:ro
-    networks:
-      - saint_egidio_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: ["python3", "-u", "main.py"]
 
 networks:
   saint_egidio_network:
     external: true
     name: saint_egidio_network
+

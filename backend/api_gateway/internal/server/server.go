@@ -32,11 +32,12 @@ const (
 
 //go:generate options-gen -out-filename=server_options.gen.go -from-struct=Options
 type Options struct {
-	logger     *zap.Logger        `option:"mandatory" validate:"required"`
-	serverAddr string             `option:"mandatory" validate:"required,hostname_port"`
-	v1Swagger  *openapi3.T        `option:"mandatory" validate:"required"`
-	v1Handlers v1.ServerInterface `option:"mandatory" validate:"required"`
-	jwtSecret  string             `option:"mandatory" validate:"required"`
+	logger       *zap.Logger        `option:"mandatory" validate:"required"`
+	serverAddr   string             `option:"mandatory" validate:"required,hostname_port"`
+	v1Swagger    *openapi3.T        `option:"mandatory" validate:"required"`
+	v1Handlers   v1.ServerInterface `option:"mandatory" validate:"required"`
+	jwtSecret    string             `option:"mandatory" validate:"required"`
+	allowOrigins []string           `option:"mandatory" validate:"required"`
 }
 
 type Server struct {
@@ -54,6 +55,9 @@ func New(opts Options) (*Server, error) {
 		middlewares.NewRecovery(opts.logger),
 		middlewares.NewLogging(opts.logger),
 		middleware.BodyLimit("12KB"),
+		middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins: opts.allowOrigins,
+		}),
 		apmecho.Middleware(nameServer),
 	)
 

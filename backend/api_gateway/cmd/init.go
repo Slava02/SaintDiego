@@ -23,6 +23,7 @@ const nameServer = "server-apigw"
 
 func initServer(
 	addr string,
+	allowOrigins []string,
 	v1Swagger *openapi3.T,
 	scheduleAddr string,
 	servicesAddr string,
@@ -87,6 +88,7 @@ func initServer(
 		v1Swagger,
 		v1Handlers,
 		jwtSecret,
+		allowOrigins,
 	))
 	if err != nil {
 		return nil, fmt.Errorf("build server: %v", err)

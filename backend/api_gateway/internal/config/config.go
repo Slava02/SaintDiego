@@ -21,8 +21,9 @@ type ServersConfig struct {
 }
 
 type APIGWServerConfig struct {
-	Addr string    `toml:"addr" validate:"required,hostname_port"`
-	JWT  JWTConfig `toml:"jwt"`
+	Addr         string    `toml:"addr" validate:"required,hostname_port"`
+	JWT          JWTConfig `toml:"jwt"`
+	AllowOrigins []string  `toml:"allow_origins" validate:"required"`
 }
 
 type MicroservicesConfig struct {
