@@ -60,6 +60,37 @@ check_db_availability() {
     return 1
 }
 
+# Функция для очистки при выходе
+cleanup() {
+    print_message "🛑 Остановка всех сервисов..." "${YELLOW}"
+    
+    # Остановка бэкенд сервисов
+    cd "$PROJECT_ROOT/backend"
+    for service in schedule services events volunteers clients auth api; do
+        if [ -f "${service}/${service}.pid" ]; then
+            pid=$(cat "${service}/${service}.pid")
+            if ps -p $pid > /dev/null; then
+                print_message "Stopping $service (PID: $pid)..." "${YELLOW}"
+                kill $pid
+                rm "${service}/${service}.pid"
+            fi
+        fi
+    done
+    
+    # Остановка Docker контейнеров
+    cd "$PROJECT_ROOT/db/local_db"
+    docker-compose down
+    
+    cd "$PROJECT_ROOT/frontend/bot"
+    docker-compose down
+    
+    print_message "✅ Все сервисы остановлены" "${GREEN}"
+    exit 0
+}
+
+# Устанавливаем обработчик для корректного завершения
+trap cleanup SIGINT SIGTERM
+
 # Устанавливаем текущую директорию как корень проекта
 PROJECT_ROOT=$(pwd)
 
@@ -107,25 +138,19 @@ go run migrateCLI/migration.go migrate up
 status_up=$?
 print_status $status_up "Миграция up выполнена"
 
-# ШАГ 3: Сборка контейнеров бэкенда
-print_step_header "3" "Сборка контейнеров бэкенда"
+# ШАГ 3: Запуск бэкенд сервисов
+print_step_header "3" "Запуск бэкенд сервисов"
 cd "$PROJECT_ROOT/backend"
 print_message "📁 Переход в директорию: $(pwd)" "${CYAN}"
-print_message "🏗️ Запуск процесса сборки..." "${YELLOW}"
-bash build.sh
-status=$?
-print_status $status "Сборка контейнеров бэкенда завершена"
+print_message "🚀 Запуск бэкенд сервисов..." "${YELLOW}"
 
-# ШАГ 4: Запуск бэкенда
-print_step_header "4" "Запуск контейнеров бэкенда"
-print_message "🚀 Запуск контейнеров бэкенда..." "${YELLOW}"
-docker-compose down
-docker-compose up -d
+# Запускаем все сервисы через start_services.sh
+./start_services_linux.sh
 status=$?
-print_status $status "Контейнеры бэкенда запущены"
+print_status $status "Бэкенд сервисы запущены"
 
-# ШАГ 5: Сборка и запуск бота
-print_step_header "5" "Сборка и запуск контейнера бота"
+# ШАГ 4: Сборка и запуск бота
+print_step_header "4" "Сборка и запуск контейнера бота"
 cd "$PROJECT_ROOT/frontend/bot"
 print_message "📁 Переход в директорию: $(pwd)" "${CYAN}"
 print_message "🏗️ Сборка контейнера бота..." "${YELLOW}"
@@ -145,8 +170,19 @@ print_message "╔════════════════════�
 print_message "║               ПРИЛОЖЕНИЕ УСПЕШНО ЗАПУЩЕНО!                 ║" "${GREEN}"
 print_message "╚════════════════════════════════════════════════════════════╝" "${GREEN}"
 echo ""
-print_message "Для просмотра логов контейнеров используйте:" "${CYAN}"
+print_message "Для просмотра логов используйте:" "${CYAN}"
 print_message "  • База данных:  docker logs mks-db" "${CYAN}"
-print_message "  • API Gateway:  docker logs api" "${CYAN}"
 print_message "  • Бот:          docker logs saint_egidio_bot" "${CYAN}"
-echo "" 
+print_message "  • Бэкенд:       Логи в файлах:" "${CYAN}"
+print_message "    - schedule.log" "${CYAN}"
+print_message "    - services.log" "${CYAN}"
+print_message "    - events.log" "${CYAN}"
+print_message "    - volunteers.log" "${CYAN}"
+print_message "    - clients.log" "${CYAN}"
+print_message "    - auth.log" "${CYAN}"
+print_message "    - api.log" "${CYAN}"
+echo ""
+print_message "Нажмите Ctrl+C для остановки всех сервисов" "${YELLOW}"
+
+# Ждем сигнала для завершения
+wait 
