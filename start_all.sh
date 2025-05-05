@@ -145,6 +145,7 @@ print_message "📁 Переход в директорию: $(pwd)" "${CYAN}"
 print_message "🚀 Запуск бэкенд сервисов..." "${YELLOW}"
 
 # Запускаем все сервисы через start_services.sh
+chmod +x start_services_linux.sh
 ./start_services_linux.sh
 status=$?
 print_status $status "Бэкенд сервисы запущены"

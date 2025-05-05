@@ -6,25 +6,25 @@ env = "dev"
 level = "debug"
 
 [servers.apiGW]
-addr = ":8080"
+addr = "0.0.0.0:8080"
 
 [services.schedule]
-addr = ":50051"
+addr = "localhost:50051"
 
 [services.services]
-addr = ":50052"
+addr = "localhost:50052"
 
 [services.events]
-addr = ":50053"
+addr = "localhost:50053"
 
 [services.volunteers]
-addr = ":50054"
+addr = "localhost:50054"
 
 [services.clients]
-addr = ":50055"
+addr = "localhost:50055"
 
 [services.auth]
-addr = ":50056"
+addr = "localhost:50056"
 
 [servers.apiGW.jwt]
 secret = "secret"
