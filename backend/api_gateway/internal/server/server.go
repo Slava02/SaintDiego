@@ -61,7 +61,10 @@ func New(opts Options) (*Server, error) {
 		apmecho.Middleware(nameServer),
 	)
 
-	v1Group := e.Group("v1", oapimdlwr.OapiRequestValidatorWithOptions(opts.v1Swagger, &oapimdlwr.Options{
+	swagger := opts.v1Swagger
+	swagger.Servers = nil
+
+	v1Group := e.Group("v1", oapimdlwr.OapiRequestValidatorWithOptions(swagger, &oapimdlwr.Options{
 		Options: openapi3filter.Options{
 			ExcludeRequestBody:  false,
 			ExcludeResponseBody: true,
