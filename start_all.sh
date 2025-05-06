@@ -98,40 +98,49 @@ PROJECT_ROOT=$(pwd)
 print_message "🌐 Создание Docker сети..." "${CYAN}"
 docker network create saint_egidio_network 2>/dev/null || true
 
-# ШАГ 1: Запуск базы данных
-print_step_header "1" "Запуск контейнера с базой данных"
+# ШАГ 1: Проверка и запуск базы данных
+print_step_header "1" "Проверка и запуск базы данных"
 cd "$PROJECT_ROOT/db/local_db"
 print_message "📁 Переход в директорию: $(pwd)" "${CYAN}"
-print_message "🚀 Запуск контейнера с базой данных..." "${YELLOW}"
 
-# Останавливаем и удаляем существующий контейнер
-docker-compose down -v
-docker rm -f mks-db 2>/dev/null || true
-
-# Запускаем контейнер
-docker-compose up -d
-status=$?
-print_status $status "База данных запущена"
-
-# Ожидаем, пока база данных станет доступной
+# Проверяем доступность базы данных
+print_message "🔍 Проверка доступности базы данных..." "${YELLOW}"
 check_db_availability
 db_ready=$?
-print_status $db_ready "База данных инициализирована и готова к использованию"
+
+if [ $db_ready -eq 0 ]; then
+    print_status 0 "База данных доступна"
+else
+    print_message "⚠️ База данных недоступна, запускаем контейнер..." "${YELLOW}"
+    
+    # Останавливаем и удаляем существующий контейнер
+    docker-compose down -v
+    docker rm -f mks-db 2>/dev/null || true
+
+    # Запускаем контейнер
+    docker-compose up -d
+    status=$?
+    print_status $status "База данных запущена"
+
+    # Ожидаем, пока база данных станет доступной
+    check_db_availability
+    db_ready=$?
+    print_status $db_ready "База данных инициализирована и готова к использованию"
+
+    # Выполняем миграцию init только если база была пересоздана
+    if [ $db_ready -eq 0 ]; then
+        print_message "🔄 Выполнение миграции init..." "${YELLOW}"
+        cd "$PROJECT_ROOT/db"
+        go run migrateCLI/migration.go migrate init
+        status_init=$?
+        print_status $status_init "Миграция init выполнена"
+    fi
+fi
 
 # ШАГ 2: Выполнение миграций
 print_step_header "2" "Миграция базы данных"
 cd "$PROJECT_ROOT/db"
 print_message "📁 Переход в директорию: $(pwd)" "${CYAN}"
-
-# Копируем конфиг для Docker
-cp configs/config.docker.toml configs/config.toml
-
-print_message "🔄 Выполнение миграции init..." "${YELLOW}"
-go run migrateCLI/migration.go migrate init
-status_init=$?
-print_status $status_init "Миграция init выполнена"
-
-sleep 2
 
 print_message "🔄 Выполнение миграции up..." "${YELLOW}"
 go run migrateCLI/migration.go migrate up

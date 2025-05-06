@@ -67,7 +67,6 @@ func New(opts Options) (*Server, error) {
 			ExcludeResponseBody: true,
 			AuthenticationFunc:  openapi3filter.NoopAuthenticationFunc,
 		},
-		SilenceServersWarning: true,
 	}),
 		func(next echo.HandlerFunc) echo.HandlerFunc {
 			return func(c echo.Context) error {
