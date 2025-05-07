@@ -40,3 +40,5 @@ frontend/saintEgidio/
 node_modules/
 
 .next/
+
+mks/

@@ -1138,6 +1138,11 @@ paths:
           required: true
           schema:
             type: integer
+        - name: is_blocked
+          in: query
+          required: false
+          schema:
+            type: boolean
       tags:
         - clients
       summary: Получение списка живых клиентов

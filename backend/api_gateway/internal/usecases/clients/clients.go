@@ -51,8 +51,9 @@ func New(opts Options) (*UseCase, error) {
 
 func (u *UseCase) GetClients(ctx context.Context, params *GetClientParams) ([]*models.Client, int32, error) {
 	pbReq := &pb.GetClientsRequest{
-		Page:    int64(params.Page),
-		PerPage: int64(params.PerPage),
+		Page:      int64(params.Page),
+		PerPage:   int64(params.PerPage),
+		IsBlocked: params.IsBlocked,
 	}
 
 	pbRes, err := u.clientsClient.GetClients(ctx, pbReq)
