@@ -64,7 +64,7 @@ export function RecurrenceForm({ recurrence, onChange }: RecurrenceFormProps) {
             <SelectContent>
               <SelectItem value="never">Никогда</SelectItem>
               <SelectItem value="count">После количества повторений</SelectItem>
-              <SelectItem value="until">До даты</SelectItem>
+              <SelectItem value="date">До даты</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -85,7 +85,7 @@ export function RecurrenceForm({ recurrence, onChange }: RecurrenceFormProps) {
           </div>
         )}
 
-        {recurrence.endType === "until" && (
+        {recurrence.endType === "date" && (
           <div className="space-y-2">
             <Label htmlFor="endDate" className="required">
               Дата окончания
@@ -93,8 +93,8 @@ export function RecurrenceForm({ recurrence, onChange }: RecurrenceFormProps) {
             <Input
               id="endDate"
               type="date"
-              value={recurrence.endValue}
-              onChange={(e) => onChange({ endValue: e.target.value })}
+              value={recurrence.endValue ? recurrence.endValue.split("T")[0] : ""}
+              onChange={(e) => onChange({ endValue: e.target.value ? `${e.target.value}T00:00:00` : "" })}
             />
           </div>
         )}

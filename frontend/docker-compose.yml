@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  bot:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    image: saint_egidio_bot:latest
+    container_name: saint_egidio_bot
+    restart: unless-stopped
+    env_file:
+      - path: ./bot/docker.env # Adjusted path relative to this docker-compose.yml
+        required: true
+    working_dir: /app
+    volumes:
+      - ./bot:/app:ro # Adjusted path relative to this docker-compose.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: ["python3", "-u", "main.py"]
+    networks:
+      - saint_egidio_network
+
+  frontend_admin:
+    build:
+      context: ./saint-egidio-admin
+      dockerfile: Dockerfile
+    image: saint_egidio_admin_frontend:latest
+    container_name: saint_egidio_admin_frontend
+    restart: unless-stopped
+    ports:
+      - "3001:3000" # Map host port 3001 to container port 3000
+    environment:
+      NODE_ENV: production
+      # IMPORTANT: You need to set this to your backend API URL
+      # Example: NEXT_PUBLIC_API_URL: http://your_backend_api_host:port
+      # If backend runs on host: NEXT_PUBLIC_API_URL: http://host.docker.internal:8000
+      # If backend is another docker service on same network: NEXT_PUBLIC_API_URL: http://backend_service_name:port
+      NEXT_PUBLIC_API_URL: "http://localhost:8080" # Replace with your actual API URL
+    networks:
+      - saint_egidio_network
+
+networks:
+  saint_egidio_network:
+    name: saint_egidio_network
+    driver: bridge 

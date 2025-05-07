@@ -1,14 +1,24 @@
 import { API_BASE_URL } from "@/lib/constants"
 import type { Client, GetClientsResponse, BlockClientRequest } from "@/lib/types"
 
-// Получение списка клиентов
-export async function getClients(page = 1, perPage = 20, search?: string): Promise<GetClientsResponse> {
+// Получение списка клиентов с возможностью поиска
+export async function getClients(
+  page = 1,
+  perPage = 20,
+  search?: string,
+  isBlocked?: boolean,
+): Promise<GetClientsResponse> {
   const token = localStorage.getItem("token")
   if (!token) throw new Error("Unauthorized")
 
   let url = `${API_BASE_URL}/clients?page=${page}&per_page=${perPage}`
+
   if (search) {
     url += `&search=${encodeURIComponent(search)}`
+  }
+
+  if (isBlocked !== undefined) {
+    url += `&is_blocked=${isBlocked}`
   }
 
   const response = await fetch(url, {
@@ -26,7 +36,7 @@ export async function getClients(page = 1, perPage = 20, search?: string): Promi
 }
 
 // Получение клиента по ID
-export async function getClient(id: number): Promise<Client> {
+export async function getClientById(id: number): Promise<Client> {
   const token = localStorage.getItem("token")
   if (!token) throw new Error("Unauthorized")
 
@@ -38,6 +48,9 @@ export async function getClient(id: number): Promise<Client> {
   })
 
   if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error("Client not found")
+    }
     throw new Error("Failed to fetch client")
   }
 
@@ -67,20 +80,6 @@ export async function blockClient(id: number, data: BlockClientRequest): Promise
 }
 
 // Получение заблокированных клиентов
-export async function getBlockedClients(page = 1, perPage = 20): Promise<GetClientsResponse> {
-  const token = localStorage.getItem("token")
-  if (!token) throw new Error("Unauthorized")
-
-  const response = await fetch(`${API_BASE_URL}/clients?page=${page}&per_page=${perPage}&is_blocked=true`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch blocked clients")
-  }
-
-  return response.json()
+export async function getBlockedClients(page = 1, perPage = 20, search?: string): Promise<GetClientsResponse> {
+  return getClients(page, perPage, search, true)
 }

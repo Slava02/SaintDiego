@@ -4,7 +4,7 @@ go 1.24.2
 
 require (
 	github.com/Slava02/SaintDiego/backend/auth v0.0.0-20250423111436-6cd4c9e44ba8
-	github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250507110652-df2c6ffff0ba
+	github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250507123536-6d5dd14dc233
 	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250421132310-f418824f9975
 	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250427084852-4e1049a21478
 	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250416101532-01831f40d320

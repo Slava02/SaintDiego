@@ -1,5 +1,4 @@
-export interface TimeSlot {
-  id: number
+export interface CreateTimeSlotRequest {
   title: string
   type: "single" | "recurring"
   locationId: number
@@ -10,15 +9,32 @@ export interface TimeSlot {
   recurrence?: any
 }
 
-export interface CreateTimeSlotRequest {
+export interface TimeSlot {
+  id: number
   title: string
   type: "single" | "recurring"
   locationId: number
   capacity: number
   startDate: string
   endDate: string
-  services: any[]
-  recurrence?: any
+  status: "active" | "archived"
+  services: TimeSlotService[]
+  recurrence?: Recurrence
+}
+
+export interface TimeSlotService {
+  timeSlotId?: number
+  serviceTypeId: number
+  capacity: number
+  bookingWindow: number
+  time: string
+}
+
+export interface Recurrence {
+  frequency: "daily" | "weekly" | "monthly" | "yearly"
+  interval: number
+  endType: "never" | "count" | "date"
+  endValue?: string
 }
 
 export interface TimeSlotFilters {

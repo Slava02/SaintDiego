@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Slava02/SaintDiego/backend/clients/internal/models"
@@ -48,7 +50,8 @@ func (r *ClientsRepository) GetClients(ctx context.Context, page, perPage int32,
 	if search != nil {
 		searchInt, err := strconv.Atoi(*search)
 		if err != nil {
-			query = query.Where("firstname LIKE ? OR lastname LIKE ? OR middlename LIKE ?", "%"+*search+"%", "%"+*search+"%", "%"+*search+"%")
+			searchStr := "%" + trimNonLetters(strings.ToLower(*search)) + "%"
+			query = query.Where("firstname LIKE ? OR lastname LIKE ? OR middlename LIKE ?", searchStr, searchStr, searchStr)
 		} else {
 			query = query.Where("id = ?", searchInt)
 		}
@@ -198,4 +201,10 @@ func (r *ClientsRepository) GetClientServices(ctx context.Context, clientID int6
 	}
 
 	return services, int64(total), nil
+}
+
+func trimNonLetters(s string) string {
+	// Удаляет все не-буквы в начале и конце строки (кириллица и латиница)
+	re := regexp.MustCompile(`^[^a-zA-Zа-яА-ЯёЁ]+|[^a-zA-Zа-яА-ЯёЁ]+$`)
+	return re.ReplaceAllString(s, "")
 }

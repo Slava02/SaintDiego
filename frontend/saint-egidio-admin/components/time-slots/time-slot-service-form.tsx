@@ -94,7 +94,9 @@ export function TimeSlotServiceForm({
             type="time"
             value={service.time || ""}
             onChange={(e) => onChange({ time: e.target.value })}
+            placeholder="ЧЧ:ММ"
           />
+          <p className="text-xs text-muted-foreground">Укажите время начала услуги в формате ЧЧ:ММ</p>
         </div>
       </CardContent>
     </Card>

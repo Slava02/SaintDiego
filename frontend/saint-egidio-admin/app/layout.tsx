@@ -5,6 +5,7 @@ import { Providers } from "./providers"
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] })
 
+
 export default function RootLayout({
   children,
 }: {
@@ -20,5 +21,5 @@ export default function RootLayout({
 }
 
 export const metadata = {
-      generator: 'v0.dev'
-    };
+  generator: 'v0.dev'
+};

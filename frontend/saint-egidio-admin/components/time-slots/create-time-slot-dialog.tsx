@@ -28,10 +28,13 @@ export function CreateTimeSlotDialog({ open, onOpenChange, onSuccess }: CreateTi
   const [type, setType] = useState<"single" | "recurring">("single")
   const [locationId, setLocationId] = useState<number | "">("")
   const [capacity, setCapacity] = useState("")
+
+  // Обновленные поля для даты и времени
   const [startDate, setStartDate] = useState("")
   const [startTime, setStartTime] = useState("")
   const [endDate, setEndDate] = useState("")
   const [endTime, setEndTime] = useState("")
+
   const [services, setServices] = useState<any[]>([{ id: Date.now() }])
   const [recurrence, setRecurrence] = useState({
     frequency: "weekly",
@@ -47,11 +50,19 @@ export function CreateTimeSlotDialog({ open, onOpenChange, onSuccess }: CreateTi
 
   const { toast } = useToast()
 
+  // При открытии диалога, устанавливаем endDate равным startDate по умолчанию
   useEffect(() => {
     if (open) {
       fetchLocationsAndServices()
     }
   }, [open])
+
+  // Когда меняется startDate, обновляем endDate, если он пустой или раньше startDate
+  useEffect(() => {
+    if (startDate && (!endDate || new Date(endDate) < new Date(startDate))) {
+      setEndDate(startDate)
+    }
+  }, [startDate])
 
   const fetchLocationsAndServices = async () => {
     try {
@@ -126,32 +137,72 @@ export function CreateTimeSlotDialog({ open, onOpenChange, onSuccess }: CreateTi
       return
     }
 
-    const formattedServices = validServices.map((service) => ({
-      serviceTypeId: Number.parseInt(service.serviceTypeId),
-      capacity: Number.parseInt(service.capacity),
-      bookingWindow: Number.parseInt(service.bookingWindow),
-      time: service.time,
-    }))
+    // Форматируем даты и время в ISO формат
+    const startDateTime = new Date(`${startDate}T${startTime}:00`)
+    const endDateTime = new Date(`${endDate}T${endTime}:00`)
 
-    const startDateTime = `${startDate}T${startTime}:00Z`
-    const endDateTime = `${endDate}T${endTime}:00Z`
+    // Проверяем, что startDate в будущем
+    if (startDateTime <= new Date()) {
+      toast({
+        title: "Ошибка",
+        description: "Дата и время начала должны быть в будущем",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Проверяем, что endDate после startDate
+    if (endDateTime <= startDateTime) {
+      toast({
+        title: "Ошибка",
+        description: "Дата и время окончания должны быть после даты и времени начала",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Форматируем услуги
+    const formattedServices = validServices.map((service) => {
+      // Создаем дату для услуги на основе даты начала временного слота
+      const serviceDate = new Date(startDateTime)
+      const [hours, minutes] = service.time.split(":")
+      serviceDate.setHours(Number.parseInt(hours), Number.parseInt(minutes), 0, 0)
+
+      return {
+        serviceTypeId: Number.parseInt(service.serviceTypeId),
+        capacity: Number.parseInt(service.capacity),
+        bookingWindow: Number.parseInt(service.bookingWindow),
+        time: serviceDate.toISOString(),
+      }
+    })
 
     const timeSlotData: CreateTimeSlotRequest = {
       title,
       type,
       locationId: Number(locationId),
       capacity: Number(capacity),
-      startDate: startDateTime,
-      endDate: endDateTime,
+      startDate: startDateTime.toISOString(),
+      endDate: endDateTime.toISOString(),
       services: formattedServices,
     }
 
     if (type === "recurring") {
+      let endValue = null
+
+      if (recurrence.endType === "date" && recurrence.endValue) {
+        // Если тип окончания - дата, форматируем её
+        const endDate = new Date(recurrence.endValue)
+        endValue = endDate.toISOString()
+      } else if (recurrence.endType === "count" && recurrence.endValue) {
+        // Если тип окончания - количество повторений, оставляем как есть
+        endValue = recurrence.endValue
+      }
+
       timeSlotData.recurrence = {
         frequency: recurrence.frequency as any,
         interval: recurrence.interval,
         endType: recurrence.endType as any,
-        endValue: recurrence.endValue || "",
+        endValue: endValue,
       }
     }
 
@@ -230,60 +281,82 @@ export function CreateTimeSlotDialog({ open, onOpenChange, onSuccess }: CreateTi
                 </RadioGroup>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="startDate" className="required">
-                    Дата события
-                  </Label>
-                  <Input
-                    id="startDate"
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="capacity" className="required">
-                    Вместимость
-                  </Label>
-                  <Input
-                    id="capacity"
-                    type="number"
-                    min="1"
-                    value={capacity}
-                    onChange={(e) => setCapacity(e.target.value)}
-                    placeholder="Введите вместимость"
-                    required
-                  />
+              {/* Обновленные поля для даты и времени начала */}
+              <div className="space-y-2">
+                <Label className="text-base font-medium">Начало события</Label>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="startDate" className="required">
+                      Дата начала
+                    </Label>
+                    <Input
+                      id="startDate"
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="startTime" className="required">
+                      Время начала
+                    </Label>
+                    <Input
+                      id="startTime"
+                      type="time"
+                      value={startTime}
+                      onChange={(e) => setStartTime(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="startTime" className="required">
-                    Время начала
-                  </Label>
-                  <Input
-                    id="startTime"
-                    type="time"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    required
-                  />
+              {/* Обновленные поля для даты и времени окончания */}
+              <div className="space-y-2">
+                <Label className="text-base font-medium">Окончание события</Label>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="endDate" className="required">
+                      Дата окончания
+                    </Label>
+                    <Input
+                      id="endDate"
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      min={startDate} // Не позволяем выбрать дату раньше даты начала
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="endTime" className="required">
+                      Время окончания
+                    </Label>
+                    <Input
+                      id="endTime"
+                      type="time"
+                      value={endTime}
+                      onChange={(e) => setEndTime(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="endTime" className="required">
-                    Время окончания
-                  </Label>
-                  <Input
-                    id="endTime"
-                    type="time"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    required
-                  />
-                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="capacity" className="required">
+                  Вместимость
+                </Label>
+                <Input
+                  id="capacity"
+                  type="number"
+                  min="1"
+                  value={capacity}
+                  onChange={(e) => setCapacity(e.target.value)}
+                  placeholder="Введите вместимость"
+                  required
+                />
               </div>
 
               <div className="space-y-2">

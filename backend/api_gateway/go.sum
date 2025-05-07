@@ -5,6 +5,8 @@ github.com/Slava02/SaintDiego/backend/auth v0.0.0-20250423111436-6cd4c9e44ba8 h1
 github.com/Slava02/SaintDiego/backend/auth v0.0.0-20250423111436-6cd4c9e44ba8/go.mod h1:gKpKZ6BZyFeztDboYPXSgy6n9YXXrlYspSII4kqXavw=
 github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250507110652-df2c6ffff0ba h1:WxwHP2/kzAVFLT/EW//PaAd6iUOejdn5gWebwJEX740=
 github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250507110652-df2c6ffff0ba/go.mod h1:9Rh2bV1Cy8xelUMND2FSPduXUbUuuBftmubVec/Eq30=
+github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250507123536-6d5dd14dc233 h1:XskqYxvsRtwP7T6tHRZFj2MSujvYaCEwY67uet7UFaM=
+github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250507123536-6d5dd14dc233/go.mod h1:9Rh2bV1Cy8xelUMND2FSPduXUbUuuBftmubVec/Eq30=
 github.com/Slava02/SaintDiego/backend/common v0.0.0-20250421132310-f418824f9975 h1:d4tHWd0MqKjBvdtUPWWL+R6GpIUAzVX0uRC2DwExhHc=
 github.com/Slava02/SaintDiego/backend/common v0.0.0-20250421132310-f418824f9975/go.mod h1:8oSaCQ4JmfnNdyIJNgdFICVGcN86zsrkqv2mHbELzhY=
 github.com/Slava02/SaintDiego/backend/events v0.0.0-20250427084852-4e1049a21478 h1:1K53AnAHXAkN2thnA5FdhsFcos2J1AaZA9Q0+jTx5sg=

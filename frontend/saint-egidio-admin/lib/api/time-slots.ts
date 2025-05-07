@@ -38,6 +38,8 @@ export async function createTimeSlot(data: CreateTimeSlotRequest): Promise<TimeS
   const token = localStorage.getItem("token")
   if (!token) throw new Error("Unauthorized")
 
+  console.log("Отправляемые данные:", JSON.stringify(data, null, 2))
+
   const response = await fetch(`${API_BASE_URL}/timeSlots`, {
     method: "POST",
     headers: {
@@ -48,7 +50,8 @@ export async function createTimeSlot(data: CreateTimeSlotRequest): Promise<TimeS
   })
 
   if (!response.ok) {
-    const errorData = await response.json()
+    const errorData = await response.json().catch(() => ({ message: "Unknown error" }))
+    console.error("Ошибка создания временного слота:", errorData)
     throw new Error(errorData.message || "Failed to create time slot")
   }
 
@@ -56,9 +59,11 @@ export async function createTimeSlot(data: CreateTimeSlotRequest): Promise<TimeS
 }
 
 // Update a time slot
-export async function updateTimeSlot(id: number, data: CreateTimeSlotRequest): Promise<TimeSlot> {
+export async function updateTimeSlot(id: number, data: TimeSlot): Promise<TimeSlot> {
   const token = localStorage.getItem("token")
   if (!token) throw new Error("Unauthorized")
+
+  console.log("Отправляемые данные при обновлении:", JSON.stringify(data, null, 2))
 
   const response = await fetch(`${API_BASE_URL}/timeSlots/${id}`, {
     method: "PUT",
@@ -70,7 +75,8 @@ export async function updateTimeSlot(id: number, data: CreateTimeSlotRequest): P
   })
 
   if (!response.ok) {
-    const errorData = await response.json()
+    const errorData = await response.json().catch(() => ({ message: "Unknown error" }))
+    console.error("Ошибка обновления временного слота:", errorData)
     throw new Error(errorData.message || "Failed to update time slot")
   }
 

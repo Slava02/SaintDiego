@@ -1,22 +1,23 @@
-import { API_BASE_URL } from "@/lib/constants"
 import type { Participant } from "@/lib/types"
+import { getClients } from "./clients"
 
-// Поиск участников
+// Поиск участников по строке (имя, фамилия или ID)
 export async function searchParticipants(query: string): Promise<Participant[]> {
-  const token = localStorage.getItem("token")
-  if (!token) throw new Error("Unauthorized")
+  try {
+    const response = await getClients(1, 10, query)
 
-  const response = await fetch(`${API_BASE_URL}/clients?search=${encodeURIComponent(query)}&page=1&per_page=10`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  })
+    // Преобразуем Client[] в Participant[]
+    const participants: Participant[] = response.clients.map((client) => ({
+      id: client.id,
+      first_name: client.first_name,
+      middle_name: client.middle_name,
+      last_name: client.last_name,
+      // Другие поля могут быть undefined
+    }))
 
-  if (!response.ok) {
-    throw new Error("Failed to search participants")
+    return participants
+  } catch (error) {
+    console.error("Error searching participants:", error)
+    return []
   }
-
-  const data = await response.json()
-  return data.clients || []
 }

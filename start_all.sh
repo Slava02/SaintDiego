@@ -159,20 +159,19 @@ chmod +x start_services_linux.sh
 status=$?
 print_status $status "Бэкенд сервисы запущены"
 
-# ШАГ 4: Сборка и запуск бота
-print_step_header "4" "Сборка и запуск контейнера бота"
-cd "$PROJECT_ROOT/frontend/bot"
+# ШАГ 4: Сборка и запуск контейнеров фронт-енда и бота
+print_step_header "4" "Сборка и запуск контейнеров фронт-енда и бота"
+cd "$PROJECT_ROOT/frontend"
 print_message "📁 Переход в директорию: $(pwd)" "${CYAN}"
-print_message "🏗️ Сборка контейнера бота..." "${YELLOW}"
+print_message "🏗️ Сборка контейнеров фронт-енда и бота..." "${YELLOW}"
 docker-compose build
 status_build=$?
-print_status $status_build "Контейнер бота собран"
+print_status $status_build "Контейнеры фронт-енда и бота собраны"
 
-print_message "🚀 Запуск контейнера бота..." "${YELLOW}"
-docker-compose down
+print_message "🚀 Запуск контейнеров фронт-енда и бота..." "${YELLOW}"
 docker-compose up -d
 status_up=$?
-print_status $status_up "Контейнер бота запущен"
+print_status $status_up "Контейнеры фронт-енда и бота запущены"
 
 # Финальное сообщение
 echo ""

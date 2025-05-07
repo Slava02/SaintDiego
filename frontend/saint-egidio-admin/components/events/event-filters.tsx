@@ -83,6 +83,13 @@ export function EventFilters({ filters, onFilterChange, onClose }: EventFiltersP
       delete newFilters.location_id
     }
 
+    // Добавляем participant_id, если введено значение
+    if (participantSearch && !isNaN(Number(participantSearch))) {
+      newFilters.participant_id = Number(participantSearch)
+    } else {
+      delete newFilters.participant_id
+    }
+
     onFilterChange(newFilters)
   }
 
@@ -153,8 +160,9 @@ export function EventFilters({ filters, onFilterChange, onClose }: EventFiltersP
             <Label htmlFor="participantSearch">Поиск по участнику:</Label>
             <Input
               id="participantSearch"
-              type="text"
-              placeholder="Найти мероприятия по участнику (ФИО, ID)"
+              type="number"
+              min={1}
+              placeholder="Найти мероприятия по участнику (ID)"
               value={participantSearch}
               onChange={(e) => setParticipantSearch(e.target.value)}
             />
