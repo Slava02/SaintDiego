@@ -26,8 +26,10 @@ func (i *Implementation) GetClients(ctx context.Context, req *pb.GetClientsReque
 	defer span.Finish()
 
 	clients, total, err := i.clientsUC.GetClients(ctx, &clients.GetClientsReq{
-		Page:    int32(req.Page),
-		PerPage: int32(req.PerPage),
+		Page:      int32(req.Page),
+		PerPage:   int32(req.PerPage),
+		IsBlocked: req.IsBlocked,
+		Search:    req.Search,
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get clients: %v", err)
@@ -148,6 +150,11 @@ func convertModelClientToPB(client *models.Client) *pb.Client {
 		birthDate = timestamppb.New(client.BirthDate)
 	}
 
+	var blockedAt *timestamppb.Timestamp
+	if client.BlockedAt != nil {
+		blockedAt = timestamppb.New(*client.BlockedAt)
+	}
+
 	return &pb.Client{
 		Id:            client.Id,
 		FirstName:     client.FirstName,
@@ -160,6 +167,7 @@ func convertModelClientToPB(client *models.Client) *pb.Client {
 		IsNew:         client.IsNew,
 		PhotoName:     client.PhotoName,
 		BlockedReason: client.BlockedReason,
+		BlockedAt:     blockedAt,
 	}
 }
 

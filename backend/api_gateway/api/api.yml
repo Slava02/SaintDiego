@@ -1143,6 +1143,11 @@ paths:
           required: false
           schema:
             type: boolean
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
       tags:
         - clients
       summary: Получение списка живых клиентов

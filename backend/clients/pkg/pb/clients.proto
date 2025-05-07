@@ -20,6 +20,7 @@ message GetClientsRequest {
   int64 page = 1;
   int64 per_page = 2;
   optional bool is_blocked = 3;
+  optional string search = 4;
 }
 
 message GetClientByIdRequest {

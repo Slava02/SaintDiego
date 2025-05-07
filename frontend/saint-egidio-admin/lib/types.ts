@@ -108,3 +108,38 @@ export interface ServiceType {
   min_period_days: number
   registration_available: boolean
 }
+
+// Client entity based on OpenAPI
+export interface Client {
+  id: number
+  first_name: string
+  middle_name: string
+  last_name: string
+  is_homeless?: boolean
+  photo_name?: string
+  birth_date?: string
+  gender?: number
+  is_new: boolean
+  is_blocked?: boolean
+  blocked_at?: string
+  blocked_reason?: string
+}
+
+export interface GetClientsResponse {
+  clients: Client[]
+  total: number
+  page: number
+  per_page: number
+  total_pages: number
+}
+
+export interface BlockClientRequest {
+  is_blocked: boolean
+  block_reason?: string
+}
+
+
+export interface UpdateServiceRequest {
+  min_period_days: number
+  registration_available: boolean
+}

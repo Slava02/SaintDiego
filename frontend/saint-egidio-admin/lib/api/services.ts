@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "@/lib/constants"
-import type { ServiceType, GetServicesResponse, UpdateServiceRequest, CreateServiceRequest } from "@/lib/types"
+import type { ServiceType, GetServicesResponse, UpdateServiceRequest } from "@/lib/types"
 
 // Получение списка услуг
 export async function getServices(page = 1, perPage = 20, registrationAvailable?: boolean): Promise<GetServicesResponse> {
@@ -66,35 +66,14 @@ export async function updateService(id: number, data: UpdateServiceRequest): Pro
   return response.json()
 }
 
-// Создание услуги (если API поддерживает)
-export async function createService(data: CreateServiceRequest): Promise<ServiceType> {
+// Удалить функцию createService и заменить её на функцию getAllServices для получения всех услуг без пагинации
+
+// Получение всех услуг без пагинации
+export async function getAllServices(): Promise<ServiceType[]> {
   const token = localStorage.getItem("token")
   if (!token) throw new Error("Unauthorized")
 
-  const response = await fetch(`${API_BASE_URL}/services`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  })
-
-  if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.message || "Failed to create service")
-  }
-
-  return response.json()
-}
-
-// Удаление услуги (если API поддерживает)
-export async function deleteService(id: number): Promise<{ success: boolean }> {
-  const token = localStorage.getItem("token")
-  if (!token) throw new Error("Unauthorized")
-
-  const response = await fetch(`${API_BASE_URL}/services/${id}`, {
-    method: "DELETE",
+  const response = await fetch(`${API_BASE_URL}/services?page=1&per_page=100`, {
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -102,9 +81,11 @@ export async function deleteService(id: number): Promise<{ success: boolean }> {
   })
 
   if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.message || "Failed to delete service")
+    throw new Error("Failed to fetch all services")
   }
 
-  return { success: true }
+  const data = await response.json()
+  return data.items
 }
+
+

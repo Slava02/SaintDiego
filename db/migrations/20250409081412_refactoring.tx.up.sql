@@ -46,7 +46,9 @@ ALTER TABLE `client`
 ADD COLUMN IF NOT EXISTS `blocked_at` datetime;
 --bun:split
 UPDATE `client`
-SET `is_blocked` = true
+SET `is_blocked` = true,
+    `blocked_at` = NOW(),
+    `blocked_reason` = 'test'
 WHERE `id` IN (1, 3, 5, 7, 9);
 --bun:split
 CREATE TABLE IF NOT EXISTS `client_field_value` (

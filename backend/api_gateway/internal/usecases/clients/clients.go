@@ -54,6 +54,7 @@ func (u *UseCase) GetClients(ctx context.Context, params *GetClientParams) ([]*m
 		Page:      int64(params.Page),
 		PerPage:   int64(params.PerPage),
 		IsBlocked: params.IsBlocked,
+		Search:    params.Search,
 	}
 
 	pbRes, err := u.clientsClient.GetClients(ctx, pbReq)
@@ -157,5 +158,6 @@ func convertClientToResponse(client *pb.Client) *models.Client {
 		IsNew:         client.IsNew,
 		IsBlocked:     client.IsBlocked,
 		BlockedReason: client.BlockedReason,
+		BlockedAt:     pointer.PtrWithZeroAsNil(client.BlockedAt.AsTime()),
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/Slava02/SaintDiego/backend/clients/internal/models"
@@ -29,7 +30,7 @@ func NewClientsRepository(opts Options) *ClientsRepository {
 	return &ClientsRepository{db: opts.DB}
 }
 
-func (r *ClientsRepository) GetClients(ctx context.Context, page, perPage int32) ([]*models.Client, int64, error) {
+func (r *ClientsRepository) GetClients(ctx context.Context, page, perPage int32, isBlocked *bool, search *string) ([]*models.Client, int64, error) {
 	var clients []*models.Client
 
 	diedClients := r.db.Select(ctx, (*models.ClientFieldValue)(nil)).
@@ -38,9 +39,22 @@ func (r *ClientsRepository) GetClients(ctx context.Context, page, perPage int32)
 
 	offset := (page - 1) * perPage
 	query := r.db.Select(ctx, &clients).
-		Where("id NOT IN (?)", diedClients).
-		Limit(int(perPage)).
-		Offset(int(offset))
+		Where("id NOT IN (?)", diedClients)
+
+	if isBlocked != nil {
+		query = query.Where("is_blocked = ?", *isBlocked)
+	}
+
+	if search != nil {
+		searchInt, err := strconv.Atoi(*search)
+		if err != nil {
+			query = query.Where("firstname LIKE ? OR lastname LIKE ? OR middlename LIKE ?", "%"+*search+"%", "%"+*search+"%", "%"+*search+"%")
+		} else {
+			query = query.Where("id = ?", searchInt)
+		}
+	}
+
+	query = query.Limit(int(perPage)).Offset(int(offset))
 
 	total, err := query.ScanAndCount(ctx, &clients)
 	if err != nil {

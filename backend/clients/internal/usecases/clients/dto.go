@@ -1,8 +1,10 @@
 package clients
 
 type GetClientsReq struct {
-	Page    int32 `json:"page" validate:"required"`
-	PerPage int32 `json:"per_page" validate:"required"`
+	Page      int32   `json:"page" validate:"required"`
+	PerPage   int32   `json:"per_page" validate:"required"`
+	IsBlocked *bool   `json:"is_blocked" validate:"required"`
+	Search    *string `json:"search" validate:"required"`
 }
 
 type CreateClientReq struct {

@@ -3,9 +3,10 @@ package clients
 import "github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
 
 type GetClientParams struct {
-	Page      int32 `query:"page" json:"page" validate:"required"`
-	PerPage   int32 `query:"per_page" json:"per_page" validate:"required"`
-	IsBlocked *bool `query:"is_blocked" json:"is_blocked" validate:"required"`
+	Page      int32   `query:"page" json:"page" validate:"required"`
+	PerPage   int32   `query:"per_page" json:"per_page" validate:"required"`
+	IsBlocked *bool   `query:"is_blocked" json:"is_blocked" validate:"required"`
+	Search    *string `query:"search" json:"search" validate:"required"`
 }
 
 type GetClientResponse struct {

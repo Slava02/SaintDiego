@@ -23,6 +23,7 @@ type Client struct {
 	BlockedReason *string    `bun:"blocked_reason" json:"blocked_reason,omitempty"`
 	UpdatedByID   *int64     `bun:"updated_by_id" json:"updated_by_id,omitempty"`
 	CreatedByID   *int64     `bun:"created_by_id" json:"created_by_id,omitempty"`
+	BlockedAt     *time.Time `bun:"blocked_at" json:"blocked_at,omitempty"`
 }
 
 type ClientFieldValue struct {

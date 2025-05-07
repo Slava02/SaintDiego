@@ -14,7 +14,7 @@ import (
 )
 
 type IClientsRepository interface {
-	GetClients(ctx context.Context, page, perPage int32) ([]*models.Client, int64, error)
+	GetClients(ctx context.Context, page, perPage int32, isBlocked *bool, search *string) ([]*models.Client, int64, error)
 	GetClientByID(ctx context.Context, id int64) (*models.Client, error)
 	CreateClient(ctx context.Context, client *models.Client) (*models.Client, error)
 	BlockClient(ctx context.Context, id int64, blockReason *string) (*models.Client, error)
@@ -68,7 +68,7 @@ func New(opts Options) (*UseCase, error) {
 }
 
 func (u *UseCase) GetClients(ctx context.Context, req *GetClientsReq) ([]*models.Client, int64, error) {
-	clients, total, err := u.clientsRepository.GetClients(ctx, req.Page, req.PerPage)
+	clients, total, err := u.clientsRepository.GetClients(ctx, req.Page, req.PerPage, req.IsBlocked, req.Search)
 	if err != nil {
 		return nil, 0, fmt.Errorf("get clients: %w", err)
 	}

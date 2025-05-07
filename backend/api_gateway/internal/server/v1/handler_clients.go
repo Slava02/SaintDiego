@@ -149,5 +149,6 @@ func convertClientToResponse(client *models.Client) Client {
 		IsNew:         client.IsNew,
 		IsHomeless:    client.IsHomeless,
 		BlockedReason: client.BlockedReason,
+		BlockedAt:     client.BlockedAt,
 	}
 }

@@ -3,8 +3,8 @@ github.com/HdrHistogram/hdrhistogram-go v1.1.2/go.mod h1:yDgFjdqOqDEKOvasDdhWNXY
 github.com/RaveNoX/go-jsoncommentstrip v1.0.0/go.mod h1:78ihd09MekBnJnxpICcwzCMzGrKSKYe4AqU6PDYYpjk=
 github.com/Slava02/SaintDiego/backend/auth v0.0.0-20250423111436-6cd4c9e44ba8 h1:mz8Sjae9tw5MaO3/E0pwYB2rCMZ4MncaWnYNgyt6lhI=
 github.com/Slava02/SaintDiego/backend/auth v0.0.0-20250423111436-6cd4c9e44ba8/go.mod h1:gKpKZ6BZyFeztDboYPXSgy6n9YXXrlYspSII4kqXavw=
-github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250425142917-915a210a0acd h1:TV6x6IeNaRHelwiqysPwpMEBhxPEE9Q6XtVeZqP8Mz4=
-github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250425142917-915a210a0acd/go.mod h1:ZIalKTXvSEF21d2/kNrHeaNq+89QPevYg5EpL9EsPHQ=
+github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250507110652-df2c6ffff0ba h1:WxwHP2/kzAVFLT/EW//PaAd6iUOejdn5gWebwJEX740=
+github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250507110652-df2c6ffff0ba/go.mod h1:9Rh2bV1Cy8xelUMND2FSPduXUbUuuBftmubVec/Eq30=
 github.com/Slava02/SaintDiego/backend/common v0.0.0-20250421132310-f418824f9975 h1:d4tHWd0MqKjBvdtUPWWL+R6GpIUAzVX0uRC2DwExhHc=
 github.com/Slava02/SaintDiego/backend/common v0.0.0-20250421132310-f418824f9975/go.mod h1:8oSaCQ4JmfnNdyIJNgdFICVGcN86zsrkqv2mHbELzhY=
 github.com/Slava02/SaintDiego/backend/events v0.0.0-20250427084852-4e1049a21478 h1:1K53AnAHXAkN2thnA5FdhsFcos2J1AaZA9Q0+jTx5sg=

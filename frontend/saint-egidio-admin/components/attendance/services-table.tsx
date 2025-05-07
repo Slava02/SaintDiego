@@ -11,8 +11,8 @@ import { Pagination } from "@/components/ui/pagination"
 import { getServices } from "@/lib/api/services"
 import type { ServiceType } from "@/lib/types"
 import { EditServiceDialog } from "./edit-service-dialog"
-import { CreateServiceDialog } from "./create-service-dialog"
-import { DeleteServiceDialog } from "./delete-service-dialog"
+import { ConfigureServiceDialog } from "./configure-service-dialog"
+import { SelectServiceDialog } from "./select-service-dialog"
 
 export function ServicesTable() {
   const [services, setServices] = useState<ServiceType[]>([])
@@ -24,8 +24,8 @@ export function ServicesTable() {
     totalPages: 0,
   })
   const [serviceToEdit, setServiceToEdit] = useState<ServiceType | null>(null)
-  const [serviceToDelete, setServiceToDelete] = useState<ServiceType | null>(null)
-  const [showCreateDialog, setShowCreateDialog] = useState(false)
+  const [showSelectDialog, setShowSelectDialog] = useState(false)
+  const [serviceToConfig, setServiceToConfig] = useState<ServiceType | null>(null)
   const { toast } = useToast()
 
   const fetchServices = async () => {
@@ -68,21 +68,17 @@ export function ServicesTable() {
     })
   }
 
-  const handleCreateSuccess = () => {
-    setShowCreateDialog(false)
-    fetchServices()
-    toast({
-      title: "Успех",
-      description: "Услуга успешно создана",
-    })
+  const handleSelectService = (service: ServiceType) => {
+    setShowSelectDialog(false)
+    setServiceToConfig(service)
   }
 
-  const handleDeleteSuccess = () => {
-    setServiceToDelete(null)
+  const handleConfigSuccess = () => {
+    setServiceToConfig(null)
     fetchServices()
     toast({
       title: "Успех",
-      description: "Услуга успешно удалена",
+      description: "Услуга успешно настроена",
     })
   }
 
@@ -90,9 +86,9 @@ export function ServicesTable() {
     <div className="space-y-4">
       <div className="flex justify-between">
         <h2 className="text-xl font-semibold">Настройки услуг</h2>
-        <Button onClick={() => setShowCreateDialog(true)}>
+        <Button onClick={() => setShowSelectDialog(true)}>
           <PlusCircle className="mr-2 h-4 w-4" />
-          Добавить услугу
+          Настроить услугу
         </Button>
       </div>
 
@@ -137,10 +133,6 @@ export function ServicesTable() {
                         <Edit className="h-4 w-4" />
                         <span className="sr-only">Редактировать</span>
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => setServiceToDelete(service)}>
-                        <Trash className="h-4 w-4" />
-                        <span className="sr-only">Удалить</span>
-                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -163,16 +155,20 @@ export function ServicesTable() {
         />
       )}
 
-      <CreateServiceDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} onSuccess={handleCreateSuccess} />
-
-      {serviceToDelete && (
-        <DeleteServiceDialog
-          open={!!serviceToDelete}
-          onOpenChange={(open) => !open && setServiceToDelete(null)}
-          service={serviceToDelete}
-          onSuccess={handleDeleteSuccess}
+      {serviceToConfig && (
+        <ConfigureServiceDialog
+          open={!!serviceToConfig}
+          onOpenChange={(open) => !open && setServiceToConfig(null)}
+          service={serviceToConfig}
+          onSuccess={handleConfigSuccess}
         />
       )}
+
+      <SelectServiceDialog
+        open={showSelectDialog}
+        onOpenChange={setShowSelectDialog}
+        onSelectService={handleSelectService}
+      />
     </div>
   )
 }

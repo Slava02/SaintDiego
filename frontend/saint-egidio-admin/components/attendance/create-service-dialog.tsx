@@ -1,63 +1,44 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/components/ui/use-toast"
-import type { CreateServiceRequest } from "@/lib/types"
-import { createService } from "@/lib/api/services"
+import { Skeleton } from "@/components/ui/skeleton"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
+import { getAllServices } from "@/lib/api/services"
+import type { ServiceType } from "@/lib/types"
 
-interface CreateServiceDialogProps {
+interface SelectServiceDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSuccess: () => void
+  onSelectService: (service: ServiceType) => void
 }
 
-export function CreateServiceDialog({ open, onOpenChange, onSuccess }: CreateServiceDialogProps) {
-  const [name, setName] = useState("")
-  const [minPeriodDays, setMinPeriodDays] = useState("14")
-  const [registrationAvailable, setRegistrationAvailable] = useState(true)
+export function SelectServiceDialog({ open, onOpenChange, onSelectService }: SelectServiceDialogProps) {
+  const [services, setServices] = useState<ServiceType[]>([])
+  const [selectedServiceId, setSelectedServiceId] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
-  const handleSubmit = async () => {
-    if (!name.trim()) {
-      toast({
-        title: "Ошибка",
-        description: "Название услуги не может быть пустым",
-        variant: "destructive",
-      })
-      return
+  useEffect(() => {
+    if (open) {
+      fetchServices()
     }
+  }, [open])
 
-    const minPeriodDaysNum = Number.parseInt(minPeriodDays, 10)
-    if (isNaN(minPeriodDaysNum) || minPeriodDaysNum < 0) {
-      toast({
-        title: "Ошибка",
-        description: "Ограничение должно быть положительным числом",
-        variant: "destructive",
-      })
-      return
-    }
-
-    const createData: CreateServiceRequest = {
-      name: name.trim(),
-      min_period_days: minPeriodDaysNum,
-      registration_available: registrationAvailable,
-    }
-
+  const fetchServices = async () => {
     setIsLoading(true)
     try {
-      await createService(createData)
-      onSuccess()
-      resetForm()
+      const allServices = await getAllServices()
+      // Фильтруем услуги, которые еще не настроены (registration_available === false)
+      const availableServices = allServices.filter((service) => !service.registration_available)
+      setServices(availableServices)
     } catch (error) {
       toast({
         title: "Ошибка",
-        description: "Не удалось создать услугу",
+        description: "Не удалось загрузить список услуг",
         variant: "destructive",
       })
     } finally {
@@ -65,72 +46,62 @@ export function CreateServiceDialog({ open, onOpenChange, onSuccess }: CreateSer
     }
   }
 
-  const resetForm = () => {
-    setName("")
-    setMinPeriodDays("14")
-    setRegistrationAvailable(true)
+  const handleSubmit = () => {
+    if (!selectedServiceId) {
+      toast({
+        title: "Ошибка",
+        description: "Выберите услугу из списка",
+        variant: "destructive",
+      })
+      return
+    }
+
+    const selectedService = services.find((service) => service.id.toString() === selectedServiceId)
+    if (selectedService) {
+      onSelectService(selectedService)
+    }
   }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(open) => {
-        if (!open) resetForm()
-        onOpenChange(open)
-      }}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Добавление новой услуги</DialogTitle>
+          <DialogTitle>Выбор услуги для настройки</DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="service-name" className="required">
-              Название услуги
-            </Label>
-            <Input
-              id="service-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Введите название услуги"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="min-period-days" className="required">
-              Минимальный период между регистрациями (дней)
-            </Label>
-            <Input
-              id="min-period-days"
-              type="number"
-              min="0"
-              value={minPeriodDays}
-              onChange={(e) => setMinPeriodDays(e.target.value)}
-              required
-            />
-            <p className="text-sm text-muted-foreground">
-              Укажите минимальное количество дней между регистрациями на эту услугу
-            </p>
-          </div>
-
-          <div className="flex items-center justify-between space-y-0">
-            <Label htmlFor="registration-available">Регистрация доступна</Label>
-            <Switch
-              id="registration-available"
-              checked={registrationAvailable}
-              onCheckedChange={setRegistrationAvailable}
-            />
-          </div>
+        <div className="py-4">
+          {isLoading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <Skeleton key={index} className="h-12 w-full" />
+              ))}
+            </div>
+          ) : services.length === 0 ? (
+            <div className="rounded-md border p-4 text-center">
+              <p className="text-muted-foreground">Все доступные услуги уже настроены</p>
+            </div>
+          ) : (
+            <RadioGroup value={selectedServiceId} onValueChange={setSelectedServiceId}>
+              <div className="space-y-2">
+                {services.map((service) => (
+                  <div key={service.id} className="flex items-center space-x-2 rounded-md border p-3">
+                    <RadioGroupItem value={service.id.toString()} id={`service-${service.id}`} />
+                    <Label htmlFor={`service-${service.id}`} className="flex-1 cursor-pointer">
+                      {service.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </RadioGroup>
+          )}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Отмена
           </Button>
-          <Button onClick={handleSubmit} disabled={isLoading}>
-            {isLoading ? "Создание..." : "Создать"}
+          <Button onClick={handleSubmit} disabled={isLoading || services.length === 0 || !selectedServiceId}>
+            Выбрать
           </Button>
         </DialogFooter>
       </DialogContent>
