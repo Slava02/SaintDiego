@@ -35,11 +35,11 @@ services:
       # Example: NEXT_PUBLIC_API_URL: http://your_backend_api_host:port
       # If backend runs on host: NEXT_PUBLIC_API_URL: http://host.docker.internal:8000
       # If backend is another docker service on same network: NEXT_PUBLIC_API_URL: http://backend_service_name:port
-      NEXT_PUBLIC_API_URL: "http://localhost:8080" # Replace with your actual API URL
+      NEXT_PUBLIC_API_URL: "http://194.87.133.124:8080" # Replace with your actual API URL
     networks:
       - saint_egidio_network
 
 networks:
   saint_egidio_network:
+    external: true
     name: saint_egidio_network
-    driver: bridge 

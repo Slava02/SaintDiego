@@ -31,12 +31,6 @@ go.work.sum
 ## internals
 backend/vendor/
 
-
-## frontend
-frontend/saintEgidio/node_modules/
-frontend/saintEgidio/.next/
-frontend/saintEgidio/
-
 node_modules/
 
 .next/
