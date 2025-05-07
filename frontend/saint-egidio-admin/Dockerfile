@@ -19,6 +19,8 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 COPY --from=deps /app/node_modules /app/node_modules
 COPY . .
+
+COPY .env .env
 # Build the Next.js application
 RUN pnpm build
 
