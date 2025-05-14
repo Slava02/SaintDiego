@@ -11,7 +11,7 @@ type Event struct {
 	ServiceTypeID     int64     `json:"serviceTypeId" validate:"required"`
 	ParticipantsCount int32     `json:"participantsCount" validate:"required,min=0"`
 	ServiceName       string    `json:"serviceName" validate:"required,min=1"`
-	Location          Location  `json:"location" validate:"required"`
+	Location          *Location `json:"location" validate:"required"`
 }
 
 type Participant struct {

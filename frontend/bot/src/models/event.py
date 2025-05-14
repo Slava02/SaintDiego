@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Dict, Optional
 from datetime import datetime
 
+from .location import Location
 
 @dataclass
 class Event:
@@ -12,6 +13,7 @@ class Event:
     datetime: datetime
     capacity: int
     participants_count: int
+    location: Location
     time_slot_service_id: Optional[int] = None
 
     @classmethod
@@ -24,6 +26,7 @@ class Event:
             datetime=datetime.fromisoformat(data["datetime"].replace("Z", "+00:00")),
             capacity=data["capacity"],
             participants_count=data["participantsCount"],
+            location=Location.from_dict(data["location"]),
             time_slot_service_id=data.get("timeSlotServiceId")
         )
 
@@ -36,5 +39,6 @@ class Event:
             "datetime": self.datetime.isoformat(),
             "capacity": self.capacity,
             "participantsCount": self.participants_count,
+            "location": self.location.to_dict(),
             "timeSlotServiceId": self.time_slot_service_id
         } 

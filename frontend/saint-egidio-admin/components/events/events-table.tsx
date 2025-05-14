@@ -162,7 +162,16 @@ export function EventsTable({
                 <TableRow key={event.id}>
                   <TableCell className="font-medium">{event.serviceName}</TableCell>
                   <TableCell>{format(new Date(event.datetime), "dd.MM.yyyy HH:mm", { locale: ru })}</TableCell>
-                  <TableCell>{event.locationName || "Не указано"}</TableCell>
+                  <TableCell>
+                    {event.location ? (
+                      <div>
+                        <div>{event.location.name}</div>
+                        <div className="text-sm text-muted-foreground">{event.location.address}</div>
+                      </div>
+                    ) : (
+                      "Не указано"
+                    )}
+                  </TableCell>
                   <TableCell>
                     {event.participantsCount}/{event.capacity}
                   </TableCell>
@@ -210,7 +219,7 @@ export function EventsTable({
             <AlertDialogTitle>Вы уверены?</AlertDialogTitle>
             <AlertDialogDescription>
               Это действие нельзя отменить. Мероприятие будет удалено навсегда.
-              {eventToDelete?.participantsCount > 0 && (
+              {eventToDelete && eventToDelete.participantsCount > 0 && (
                 <span className="mt-2 block font-semibold text-red-600">
                   Внимание! У этого мероприятия есть участники ({eventToDelete.participantsCount} чел.)
                 </span>

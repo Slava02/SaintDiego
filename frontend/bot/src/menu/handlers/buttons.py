@@ -62,10 +62,11 @@ async def on_time_selected(callback, button, manager: DialogManager, item):
     event = next((e for e in events if e["id"] == event_id), None)
     
     if event:
-        event_time = event["datetime"]
+        event_time = event["datetime"].strftime("%H:%M")
         logger.info(f"Found event: id={event_id}, time={event_time}")
         
         manager.dialog_data["event_id"] = event_id
+        manager.dialog_data["selected_event_id"] = event_id
         manager.dialog_data["event_time"] = event_time
         
         await manager.switch_to(MainMenu.confirm_booking)

@@ -100,6 +100,11 @@ class BookingService:
                         events = []
                         for event in data.get("items", []):
                             try:
+                                # Проверяем наличие location в данных
+                                if "location" not in event:
+                                    self.logger.warning(f"Event {event.get('id')} has no location data")
+                                    continue
+                                    
                                 event_obj = Event.from_dict(event)
                                 events.append(event_obj)
                                 self.logger.info(f"Created event object: {event_obj}")

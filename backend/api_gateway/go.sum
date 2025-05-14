@@ -9,6 +9,8 @@ github.com/Slava02/SaintDiego/backend/common v0.0.0-20250421132310-f418824f9975 
 github.com/Slava02/SaintDiego/backend/common v0.0.0-20250421132310-f418824f9975/go.mod h1:8oSaCQ4JmfnNdyIJNgdFICVGcN86zsrkqv2mHbELzhY=
 github.com/Slava02/SaintDiego/backend/events v0.0.0-20250427084852-4e1049a21478 h1:1K53AnAHXAkN2thnA5FdhsFcos2J1AaZA9Q0+jTx5sg=
 github.com/Slava02/SaintDiego/backend/events v0.0.0-20250427084852-4e1049a21478/go.mod h1:6lblPzLrFHwuQhRbp6LG7VWu7v/WVyyqfNwSCYdY9SE=
+github.com/Slava02/SaintDiego/backend/events v0.0.0-20250514075658-c95b03312b68 h1:vFZKq1CVsjOroX+lkajBLHFVor6rR9lsqU6wLfpNWT4=
+github.com/Slava02/SaintDiego/backend/events v0.0.0-20250514075658-c95b03312b68/go.mod h1:uFtCd7YV46fl0LPapvLlupbMS92bgCLOpVoV6Olbros=
 github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250416101532-01831f40d320 h1:lZHWhkWWoCKfFvCiqJBdK1uWplAN5tjkQMokYBjxWyE=
 github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250416101532-01831f40d320/go.mod h1:NEGc5wYFowEs4IvzpyAwwaGbP9mdmaC3gUS50jq1D5g=
 github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250514070025-9f772c044408 h1:BKdx/L9tbDd41+iDjgNd33Lq2LUp1B7oGArqnPJgcSM=

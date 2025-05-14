@@ -256,7 +256,9 @@ confirm_booking_window = Window(
            "👤 Посетитель: {client_full_name}\n"
            "📋 Услуга: {service_name}\n"
            "📅 Дата: {selected_date}\n"
-           "🕒 Время: {event_time}"),
+           "⏰ Время: {event_time}\n"
+           "📍 Место: {location_name}\n"
+           "🏠 Адрес: {location_address}"),
     Column(
         Button(Const("✅ Подтвердить"), id="confirm", on_click=on_confirm_booking),
         Button(Const("❌ Отмена"), id="cancel", on_click=on_back_to_main)

@@ -121,7 +121,9 @@ async def get_events_data(dialog_manager: DialogManager, **kwargs):
             "service_id": event.service_id,
             "service_name": event.service_name,
             "capacity": event.capacity,
-            "participants_count": event.participants_count
+            "participants_count": event.participants_count,
+            "location_name": event.location.name,
+            "location_address": event.location.address
         }
         events.append(event_dict)
         logger.info(f"Created event dict: {event_dict}")
@@ -149,6 +151,19 @@ async def get_events_data(dialog_manager: DialogManager, **kwargs):
     client_service = ClientService()
     client = client_service.get_client_by_id(client_id)
     
+    # Находим выбранное событие для получения информации о локации
+    location_name = ""
+    location_address = ""
+    
+    # Попробуем найти событие по ID, если оно указано
+    selected_event_id = dialog_manager.dialog_data.get("selected_event_id")
+    if selected_event_id:
+        for event in events:
+            if event["id"] == selected_event_id:
+                location_name = event["location_name"]
+                location_address = event["location_address"]
+                break
+    
     if not client:
         logger.error(f"Client not found in ClientService: id={client_id}")
         return {
@@ -158,6 +173,8 @@ async def get_events_data(dialog_manager: DialogManager, **kwargs):
             "selected_date": dialog_manager.dialog_data.get("selected_date", ""),
             "service_name": dialog_manager.dialog_data.get("service_name", ""),
             "event_time": dialog_manager.dialog_data.get("event_time", ""),
+            "location_name": location_name,
+            "location_address": location_address,
             "client_full_name": "Не указано"
         }
     
@@ -168,6 +185,8 @@ async def get_events_data(dialog_manager: DialogManager, **kwargs):
         "selected_date": dialog_manager.dialog_data.get("selected_date", ""),
         "service_name": dialog_manager.dialog_data.get("service_name", ""),
         "event_time": dialog_manager.dialog_data.get("event_time", ""),
+        "location_name": location_name,
+        "location_address": location_address,
         "client_full_name": client.full_name
     }
 

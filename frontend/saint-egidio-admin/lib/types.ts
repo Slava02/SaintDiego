@@ -73,10 +73,11 @@ export interface Event {
   id: number
   serviceName: string
   datetime: string
-  locationName?: string
+  location: Location
   capacity: number
   participantsCount: number
-  service_id: number
+  timeSlotServiceId: number
+  serviceTypeId: number
 }
 
 export interface UpdateEventRequest {

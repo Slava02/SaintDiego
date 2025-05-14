@@ -89,7 +89,7 @@ type TimeSlotWithParticipantCount struct {
 }
 
 type Location struct {
-	ID      int64  `json:"id" validate:"required,min=1"`
-	Name    string `json:"name" validate:"required,min=1"`
-	Address string `json:"address" validate:"required,min=1"`
+	ID      int64  `bun:"id,pk" json:"id" validate:"required,min=1"`
+	Name    string `bun:"name" json:"name" validate:"required,min=1"`
+	Address string `bun:"address" json:"address" validate:"required,min=1"`
 }

@@ -322,11 +322,15 @@ func convertEventToResponse(event *models.Event) Event {
 		ServiceTypeId:     event.ServiceTypeID,
 		ParticipantsCount: event.ParticipantsCount,
 		ServiceName:       event.ServiceName,
-		Location:          convertLocationToResponse(&event.Location),
+		Location:          convertLocationToResponse(event.Location),
 	}
 }
 
 func convertLocationToResponse(location *models.Location) Location {
+	if location == nil {
+		return Location{}
+	}
+
 	return Location{
 		Id:      location.ID,
 		Name:    location.Name,

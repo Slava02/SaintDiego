@@ -226,3 +226,11 @@ func convertEventToResponse(event *pb.Event) *models.Event {
 		Location:          convertLocationToResponse(event.Location),
 	}
 }
+
+func convertLocationToResponse(location *pb.Location) *models.Location {
+	return &models.Location{
+		ID:      location.Id,
+		Name:    location.Name,
+		Address: location.Address,
+	}
+}
