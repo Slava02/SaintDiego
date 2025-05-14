@@ -71,6 +71,7 @@ func run() error {
 		ServicesAddr:  cfg.GRPCClient.Services.Addr,
 		ClientAddr:    cfg.GRPCClient.Clients.Addr,
 		VolunteerAddr: cfg.GRPCClient.Volunteers.Addr,
+		LocationAddr:  cfg.GRPCClient.Locations.Addr,
 	})
 	if err != nil {
 		return fmt.Errorf("init manager: %v", err)
@@ -111,6 +112,7 @@ func run() error {
 		manager.Services(),
 		manager.Clients(),
 		manager.Volunteers(),
+		manager.Locations(),
 	))
 	if err != nil {
 		lg.Error("init events usecase", zap.Error(err))

@@ -298,6 +298,19 @@ func convertModelEventToPB(event *models.Event) *pb.Event {
 		ServiceTypeId:     event.ServiceTypeID,
 		ParticipantsCount: event.ParticipantsCount,
 		ServiceName:       event.ServiceName,
+		Location:          convertModelLocationToPB(event.Location),
+	}
+}
+
+func convertModelLocationToPB(location *models.Location) *pb.Location {
+	if location == nil {
+		return nil
+	}
+
+	return &pb.Location{
+		Id:      location.ID,
+		Name:    location.Name,
+		Address: location.Address,
 	}
 }
 

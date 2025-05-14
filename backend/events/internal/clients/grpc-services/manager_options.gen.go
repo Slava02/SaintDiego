@@ -14,6 +14,7 @@ func NewManagerOptions(
 	ServicesAddr string,
 	ClientAddr string,
 	VolunteerAddr string,
+	LocationAddr string,
 	options ...OptManagerOptionsSetter,
 ) ManagerOptions {
 	o := ManagerOptions{}
@@ -26,6 +27,8 @@ func NewManagerOptions(
 
 	o.VolunteerAddr = VolunteerAddr
 
+	o.LocationAddr = LocationAddr
+
 	for _, opt := range options {
 		opt(&o)
 	}
@@ -37,6 +40,7 @@ func (o *ManagerOptions) Validate() error {
 	errs.Add(errors461e464ebed9.NewValidationError("ServicesAddr", _validate_ManagerOptions_ServicesAddr(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("ClientAddr", _validate_ManagerOptions_ClientAddr(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("VolunteerAddr", _validate_ManagerOptions_VolunteerAddr(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("LocationAddr", _validate_ManagerOptions_LocationAddr(o)))
 	return errs.AsError()
 }
 
@@ -57,6 +61,13 @@ func _validate_ManagerOptions_ClientAddr(o *ManagerOptions) error {
 func _validate_ManagerOptions_VolunteerAddr(o *ManagerOptions) error {
 	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.VolunteerAddr, "required"); err != nil {
 		return fmt461e464ebed9.Errorf("field `VolunteerAddr` did not pass the test: %w", err)
+	}
+	return nil
+}
+
+func _validate_ManagerOptions_LocationAddr(o *ManagerOptions) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.LocationAddr, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `LocationAddr` did not pass the test: %w", err)
 	}
 	return nil
 }

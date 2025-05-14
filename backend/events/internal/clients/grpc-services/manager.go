@@ -14,12 +14,14 @@ type ManagerOptions struct {
 	ServicesAddr  string `option:"mandatory" validate:"required"`
 	ClientAddr    string `option:"mandatory" validate:"required"`
 	VolunteerAddr string `option:"mandatory" validate:"required"`
+	LocationAddr  string `option:"mandatory" validate:"required"`
 }
 
 type Manager struct {
 	servicesClient  *ServicesClient
 	clientClient    *ClientsClient
 	volunteerClient *VolunteersClient
+	locationClient  *LocationsClient
 }
 
 func NewManager(opts ManagerOptions) (*Manager, error) {
@@ -47,10 +49,18 @@ func NewManager(opts ManagerOptions) (*Manager, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create volunteer client: %w", err)
 	}
+
+	locationClient, err := NewLocationsClient(LocationsClientOptions{
+		LocationsServerAddr: opts.LocationAddr,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create location client: %w", err)
+	}
 	return &Manager{
 		servicesClient:  servicesClient,
 		clientClient:    clientClient,
 		volunteerClient: volunteerClient,
+		locationClient:  locationClient,
 	}, nil
 }
 
@@ -64,6 +74,9 @@ func (m *Manager) Close() error {
 	}
 	if err := m.volunteerClient.Close(); err != nil {
 		return fmt.Errorf("failed to close volunteer client: %w", err)
+	}
+	if err := m.locationClient.Close(); err != nil {
+		return fmt.Errorf("failed to close location client: %w", err)
 	}
 	return nil
 }
@@ -81,4 +94,9 @@ func (m *Manager) Clients() *ClientsClient {
 // Volunteers returns the volunteers service client
 func (m *Manager) Volunteers() *VolunteersClient {
 	return m.volunteerClient
+}
+
+// Locations returns the locations service client
+func (m *Manager) Locations() *LocationsClient {
+	return m.locationClient
 }

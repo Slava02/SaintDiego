@@ -16,9 +16,10 @@ type Event struct {
 	ServiceTypeID     int64     `bun:"service_type_id" json:"service_type_id"`
 	ParticipantsCount int32     `bun:"participants_count" json:"participants_count"`
 	ServiceName       string    `bun:"service_name" json:"service_name"`
-	Location          Location  `bun:"-" json:"location"`
-	// Many-to-many relationship with Client through EventClient
-	Clients []*Client `bun:"m2m:event_client,join:Event=Client"`
+	LocationID        int64     `bun:"location_id" json:"location_id"`
+
+	Clients  []*Client `bun:"m2m:event_client,join:Event=Client"`
+	Location *Location `bun:"rel:belongs-to,join:location_id=id" json:"location,omitempty"`
 }
 
 type EventClient struct {

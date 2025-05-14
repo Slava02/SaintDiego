@@ -52,6 +52,7 @@ type GRPCClientConfig struct {
 	Services   ServicesConfig   `toml:"services" validate:"required"`
 	Volunteers VolunteersConfig `toml:"volunteers" validate:"required"`
 	Clients    ClientsConfig    `toml:"clients" validate:"required"`
+	Locations  LocationsConfig  `toml:"locations" validate:"required"`
 }
 
 type ServicesConfig struct {
@@ -63,5 +64,9 @@ type VolunteersConfig struct {
 }
 
 type ClientsConfig struct {
+	Addr string `toml:"addr" validate:"required,hostname_port"`
+}
+
+type LocationsConfig struct {
 	Addr string `toml:"addr" validate:"required,hostname_port"`
 }

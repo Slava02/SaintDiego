@@ -28,3 +28,6 @@ addr = ":50054"
 
 [grpc_client.clients]
 addr = ":50055"
+
+[grpc_client.locations]
+addr = ":50051"

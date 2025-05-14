@@ -39,6 +39,10 @@ type IVolunteersClient interface {
 	GetVolunteerByTgId(ctx context.Context, tgId int64) error
 }
 
+type ILocationsClient interface {
+	GetLocationById(ctx context.Context, id int64) (*models.Location, error)
+}
+
 var (
 	ErrEventNotFound            = errors.New("event not found")
 	ErrClientNotFound           = errors.New("client not found")
@@ -54,6 +58,7 @@ type Options struct {
 	ServicesClient   IServicesClient   `option:"mandatory" validate:"required"`
 	ClientsClient    IClientsClient    `option:"mandatory" validate:"required"`
 	VolunteersClient IVolunteersClient `option:"mandatory" validate:"required"`
+	LocationsClient  ILocationsClient  `option:"mandatory" validate:"required"`
 }
 
 type UseCase struct {
@@ -62,6 +67,7 @@ type UseCase struct {
 	servicesClient   IServicesClient
 	clientsClient    IClientsClient
 	volunteersClient IVolunteersClient
+	locationsClient  ILocationsClient
 }
 
 func New(opts Options) (*UseCase, error) {
@@ -75,6 +81,7 @@ func New(opts Options) (*UseCase, error) {
 		servicesClient:   opts.ServicesClient,
 		clientsClient:    opts.ClientsClient,
 		volunteersClient: opts.VolunteersClient,
+		locationsClient:  opts.LocationsClient,
 	}, nil
 }
 
@@ -116,6 +123,14 @@ func (u *UseCase) GetEvents(ctx context.Context, params *GetEventsParams) ([]*mo
 		}
 	}
 
+	for _, event := range events {
+		location, err := u.locationsClient.GetLocationById(ctx, event.LocationID)
+		if err != nil {
+			return nil, 0, fmt.Errorf("get location by id: %w", err)
+		}
+		event.Location = location
+	}
+
 	return events, total, nil
 }
 
@@ -127,6 +142,12 @@ func (u *UseCase) GetEvent(ctx context.Context, id int64) (*models.Event, error)
 		}
 		return nil, fmt.Errorf("get event: %w", err)
 	}
+
+	location, err := u.locationsClient.GetLocationById(ctx, event.LocationID)
+	if err != nil {
+		return nil, fmt.Errorf("get location by id: %w", err)
+	}
+	event.Location = location
 
 	return event, nil
 }
@@ -292,6 +313,14 @@ func (u *UseCase) GetAvailableEventsForClientByServiceId(ctx context.Context, pa
 		}
 
 		eventsResponse = append(eventsResponse, event)
+	}
+
+	for _, event := range eventsResponse {
+		location, err := u.locationsClient.GetLocationById(ctx, event.LocationID)
+		if err != nil {
+			return nil, 0, fmt.Errorf("get location by id: %w", err)
+		}
+		event.Location = location
 	}
 
 	// TODO: тут неверно рассчитывается total, так как не учитываютя события, которые не прошли по заполненности таймслота и не вернулись по LIMIT и OFFSET

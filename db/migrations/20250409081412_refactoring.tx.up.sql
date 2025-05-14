@@ -202,11 +202,13 @@ CREATE TABLE IF NOT EXISTS `event` (
     `capacity` int(11) NOT NULL,
     `datetime` datetime NOT NULL,
     `service_name` varchar(255) NOT NULL,
+    `location_id` int(11) NOT NULL,
     PRIMARY KEY (`id`),
     KEY `IDX_event_time_slot_service_id` (`time_slot_service_id`),
     KEY `IDX_event_service_type_id` (`service_type_id`),
     CONSTRAINT `FK_event_time_slot_service` FOREIGN KEY (`time_slot_service_id`) REFERENCES `time_slot_service` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT `FK_event_service_type` FOREIGN KEY (`service_type_id`) REFERENCES `service_type` (`id`)
+    CONSTRAINT `FK_event_service_type` FOREIGN KEY (`service_type_id`) REFERENCES `service_type` (`id`),
+    CONSTRAINT `FK_event_location` FOREIGN KEY (`location_id`) REFERENCES `location` (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 --bun:split
 CREATE TABLE IF NOT EXISTS `event_client` (
@@ -240,14 +242,7 @@ VALUES (
     );
 --bun:split
 INSERT INTO `location` (`name`, `address`)
-VALUES ('Центр социальной помощи', 'ул. Ленина, 10'),
-    ('Социальный центр "Забота"', 'пр. Победы, 25'),
-    ('Центр помощи бездомным', 'ул. Мира, 15'),
-    ('Социальная служба "Добро"', 'ул. Советская, 8'),
-    (
-        'Центр социальной адаптации',
-        'пр. Строителей, 42'
-    );
+VALUES ('Цветной', 'Садовая-Самотёчная ул., 7, стр. 1');
 --bun:split
 INSERT INTO `volunteer` (
         `tg_id`,

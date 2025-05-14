@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Slava02/SaintDiego/backend/events/internal/models"
 	api "github.com/Slava02/SaintDiego/backend/schedule/pkg/pb"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"google.golang.org/grpc"
@@ -55,16 +56,26 @@ func (c *LocationsClient) Close() error {
 	return c.conn.Close()
 }
 
-func (c *LocationsClient) GetLocationById(ctx context.Context, id int64) error {
-	_, err := c.ScheduleServiceClient.GetLocationById(ctx, &api.GetLocationByIdRequest{
+func (c *LocationsClient) GetLocationById(ctx context.Context, id int64) (*models.Location, error) {
+	resp, err := c.ScheduleServiceClient.GetLocationById(ctx, &api.GetLocationByIdRequest{
 		Id: id,
 	})
 	if err != nil {
 		switch status.Code(err) {
 		case codes.NotFound:
-			return fmt.Errorf("location not found: %w", err)
+			return nil, fmt.Errorf("location not found: %w", err)
+		default:
+			return nil, fmt.Errorf("get location by id: %w", err)
 		}
 	}
 
-	return nil
+	return convertLocationToResponse(resp), nil
+}
+
+func convertLocationToResponse(location *api.Location) *models.Location {
+	return &models.Location{
+		ID:      location.Id,
+		Name:    location.Name,
+		Address: location.Address,
+	}
 }

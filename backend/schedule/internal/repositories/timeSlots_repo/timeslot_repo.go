@@ -329,6 +329,7 @@ func (r *TimeSlotRepository) InsertUpdateEvents(ctx context.Context, events []*m
 			Set("capacity = ?", event.Capacity).
 			Set("datetime = ?", event.DateTime).
 			Set("time_slot_service_id = ?", event.TimeSlotServiceID).
+			Set("location_id = ?", event.LocationID).
 			Exec(ctx)
 		if err != nil {
 			return fmt.Errorf("create events: %w", err)

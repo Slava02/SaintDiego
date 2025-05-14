@@ -295,6 +295,7 @@ func (u UseCase) generateEvents(timeSlot *models.TimeSlot, services []*models.Ti
 				DateTime:          timeSlot.StartDate,
 				ServiceTypeID:     service.ServiceTypeID,
 				ServiceName:       serviceTypes[service.ServiceTypeID].Name,
+				LocationID:        timeSlot.LocationID,
 			}
 			events = append(events, event)
 		}
@@ -339,6 +340,7 @@ func (u UseCase) generateEvents(timeSlot *models.TimeSlot, services []*models.Ti
 				DateTime:          eventDateTime,
 				ServiceTypeID:     service.ServiceTypeID,
 				ServiceName:       serviceTypes[service.ServiceTypeID].Name,
+				LocationID:        timeSlot.LocationID,
 			}
 			events = append(events, event)
 		}

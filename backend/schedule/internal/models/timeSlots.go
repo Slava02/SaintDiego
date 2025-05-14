@@ -64,9 +64,11 @@ type Event struct {
 	Capacity          int32     `bun:"capacity,notnull" json:"capacity" validate:"required,min=1"`
 	DateTime          time.Time `bun:"datetime,notnull" json:"datetime" validate:"required"`
 	ServiceTypeID     int64     `bun:"service_type_id,notnull" json:"service_type_id" validate:"required"`
+	LocationID        int64     `bun:"location_id,notnull" json:"location_id" validate:"required"`
 
 	// Relations
 	TimeSlotService *TimeSlotService `bun:"rel:belongs-to,join:time_slot_service_id=id" json:"time_slot_service,omitempty"`
+	Location        *Location        `bun:"rel:belongs-to,join:location_id=id" json:"location,omitempty"`
 }
 
 type ServiceType struct {

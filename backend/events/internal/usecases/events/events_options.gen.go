@@ -16,6 +16,7 @@ func NewOptions(
 	ServicesClient IServicesClient,
 	ClientsClient IClientsClient,
 	VolunteersClient IVolunteersClient,
+	LocationsClient ILocationsClient,
 	options ...OptOptionsSetter,
 ) Options {
 	o := Options{}
@@ -32,6 +33,8 @@ func NewOptions(
 
 	o.VolunteersClient = VolunteersClient
 
+	o.LocationsClient = LocationsClient
+
 	for _, opt := range options {
 		opt(&o)
 	}
@@ -45,6 +48,7 @@ func (o *Options) Validate() error {
 	errs.Add(errors461e464ebed9.NewValidationError("ServicesClient", _validate_Options_ServicesClient(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("ClientsClient", _validate_Options_ClientsClient(o)))
 	errs.Add(errors461e464ebed9.NewValidationError("VolunteersClient", _validate_Options_VolunteersClient(o)))
+	errs.Add(errors461e464ebed9.NewValidationError("LocationsClient", _validate_Options_LocationsClient(o)))
 	return errs.AsError()
 }
 
@@ -79,6 +83,13 @@ func _validate_Options_ClientsClient(o *Options) error {
 func _validate_Options_VolunteersClient(o *Options) error {
 	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.VolunteersClient, "required"); err != nil {
 		return fmt461e464ebed9.Errorf("field `VolunteersClient` did not pass the test: %w", err)
+	}
+	return nil
+}
+
+func _validate_Options_LocationsClient(o *Options) error {
+	if err := validator461e464ebed9.GetValidatorFor(o).Var(o.LocationsClient, "required"); err != nil {
+		return fmt461e464ebed9.Errorf("field `LocationsClient` did not pass the test: %w", err)
 	}
 	return nil
 }

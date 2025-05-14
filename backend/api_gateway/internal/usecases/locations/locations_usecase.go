@@ -11,6 +11,7 @@ import (
 
 type IEventsClient interface {
 	GetLocations(ctx context.Context, req *pb.GetLocationsRequest) (*pb.GetLocationsResponse, error)
+	GetLocationById(ctx context.Context, req *pb.GetLocationByIdRequest) (*pb.Location, error)
 	CreateLocation(ctx context.Context, req *pb.CreateLocationRequest) (*pb.Location, error)
 	UpdateLocation(ctx context.Context, req *pb.UpdateLocationRequest) (*pb.Location, error)
 	DeleteLocation(ctx context.Context, req *pb.DeleteLocationRequest) (*pb.DeleteLocationResponse, error)
@@ -41,11 +42,7 @@ func (u UseCase) GetLocationById(ctx context.Context, id int64) (*models.Locatio
 		return nil, fmt.Errorf("get location by id: %w", err)
 	}
 
-	return &models.Location{
-		ID:      resp.Location.Id,
-		Name:    resp.Location.Name,
-		Address: resp.Location.Address,
-	}, nil
+	return convertLocationToResponse(resp), nil
 }
 
 func (u UseCase) GetLocations(ctx context.Context) ([]*models.Location, error) {
@@ -56,11 +53,7 @@ func (u UseCase) GetLocations(ctx context.Context) ([]*models.Location, error) {
 
 	locations := make([]*models.Location, len(resp.Locations))
 	for i, location := range resp.Locations {
-		locations[i] = &models.Location{
-			ID:      location.Id,
-			Name:    location.Name,
-			Address: location.Address,
-		}
+		locations[i] = convertLocationToResponse(location)
 	}
 	return locations, nil
 }
@@ -74,11 +67,7 @@ func (u UseCase) CreateLocation(ctx context.Context, req *CreateLocationRequest)
 		return nil, fmt.Errorf("create location: %w", err)
 	}
 
-	return &models.Location{
-		ID:      resp.Id,
-		Name:    resp.Name,
-		Address: resp.Address,
-	}, nil
+	return convertLocationToResponse(resp), nil
 }
 
 func (u UseCase) UpdateLocation(ctx context.Context, req *UpdateLocationRequest) (*models.Location, error) {
@@ -91,11 +80,7 @@ func (u UseCase) UpdateLocation(ctx context.Context, req *UpdateLocationRequest)
 		return nil, fmt.Errorf("update location: %w", err)
 	}
 
-	return &models.Location{
-		ID:      resp.Id,
-		Name:    resp.Name,
-		Address: resp.Address,
-	}, nil
+	return convertLocationToResponse(resp), nil
 }
 
 func (u UseCase) DeleteLocation(ctx context.Context, id int64) error {
@@ -105,4 +90,12 @@ func (u UseCase) DeleteLocation(ctx context.Context, id int64) error {
 	}
 
 	return nil
+}
+
+func convertLocationToResponse(location *pb.Location) *models.Location {
+	return &models.Location{
+		ID:      location.Id,
+		Name:    location.Name,
+		Address: location.Address,
+	}
 }

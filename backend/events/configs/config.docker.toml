@@ -28,3 +28,6 @@ addr = "volunteers:50054"
 
 [grpc_client.clients]
 addr = "clients:50055"
+
+[grpc_client.locations]
+addr = "locations:50051"
