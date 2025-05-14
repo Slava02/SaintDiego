@@ -223,5 +223,6 @@ func convertEventToResponse(event *pb.Event) *models.Event {
 		ServiceTypeID:     event.ServiceTypeId,
 		ParticipantsCount: event.ParticipantsCount,
 		ServiceName:       event.ServiceName,
+		Location:          convertLocationToResponse(event.Location),
 	}
 }

@@ -5,7 +5,6 @@ import { Providers } from "./providers"
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] })
 
-
 export default function RootLayout({
   children,
 }: {
@@ -14,7 +13,9 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   )

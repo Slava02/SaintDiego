@@ -48,6 +48,9 @@ export function CreateTimeSlotDialog({ open, onOpenChange, onSuccess }: CreateTi
   const [isLoading, setIsLoading] = useState(false)
   const [showCreateLocation, setShowCreateLocation] = useState(false)
 
+  // Add error state
+  const [error, setError] = useState<string | null>(null)
+
   const { toast } = useToast()
 
   // При открытии диалога, устанавливаем endDate равным startDate по умолчанию
@@ -66,7 +69,7 @@ export function CreateTimeSlotDialog({ open, onOpenChange, onSuccess }: CreateTi
 
   const fetchLocationsAndServices = async () => {
     try {
-      const [locationsData, servicesData] = await Promise.all([getLocations(), getServices()])
+      const [locationsData, servicesData] = await Promise.all([getLocations(), getServices(1, 100, true)])
       setLocations(locationsData)
       setServiceTypes(servicesData.items)
     } catch (error) {
@@ -114,7 +117,11 @@ export function CreateTimeSlotDialog({ open, onOpenChange, onSuccess }: CreateTi
   }
 
   const handleSubmit = async () => {
+    // Reset any previous errors
+    setError(null)
+
     if (!title || !locationId || !capacity || !startDate || !startTime || !endDate || !endTime) {
+      setError("Заполните все обязательные поля")
       toast({
         title: "Ошибка",
         description: "Заполните все обязательные поля",
@@ -129,6 +136,7 @@ export function CreateTimeSlotDialog({ open, onOpenChange, onSuccess }: CreateTi
     )
 
     if (validServices.length === 0) {
+      setError("Добавьте хотя бы одну услугу")
       toast({
         title: "Ошибка",
         description: "Добавьте хотя бы одну услугу",
@@ -143,6 +151,7 @@ export function CreateTimeSlotDialog({ open, onOpenChange, onSuccess }: CreateTi
 
     // Проверяем, что startDate в будущем
     if (startDateTime <= new Date()) {
+      setError("Дата и время начала должны быть в будущем")
       toast({
         title: "Ошибка",
         description: "Дата и время начала должны быть в будущем",
@@ -153,6 +162,7 @@ export function CreateTimeSlotDialog({ open, onOpenChange, onSuccess }: CreateTi
 
     // Проверяем, что endDate после startDate
     if (endDateTime <= startDateTime) {
+      setError("Дата и время окончания должны быть после даты и времени начала")
       toast({
         title: "Ошибка",
         description: "Дата и время окончания должны быть после даты и времени начала",
@@ -212,6 +222,7 @@ export function CreateTimeSlotDialog({ open, onOpenChange, onSuccess }: CreateTi
       onSuccess()
       resetForm()
     } catch (error) {
+      setError("Не удалось создать временной слот")
       toast({
         title: "Ошибка",
         description: "Не удалось создать временной слот",
@@ -247,6 +258,14 @@ export function CreateTimeSlotDialog({ open, onOpenChange, onSuccess }: CreateTi
           <DialogHeader>
             <DialogTitle>Создание нового временного слота</DialogTitle>
           </DialogHeader>
+
+          {/* Show error if exists */}
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+              <strong className="font-bold">Ошибка! </strong>
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
 
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-1 gap-4">

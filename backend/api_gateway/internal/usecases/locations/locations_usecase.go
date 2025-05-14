@@ -35,10 +35,23 @@ func New(opts Options) (*UseCase, error) {
 	}, nil
 }
 
+func (u UseCase) GetLocationById(ctx context.Context, id int64) (*models.Location, error) {
+	resp, err := u.eventsClient.GetLocationById(ctx, &pb.GetLocationByIdRequest{Id: id})
+	if err != nil {
+		return nil, fmt.Errorf("get location by id: %w", err)
+	}
+
+	return &models.Location{
+		ID:      resp.Location.Id,
+		Name:    resp.Location.Name,
+		Address: resp.Location.Address,
+	}, nil
+}
+
 func (u UseCase) GetLocations(ctx context.Context) ([]*models.Location, error) {
 	resp, err := u.eventsClient.GetLocations(ctx, &pb.GetLocationsRequest{})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get locations: %w", err)
 	}
 
 	locations := make([]*models.Location, len(resp.Locations))
@@ -58,7 +71,7 @@ func (u UseCase) CreateLocation(ctx context.Context, req *CreateLocationRequest)
 		Address: req.Address,
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create location: %w", err)
 	}
 
 	return &models.Location{
@@ -75,7 +88,7 @@ func (u UseCase) UpdateLocation(ctx context.Context, req *UpdateLocationRequest)
 		Address: req.Address,
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("update location: %w", err)
 	}
 
 	return &models.Location{
@@ -88,7 +101,7 @@ func (u UseCase) UpdateLocation(ctx context.Context, req *UpdateLocationRequest)
 func (u UseCase) DeleteLocation(ctx context.Context, id int64) error {
 	_, err := u.eventsClient.DeleteLocation(ctx, &pb.DeleteLocationRequest{Id: id})
 	if err != nil {
-		return err
+		return fmt.Errorf("delete location: %w", err)
 	}
 
 	return nil

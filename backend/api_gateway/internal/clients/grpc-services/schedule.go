@@ -97,3 +97,7 @@ func (c *ScheduleClient) UpdateLocation(ctx context.Context, req *api.UpdateLoca
 func (c *ScheduleClient) DeleteLocation(ctx context.Context, req *api.DeleteLocationRequest) (*api.DeleteLocationResponse, error) {
 	return c.ScheduleServiceClient.DeleteLocation(ctx, req)
 }
+
+func (c *ScheduleClient) GetLocationById(ctx context.Context, req *api.GetLocationByIdRequest) (*api.Location, error) {
+	return c.ScheduleServiceClient.GetLocationById(ctx, req)
+}

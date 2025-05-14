@@ -132,7 +132,6 @@ func (u *UseCase) BlockClient(ctx context.Context, req *BlockClientReq) (*models
 	return client, nil
 }
 
-// TODO: нужно возвращать услуги на которые не записан клиент
 func (u *UseCase) GetClientServices(ctx context.Context, req *GetClientServicesReq) ([]*models.ServiceTypes, int64, error) {
 
 	client, err := u.clientsRepository.GetClientByID(ctx, req.ClientID)
@@ -145,7 +144,6 @@ func (u *UseCase) GetClientServices(ctx context.Context, req *GetClientServicesR
 
 	// TODO: надо как-т возврщать инфу о том, что клиент не был давно или заблокирован
 	// Если клиент заблокирован или не посещал центр более года, то ему доступна услуга "Повторное собеседование"
-	// TODO: Тут возвращаются услуги безотносительно того, есть ли события для записи
 	if pointer.Indirect(client.IsBlocked) || clientLastVisitMoreThanYearAgo(client) {
 		events, err := u.eventsClient.GetEventsByCleintIdServiceId(ctx, client.Id, ReinterviewClientAvailableServiceTypeID)
 		if err != nil {
@@ -171,7 +169,6 @@ func (u *UseCase) GetClientServices(ctx context.Context, req *GetClientServicesR
 	}
 
 	// Если клиент новый, то ему доступна услуга "Первичное собеседование"
-	// TODO: Тут возвращаются услуги безотносительно того, есть ли события для записи
 	if clientIsNew(client) {
 		events, err := u.eventsClient.GetEventsByCleintIdServiceId(ctx, client.Id, PrimaryInterviewClientAvailableServiceTypeID)
 		if err != nil {

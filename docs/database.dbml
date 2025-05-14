@@ -2,6 +2,38 @@ Project SaintEgidio {
   database_type: 'MySQL'
 }
 
+// ТАБЛИЦЫ, НА КОТОРЫЕ ЕСТЬ ССЫЛКИ, НО КОТОРЫЕ НЕ УПРАВЛЯЮТСЯ ЭТИМИ МИГРАЦИЯМИ
+// (могут быть из другой системы или предыдущих миграций)
+
+Table fos_user_user {
+  Note: '[ЗАГЛУШКА] Таблица пользователей из Symfony (или аналогичной системы). Используется для created_by_id, updated_by_id.'
+  id int [pk, increment]
+  // ... другие поля пользователя ...
+}
+
+Table district {
+  Note: '[ЗАГЛУШКА] Таблица районов. Используется в client.'
+  id int [pk, increment]
+  name varchar(255)
+  // ... другие поля района ...
+}
+
+Table client_field {
+  Note: '[ЗАГЛУШКА] Таблица для описания дополнительных полей клиента (анкеты).'
+  id int [pk, increment]
+  name varchar(255)
+  // ... другие поля ...
+}
+
+Table client_field_option {
+  Note: '[ЗАГЛУШКА] Таблица для вариантов ответов для полей типа "список".'
+  id int [pk, increment]
+  client_field_id int
+  value varchar(255)
+  // ... другие поля ...
+}
+
+
 // ВСЕ, ЧТО КАСАЕТСЯ ТАЙМ-СЛОТОВ:
 Table time_slot {
   Note: 'Информация о тайм-слотах'
@@ -14,14 +46,17 @@ Table time_slot {
   start_date datetime [not null]
   end_date datetime [not null]
   status enum('active', 'archived') [not null, default: 'active']
+  created_by_id int // Связь с fos_user_user
+  updated_by_id int // Связь с fos_user_user
   created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
   updated_at datetime [not null, default: `CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`]
 
   indexes {
     status
     (start_date, end_date)
+    created_by_id
+    updated_by_id
   }
-
 }
 
 Table time_slot_recurrence {
@@ -29,6 +64,7 @@ Table time_slot_recurrence {
 
   time_slot_id int [pk]
   frequency enum('daily', 'weekly', 'monthly') [not null]
+  interval int [not null, default: 1]
   end_type enum('never', 'date') [not null]
   end_value datetime
 }
@@ -55,7 +91,8 @@ Table location {
   id int [pk, increment]
   name varchar(255) [not null]
   address varchar(255)
-
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at datetime [not null, default: `CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`]
 }
 
 // ВСЕ, ЧТО КАСАЕТСЯ УСЛУГ:
@@ -64,10 +101,10 @@ Table service_type {
   Note: '[ТАБЛИЦА ИЗ СИСТЕМЫ МКС]  Описание типа предоставляемых услуг. ВАЖНО - не на все услуги можно записаться, некоторые оказываются только непосредственно в центре'
 
   id int [pk, increment]
-  min_period_days int 
-  registration_available bool [not null]
-  created_by_id int
-  updated_by_id int
+  min_period_days int [not null, default: 0]
+  registration_available bool [not null, default: false]
+  created_by_id int // Связь с fos_user_user
+  updated_by_id int // Связь с fos_user_user
   name varchar(255)
   pay tinyint(1)
   document tinyint(1)
@@ -87,9 +124,9 @@ Table service {
 
   id int [pk, increment]
   client_id int
-  type_id int
-  created_by_id int
-  updated_by_id int
+  type_id int // Связь с service_type
+  created_by_id int // Связь с fos_user_user
+  updated_by_id int // Связь с fos_user_user
   comment longtext
   amount int
   sync_id int
@@ -107,13 +144,14 @@ Table service {
 
 // ВСЕ, ЧТО КАСАЕТСЯ КОНКРЕТНЫХ ЗАПИСЕЙ:
 Table event {
-  Note: 'Это выражение time_slot_service в конкретном дне, согласно настройкам повторения time_slot. Именно на event записывается сlient'
+  Note: 'Это выражение time_slot_service в конкретном дне, согласно настройкам повторения time_slot. Именно на event записывается client'
 
   id int [pk, increment]
   time_slot_service_id int [not null]
   service_type_id int [not null]
   capacity int [not null]
   datetime datetime [not null]
+  service_name varchar(255) [not null] // Новое поле из миграции
 
   indexes {
     time_slot_service_id
@@ -122,18 +160,18 @@ Table event {
 }
 
 Table event_client {
-  Note: 'Список записанных на event клиентов и статусы по ним'
+  Note: 'Список записанных на event клиентов'
 
   id int [pk, increment]
   event_id int [not null]
   client_id int [not null]
-  volounteer_id int [not null]
-  status enum('attend', 'absent') [not null, default: 'absent']
+  volunteer_id bigint [not null] // Изменено с volounteer_id, тип bigint
 
   indexes {
     event_id
     client_id
-    volounteer_id
+    volunteer_id
+    (event_id, client_id, volunteer_id) [unique, name: 'UK_event_client_unique'] // Уникальный ключ из миграции
   }
 }
 
@@ -141,11 +179,11 @@ Table event_client {
 Table client {
   Note: '[ТАБЛИЦА ИЗ СИСТЕМЫ МКС] Информация о клиенте и его статусе'
 
-  id int [pk, not null]
-  last_residence_district_id int
-  last_registration_district_id int
-  created_by_id int
-  updated_by_id int
+  id int [pk, increment, not null] // Добавлено increment
+  last_residence_district_id int // Связь с district
+  last_registration_district_id int // Связь с district
+  created_by_id int // Связь с fos_user_user
+  updated_by_id int // Связь с fos_user_user
   photo_name varchar(255)
   birth_date date
   birth_place varchar(255)
@@ -157,7 +195,7 @@ Table client {
   sort int
   created_at datetime
   updated_at datetime
-  is_homeless int [not null, default: 1]
+  is_homeless int(1) [not null, default: 1] // Тип уточнен как int(1)
   is_blocked boolean [not null, default: false]
   blocked_reason text
   blocked_at datetime
@@ -170,29 +208,89 @@ Table client {
   }
 }
 
-Table volounteer {
+Table client_field_value {
+  Note: '[НОВАЯ ТАБЛИЦА] Значения дополнительных полей для клиентов.'
+  id int [pk, increment]
+  field_id int // Связь с client_field
+  client_id int // Связь с client
+  option_id int // Связь с client_field_option
+  created_by_id int // Связь с fos_user_user
+  updated_by_id int // Связь с fos_user_user
+  text longtext
+  datetime datetime
+  filename varchar(255)
+  sync_id int
+  sort int
+  created_at datetime
+  updated_at datetime
+
+  indexes {
+    (field_id, client_id) [unique, name: 'value_unique']
+    field_id
+    client_id
+    option_id
+    created_by_id
+    updated_by_id
+  }
+}
+
+Table volunteer { // Ранее volounteer, структура полностью изменена
   Note: 'Информация о волонтерах, которые записывают client на события'
 
-  id int [pk, increment]
+  tg_id bigint [pk] // PK изменен на tg_id
+  first_name varchar(255) [not null]
+  last_name varchar(255) [not null]
+  middle_name varchar(255) [not null]
+  tg_login varchar(255) [not null]
 }
+
+Table schedule_users {
+  Note: '[НОВАЯ ТАБЛИЦА] Пользователи для модуля расписаний (schedule).'
+  id int [pk, increment]
+  login varchar(255) [not null]
+  password_hash varchar(255) [not null]
+  is_admin boolean [not null, default: false]
+}
+
 
 // References
 Ref: time_slot.location_id - location.id
+Ref: time_slot.created_by_id - fos_user_user.id
+Ref: time_slot.updated_by_id - fos_user_user.id
 
 Ref: time_slot_recurrence.time_slot_id - time_slot.id [delete: cascade]
 
 Ref: time_slot_service.time_slot_id - time_slot.id [delete: cascade]
 Ref: time_slot_service.service_type_id - service_type.id
 
+Ref: service_type.created_by_id - fos_user_user.id
+Ref: service_type.updated_by_id - fos_user_user.id
+
 Ref: service.client_id - client.id
 Ref: service.type_id - service_type.id
+Ref: service.created_by_id - fos_user_user.id
+Ref: service.updated_by_id - fos_user_user.id
 
 Ref: event.time_slot_service_id - time_slot_service.id [delete: cascade, update: cascade]
 Ref: event.service_type_id - service_type.id
 
 Ref: event_client.event_id - event.id [delete: cascade]
 Ref: event_client.client_id - client.id [delete: cascade]
-Ref: event_client.volounteer_id - volounteer.id [delete: cascade]
+Ref: event_client.volunteer_id - volunteer.tg_id [delete: cascade] // Обновлена ссылка
+
+Ref: client.last_residence_district_id - district.id
+Ref: client.last_registration_district_id - district.id
+Ref: client.created_by_id - fos_user_user.id
+Ref: client.updated_by_id - fos_user_user.id
+
+Ref: client_field_value.field_id - client_field.id [delete: cascade] // Добавлено on delete cascade как в SQL
+Ref: client_field_value.client_id - client.id
+Ref: client_field_value.option_id - client_field_option.id
+Ref: client_field_value.created_by_id - fos_user_user.id
+Ref: client_field_value.updated_by_id - fos_user_user.id
+
+// Ref для client_field_option (если нужно, можно добавить)
+// Ref: client_field_option.client_field_id > client_field.id
 
 
 

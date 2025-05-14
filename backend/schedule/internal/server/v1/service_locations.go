@@ -17,6 +17,7 @@ type ILocationsUC interface {
 	CreateLocation(ctx context.Context, req *locations.CreateLocationRequest) (*models.Location, error)
 	UpdateLocation(ctx context.Context, req *locations.UpdateLocationRequest) (*models.Location, error)
 	DeleteLocation(ctx context.Context, id int64) error
+	GetLocationById(ctx context.Context, id int64) (*models.Location, error)
 }
 
 func (i *Implementation) GetLocations(ctx context.Context, _ *pb.GetLocationsRequest) (*pb.GetLocationsResponse, error) {
@@ -39,6 +40,22 @@ func (i *Implementation) GetLocations(ctx context.Context, _ *pb.GetLocationsReq
 
 	return &pb.GetLocationsResponse{
 		Locations: pbLocations,
+	}, nil
+}
+
+func (i *Implementation) GetLocationById(ctx context.Context, req *pb.GetLocationByIdRequest) (*pb.Location, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "GetLocationById")
+	defer span.Finish()
+
+	location, err := i.locationsUC.GetLocationById(ctx, req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get location by id: %v", err)
+	}
+
+	return &pb.Location{
+		Id:      location.ID,
+		Name:    location.Name,
+		Address: location.Address,
 	}, nil
 }
 

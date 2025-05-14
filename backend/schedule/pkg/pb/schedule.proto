@@ -20,6 +20,7 @@ service ScheduleService {
 
   // Locations
   rpc GetLocations(GetLocationsRequest) returns (GetLocationsResponse) {}
+  rpc GetLocationById(GetLocationByIdRequest) returns (Location) {}
   rpc CreateLocation(CreateLocationRequest) returns (Location) {}
   rpc UpdateLocation(UpdateLocationRequest) returns (Location) {}
   rpc DeleteLocation(DeleteLocationRequest) returns (DeleteLocationResponse) {}
@@ -62,6 +63,10 @@ message ActivateTimeSlotRequest {
 message CreateLocationRequest {
   string name = 1;
   string address = 2;
+}
+
+message GetLocationByIdRequest {
+  int64 id = 1;
 }
 
 message UpdateLocationRequest {

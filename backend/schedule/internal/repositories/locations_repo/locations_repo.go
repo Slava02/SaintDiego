@@ -41,6 +41,16 @@ func (r *LocationRepository) GetLocations(ctx context.Context) ([]*models.Locati
 	return locations, nil
 }
 
+func (r *LocationRepository) GetLocationById(ctx context.Context, id int64) (*models.Location, error) {
+	location := &models.Location{}
+	err := r.db.Select(ctx, location).Where("id = ?", id).Scan(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("select location: %w", err)
+	}
+
+	return location, nil
+}
+
 func (r *LocationRepository) CreateLocation(ctx context.Context, req *models.Location) (*models.Location, error) {
 	_, err := r.db.Insert(ctx, req).Exec(ctx)
 	if err != nil {
@@ -82,14 +92,4 @@ func (r *LocationRepository) DeleteLocation(ctx context.Context, id int64) error
 		return fmt.Errorf("delete location: %w", err)
 	}
 	return nil
-}
-
-func (r *LocationRepository) GetLocationById(ctx context.Context, id int64) (*models.Location, error) {
-	location := &models.Location{}
-	err := r.db.Select(ctx, location).Where("id = ?", id).Scan(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("select location: %w", err)
-	}
-
-	return location, nil
 }

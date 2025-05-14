@@ -16,6 +16,7 @@ type Event struct {
 	ServiceTypeID     int64     `bun:"service_type_id" json:"service_type_id"`
 	ParticipantsCount int32     `bun:"participants_count" json:"participants_count"`
 	ServiceName       string    `bun:"service_name" json:"service_name"`
+	Location          Location  `bun:"-" json:"location"`
 	// Many-to-many relationship with Client through EventClient
 	Clients []*Client `bun:"m2m:event_client,join:Event=Client"`
 }
@@ -84,4 +85,10 @@ type TimeSlotWithParticipantCount struct {
 	ID               int64 `bun:"id,pk,autoincrement" json:"id"`
 	Capacity         int32 `bun:"capacity" json:"capacity" validate:"required,min=1"`
 	ParticipantCount int32 `bun:"participant_count" json:"participant_count" validate:"required,min=1"`
+}
+
+type Location struct {
+	ID      int64  `json:"id" validate:"required,min=1"`
+	Name    string `json:"name" validate:"required,min=1"`
+	Address string `json:"address" validate:"required,min=1"`
 }

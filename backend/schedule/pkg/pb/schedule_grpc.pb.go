@@ -27,6 +27,7 @@ const (
 	ScheduleService_ArchiveTimeSlot_FullMethodName  = "/schedule.ScheduleService/ArchiveTimeSlot"
 	ScheduleService_ActivateTimeSlot_FullMethodName = "/schedule.ScheduleService/ActivateTimeSlot"
 	ScheduleService_GetLocations_FullMethodName     = "/schedule.ScheduleService/GetLocations"
+	ScheduleService_GetLocationById_FullMethodName  = "/schedule.ScheduleService/GetLocationById"
 	ScheduleService_CreateLocation_FullMethodName   = "/schedule.ScheduleService/CreateLocation"
 	ScheduleService_UpdateLocation_FullMethodName   = "/schedule.ScheduleService/UpdateLocation"
 	ScheduleService_DeleteLocation_FullMethodName   = "/schedule.ScheduleService/DeleteLocation"
@@ -48,6 +49,7 @@ type ScheduleServiceClient interface {
 	ActivateTimeSlot(ctx context.Context, in *ActivateTimeSlotRequest, opts ...grpc.CallOption) (*TimeSlot, error)
 	// Locations
 	GetLocations(ctx context.Context, in *GetLocationsRequest, opts ...grpc.CallOption) (*GetLocationsResponse, error)
+	GetLocationById(ctx context.Context, in *GetLocationByIdRequest, opts ...grpc.CallOption) (*Location, error)
 	CreateLocation(ctx context.Context, in *CreateLocationRequest, opts ...grpc.CallOption) (*Location, error)
 	UpdateLocation(ctx context.Context, in *UpdateLocationRequest, opts ...grpc.CallOption) (*Location, error)
 	DeleteLocation(ctx context.Context, in *DeleteLocationRequest, opts ...grpc.CallOption) (*DeleteLocationResponse, error)
@@ -141,6 +143,16 @@ func (c *scheduleServiceClient) GetLocations(ctx context.Context, in *GetLocatio
 	return out, nil
 }
 
+func (c *scheduleServiceClient) GetLocationById(ctx context.Context, in *GetLocationByIdRequest, opts ...grpc.CallOption) (*Location, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Location)
+	err := c.cc.Invoke(ctx, ScheduleService_GetLocationById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *scheduleServiceClient) CreateLocation(ctx context.Context, in *CreateLocationRequest, opts ...grpc.CallOption) (*Location, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Location)
@@ -187,6 +199,7 @@ type ScheduleServiceServer interface {
 	ActivateTimeSlot(context.Context, *ActivateTimeSlotRequest) (*TimeSlot, error)
 	// Locations
 	GetLocations(context.Context, *GetLocationsRequest) (*GetLocationsResponse, error)
+	GetLocationById(context.Context, *GetLocationByIdRequest) (*Location, error)
 	CreateLocation(context.Context, *CreateLocationRequest) (*Location, error)
 	UpdateLocation(context.Context, *UpdateLocationRequest) (*Location, error)
 	DeleteLocation(context.Context, *DeleteLocationRequest) (*DeleteLocationResponse, error)
@@ -223,6 +236,9 @@ func (UnimplementedScheduleServiceServer) ActivateTimeSlot(context.Context, *Act
 }
 func (UnimplementedScheduleServiceServer) GetLocations(context.Context, *GetLocationsRequest) (*GetLocationsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetLocations not implemented")
+}
+func (UnimplementedScheduleServiceServer) GetLocationById(context.Context, *GetLocationByIdRequest) (*Location, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLocationById not implemented")
 }
 func (UnimplementedScheduleServiceServer) CreateLocation(context.Context, *CreateLocationRequest) (*Location, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateLocation not implemented")
@@ -398,6 +414,24 @@ func _ScheduleService_GetLocations_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ScheduleService_GetLocationById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLocationByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScheduleServiceServer).GetLocationById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ScheduleService_GetLocationById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScheduleServiceServer).GetLocationById(ctx, req.(*GetLocationByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ScheduleService_CreateLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateLocationRequest)
 	if err := dec(in); err != nil {
@@ -490,6 +524,10 @@ var ScheduleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetLocations",
 			Handler:    _ScheduleService_GetLocations_Handler,
+		},
+		{
+			MethodName: "GetLocationById",
+			Handler:    _ScheduleService_GetLocationById_Handler,
 		},
 		{
 			MethodName: "CreateLocation",

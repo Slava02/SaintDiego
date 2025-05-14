@@ -119,6 +119,7 @@ message Event {
   google.protobuf.Timestamp datetime = 5;
   int32 participantsCount = 6;
   string serviceName = 7;
+  Location location = 8;
 }
 
 message Participant {
@@ -135,4 +136,10 @@ message Participant {
   string volounteer_first_name = 11;
   string volounteer_middle_name = 12;
   string volounteer_last_name = 13;
+}
+
+message Location {
+  int64 id = 1;
+  string name = 2;
+  string address = 3;
 }

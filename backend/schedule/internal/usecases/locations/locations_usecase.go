@@ -52,6 +52,14 @@ func (u UseCase) GetLocations(ctx context.Context) ([]*models.Location, error) {
 	return locations, nil
 }
 
+func (u UseCase) GetLocationById(ctx context.Context, id int64) (*models.Location, error) {
+	location, err := u.locationRepository.GetLocationById(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("get location: %w", err)
+	}
+	return location, nil
+}
+
 func (u UseCase) CreateLocation(ctx context.Context, req *CreateLocationRequest) (*models.Location, error) {
 	location, err := u.locationRepository.CreateLocation(ctx, &models.Location{
 		Name:    req.Name,
@@ -85,16 +93,4 @@ func (u UseCase) DeleteLocation(ctx context.Context, id int64) error {
 	}
 
 	return u.locationRepository.DeleteLocation(ctx, id)
-}
-
-func (u UseCase) GetLocationById(ctx context.Context, id int64) (*models.Location, error) {
-	location, err := u.locationRepository.GetLocationById(ctx, id)
-	if err != nil {
-		if errors.Is(err, locationsRepo.ErrLocationNotFound) {
-			return nil, fmt.Errorf("get location: %w", ErrLocationNotFound)
-		}
-		return nil, fmt.Errorf("get location: %w", err)
-	}
-
-	return location, nil
 }

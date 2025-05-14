@@ -14,6 +14,7 @@ import (
 
 type ILocationsUC interface {
 	GetLocations(ctx context.Context) ([]*models.Location, error)
+	GetLocationById(ctx context.Context, id int64) (*models.Location, error)
 	CreateLocation(ctx context.Context, req *locations.CreateLocationRequest) (*models.Location, error)
 	UpdateLocation(ctx context.Context, req *locations.UpdateLocationRequest) (*models.Location, error)
 	DeleteLocation(ctx context.Context, id int64) error
@@ -26,6 +27,14 @@ func (h Handlers) GetLocations(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, locations)
+}
+
+func (h Handlers) GetLocationsId(ctx echo.Context, id int64) error {
+	location, err := h.locationsUC.GetLocationById(ctx.Request().Context(), id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, Err("Internal server error", err.Error()))
+	}
+	return ctx.JSON(http.StatusOK, location)
 }
 
 func (h Handlers) PostLocations(ctx echo.Context) error {

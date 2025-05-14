@@ -31,10 +31,9 @@ export function RecurrenceForm({ recurrence, onChange }: RecurrenceFormProps) {
               <SelectValue placeholder="Выберите частоту" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="daily">Ежедневно</SelectItem>
-              <SelectItem value="weekly">Еженедельно</SelectItem>
-              <SelectItem value="monthly">Ежемесячно</SelectItem>
-              <SelectItem value="yearly">Ежегодно</SelectItem>
+              <SelectItem value="daily">Дней</SelectItem>
+              <SelectItem value="weekly">Недель</SelectItem>
+              <SelectItem value="monthly">Месяцев</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -63,7 +62,6 @@ export function RecurrenceForm({ recurrence, onChange }: RecurrenceFormProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="never">Никогда</SelectItem>
-              <SelectItem value="count">После количества повторений</SelectItem>
               <SelectItem value="date">До даты</SelectItem>
             </SelectContent>
           </Select>
