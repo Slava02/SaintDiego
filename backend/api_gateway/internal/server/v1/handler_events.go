@@ -4,7 +4,6 @@ import (
 	"context"
 	"math"
 	"net/http"
-	"time"
 
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/models"
 	"github.com/Slava02/SaintDiego/backend/api_gateway/internal/usecases/events"
@@ -27,49 +26,17 @@ type IEventsUC interface {
 }
 
 func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
-	var req struct {
-		Page          int32   `query:"page" json:"page" validate:"omitempty,min=1"`
-		PerPage       int32   `query:"per_page" json:"per_page" validate:"omitempty,min=1,max=100"`
-		ParticipantID *int64  `query:"participant_id" json:"participant_id" validate:"omitempty,min=1"`
-		Status        *string `query:"status" json:"status" validate:"omitempty,oneof=upcoming past"`
-		LocationID    *int64  `query:"location_id" json:"location_id" validate:"omitempty,min=1"`
-		ServiceID     *int64  `query:"service_id" json:"service_id" validate:"omitempty,min=1"`
-		FromDate      string  `query:"from_date" json:"from_date" validate:"omitempty"`
-		ToDate        string  `query:"to_date" json:"to_date" validate:"omitempty"`
-	}
-	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
-	}
-
-	var (
-		fromDate, toDate time.Time
-		err              error
-	)
-
-	if req.FromDate != "" {
-		fromDate, err = time.Parse(time.DateOnly, req.FromDate)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
-		}
-	}
-
-	if req.ToDate != "" {
-		toDate, err = time.Parse(time.DateOnly, req.ToDate)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, Err("Bad request", err.Error()))
-		}
-	}
-
 	events, total, err := h.eventsUC.GetEvents(c.Request().Context(), &events.GetEventsParams{
-		ParticipantID: req.ParticipantID,
-		Status:        req.Status,
-		LocationID:    req.LocationID,
-		ServiceID:     req.ServiceID,
-		FromDate:      pointer.PtrWithZeroAsNil(fromDate),
-		ToDate:        pointer.PtrWithZeroAsNil(toDate),
-		Page:          req.Page,
-		PerPage:       req.PerPage,
+		ParticipantID: params.ParticipantId,
+		Status:        pointer.Ptr(string(pointer.Indirect(params.Status))),
+		LocationID:    params.LocationId,
+		ServiceID:     params.ServiceId,
+		FromDate:      params.FromDate,
+		ToDate:        params.ToDate,
+		Page:          params.Page,
+		PerPage:       params.PerPage,
 	})
+
 	if err != nil {
 		switch status.Code(err) {
 		case codes.NotFound:
@@ -80,13 +47,13 @@ func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
 	}
 
 	// Рассчитываем общее количество страниц
-	totalPages := int32(math.Ceil(float64(total) / float64(req.PerPage)))
+	totalPages := int32(math.Ceil(float64(total) / float64(params.PerPage)))
 
 	return c.JSON(http.StatusOK, GetEventsResponse{
 		Items:      convertEventsToResponse(events),
 		Total:      int32(total),
-		Page:       req.Page,
-		PerPage:    req.PerPage,
+		Page:       params.Page,
+		PerPage:    params.PerPage,
 		TotalPages: totalPages,
 	})
 }
@@ -172,6 +139,8 @@ func (h Handlers) GetEventsIdParticipants(c echo.Context, id int64, params GetEv
 	}
 
 	req.EventID = id
+	req.Page = params.Page
+	req.PerPage = params.PerPage
 
 	participants, total, err := h.eventsUC.GetParticipantsByEventId(c.Request().Context(), &req)
 	if err != nil {
@@ -190,6 +159,10 @@ func (h Handlers) GetEventsIdParticipants(c echo.Context, id int64, params GetEv
 		PerPage:      req.PerPage,
 		TotalPages:   int32(math.Ceil(float64(total) / float64(req.PerPage))),
 	})
+}
+
+func (h Handlers) GetEventsIdParticipantsReport(c echo.Context, id int64) error {
+	return c.NoContent(http.StatusNoContent)
 }
 
 // TODO: move to clients (only handler)
@@ -226,6 +199,8 @@ func (h Handlers) GetEventsServicesId(c echo.Context, id int64, params GetEvents
 	}
 
 	req.ServiceID = id
+	req.Page = params.Page
+	req.PerPage = params.PerPage
 
 	events, total, err := h.eventsUC.GetEventsByServiceId(c.Request().Context(), &req)
 	if err != nil {
@@ -248,6 +223,8 @@ func (h Handlers) GetClientsIdEvents(ctx echo.Context, id int64, params GetClien
 	}
 
 	req.ID = id
+	req.Page = int32(*params.Page)
+	req.PerPage = int32(*params.PerPage)
 
 	events, total, err := h.eventsUC.GetClientsIdEvents(ctx.Request().Context(), &req)
 	if err != nil {

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Dict, Optional
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 from .location import Location
 
@@ -19,11 +19,16 @@ class Event:
     @classmethod
     def from_dict(cls, data: Dict) -> 'Event':
         """Создание объекта из словаря"""
+        # Преобразуем время из UTC в UTC+3
+        utc_time = datetime.fromisoformat(data["datetime"].replace("Z", "+00:00"))
+        moscow_tz = timezone(timedelta(hours=3))
+        local_time = utc_time.astimezone(moscow_tz)
+        
         return cls(
             id=data["id"],
             service_id=data["serviceTypeId"],
             service_name=data["serviceName"],
-            datetime=datetime.fromisoformat(data["datetime"].replace("Z", "+00:00")),
+            datetime=local_time,
             capacity=data["capacity"],
             participants_count=data["participantsCount"],
             location=Location.from_dict(data["location"]),

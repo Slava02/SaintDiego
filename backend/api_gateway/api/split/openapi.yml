@@ -8,8 +8,6 @@ info:
 servers:
   - url: http://localhost:8080/v1
     description: Development server
-  - url: http://host.docker.internal:8080/v1
-    description: Docker-окружение
 security:
   - BearerAuth: []
 paths:
@@ -37,6 +35,8 @@ paths:
     $ref: paths/events_{id}_participants.yml
   /events/{id}/participants/{participant_id}:
     $ref: paths/events_{id}_participants_{participant_id}.yml
+  /events/{id}/participants/report:
+    $ref: paths/events_{id}_participants_report.yml
   /events/services/{id}:
     $ref: paths/events_services_{id}.yml
   /clients:

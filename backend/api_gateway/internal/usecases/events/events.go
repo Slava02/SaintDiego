@@ -47,6 +47,8 @@ func (u *UseCase) GetEvents(ctx context.Context, req *GetEventsParams) ([]*model
 		Status:        req.Status,
 		LocationId:    req.LocationID,
 		ServiceId:     req.ServiceID,
+		Page:          int64(req.Page),
+		PerPage:       int64(req.PerPage),
 	}
 
 	if req.FromDate != nil {

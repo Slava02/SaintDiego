@@ -1,6 +1,7 @@
 package events
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/Slava02/SaintDiego/backend/events/internal/models"
 	"github.com/Slava02/SaintDiego/backend/events/internal/repositories/events_repo"
+	"github.com/xuri/excelize/v2"
 )
 
 type IEventRepository interface {
@@ -272,6 +274,43 @@ func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEvent
 	return participants, total, nil
 }
 
+func (u *UseCase) GetParticipantsByEventIdReport(ctx context.Context, eventID int64) (*bytes.Buffer, string, error) {
+	participantsList := make([]*models.Participant, 0)
+	page := int64(1)
+	perPage := int64(100)
+
+	for {
+		participants, _, err := u.GetParticipantsByEventId(ctx, &GetEventsIdParticipantsParams{
+			EventID: eventID,
+			Page:    page,
+			PerPage: perPage,
+		})
+		if err != nil {
+			return nil, "", fmt.Errorf("get participants: %v", err)
+		}
+
+		participantsList = append(participantsList, participants...)
+
+		if len(participants) < int(perPage) {
+			break
+		}
+
+		page++
+	}
+
+	// Создаем Excel отчет
+	reportBytes, err := getParticipantsByEventIdReport(participantsList)
+	if err != nil {
+		return nil, "", fmt.Errorf("get participants report: %v", err)
+	}
+
+	// Генерируем имя файла на основе ID события и даты
+	filename := fmt.Sprintf("participants_event_%d_%s.xlsx",
+		eventID, time.Now().Format("2006-01-02"))
+
+	return reportBytes, filename, nil
+}
+
 func (u *UseCase) GetAvailableEventsForClientByServiceId(ctx context.Context, params *GetAvailableEventsForClientByServiceIdParams) ([]*models.Event, int64, error) {
 	err := u.servicesClient.GetServiceTypeById(ctx, params.ServiceID)
 	if err != nil {
@@ -395,4 +434,161 @@ func (u *UseCase) ClientAlreadyParticipant(ctx context.Context, eventID int64, c
 	}
 
 	return false, nil
+}
+
+func getParticipantsByEventIdReport(participants []*models.Participant) (*bytes.Buffer, error) {
+	// Create a new Excel file
+	f := excelize.NewFile()
+	defer func() {
+		if err := f.Close(); err != nil {
+			fmt.Println("Error closing file:", err)
+		}
+	}()
+
+	// Get the default sheet name
+	sheetName := "Участники"
+
+	// Create a new sheet with a custom name
+	_, err := f.NewSheet(sheetName)
+	if err != nil {
+		return nil, fmt.Errorf("error creating sheet: %w", err)
+	}
+
+	// Delete default Sheet1 that's created automatically
+	f.DeleteSheet("Sheet1")
+
+	sheetIndex, err := f.GetSheetIndex(sheetName)
+	if err != nil {
+		return nil, fmt.Errorf("error getting sheet index: %w", err)
+	}
+
+	// Set active sheet
+	f.SetActiveSheet(sheetIndex)
+
+	// Define headers
+	headers := []string{"ID", "Дата рождения", "Пол", "ФИО", "Телеграм волонтера", "ФИО волонтера"}
+
+	// Set column widths
+	f.SetColWidth(sheetName, "A", "A", 10)
+	f.SetColWidth(sheetName, "B", "B", 15)
+	f.SetColWidth(sheetName, "C", "C", 10)
+	f.SetColWidth(sheetName, "D", "D", 30)
+	f.SetColWidth(sheetName, "E", "E", 20)
+	f.SetColWidth(sheetName, "F", "F", 30)
+
+	// Create header style
+	headerStyle, err := f.NewStyle(&excelize.Style{
+		Font: &excelize.Font{
+			Bold: true,
+			Size: 12,
+		},
+		Fill: excelize.Fill{
+			Type:    "pattern",
+			Color:   []string{"#DDEBF7"},
+			Pattern: 1,
+		},
+		Border: []excelize.Border{
+			{Type: "bottom", Color: "#000000", Style: 1},
+			{Type: "right", Color: "#000000", Style: 1},
+			{Type: "top", Color: "#000000", Style: 1},
+			{Type: "left", Color: "#000000", Style: 1},
+		},
+		Alignment: &excelize.Alignment{
+			Horizontal: "center",
+			Vertical:   "center",
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error creating header style: %w", err)
+	}
+
+	// Create cell style
+	cellStyle, err := f.NewStyle(&excelize.Style{
+		Border: []excelize.Border{
+			{Type: "bottom", Color: "#000000", Style: 1},
+			{Type: "right", Color: "#000000", Style: 1},
+			{Type: "top", Color: "#000000", Style: 1},
+			{Type: "left", Color: "#000000", Style: 1},
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error creating cell style: %w", err)
+	}
+
+	// Set headers
+	for i, header := range headers {
+		cell, _ := excelize.CoordinatesToCellName(i+1, 1)
+		f.SetCellValue(sheetName, cell, header)
+		f.SetCellStyle(sheetName, cell, cell, headerStyle)
+	}
+
+	// Format date style
+	dateStyle, err := f.NewStyle(&excelize.Style{
+		NumFmt: 10, // date format: mm-dd-yy
+		Border: []excelize.Border{
+			{Type: "bottom", Color: "#000000", Style: 1},
+			{Type: "right", Color: "#000000", Style: 1},
+			{Type: "top", Color: "#000000", Style: 1},
+			{Type: "left", Color: "#000000", Style: 1},
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error creating date style: %w", err)
+	}
+
+	// Add participant data
+	for i, p := range participants {
+		row := i + 2 // Start from row 2 (after headers)
+
+		// Get gender as string
+		gender := "Мужской"
+		if p.Gender == 2 {
+			gender = "Женский"
+		}
+
+		// Combine full name
+		fullName := fmt.Sprintf("%s %s %s", p.LastName, p.FirstName, p.MiddleName)
+
+		// Combine volunteer full name if available
+		volunteerFullName := ""
+		if p.VolounteerLastName != "" || p.VolounteerFirstName != "" || p.VolounteerMiddleName != "" {
+			volunteerFullName = fmt.Sprintf("%s %s %s",
+				p.VolounteerLastName, p.VolounteerFirstName, p.VolounteerMiddleName)
+		}
+
+		// Set cell values
+		f.SetCellValue(sheetName, fmt.Sprintf("A%d", row), p.ID)
+		f.SetCellValue(sheetName, fmt.Sprintf("B%d", row), p.BirthDate)
+		f.SetCellValue(sheetName, fmt.Sprintf("C%d", row), gender)
+		f.SetCellValue(sheetName, fmt.Sprintf("D%d", row), fullName)
+
+		// Set volunteer TG info
+		if p.VolunteerTgLogin != "" {
+			f.SetCellValue(sheetName, fmt.Sprintf("E%d", row), "@"+p.VolunteerTgLogin)
+		} else if p.VolunteerTG != 0 {
+			f.SetCellValue(sheetName, fmt.Sprintf("E%d", row), p.VolunteerTG)
+		}
+
+		f.SetCellValue(sheetName, fmt.Sprintf("F%d", row), volunteerFullName)
+
+		// Apply styles
+		for col := 'A'; col <= 'F'; col++ {
+			cell := fmt.Sprintf("%c%d", col, row)
+
+			// Apply date style to the birthdate column
+			if col == 'B' {
+				f.SetCellStyle(sheetName, cell, cell, dateStyle)
+			} else {
+				f.SetCellStyle(sheetName, cell, cell, cellStyle)
+			}
+		}
+	}
+
+	// Save to buffer
+	buffer, err := f.WriteToBuffer()
+	if err != nil {
+		return nil, fmt.Errorf("error writing Excel to buffer: %w", err)
+	}
+
+	return buffer, nil
 }

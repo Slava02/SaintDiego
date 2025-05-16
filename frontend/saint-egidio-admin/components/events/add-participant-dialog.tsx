@@ -63,7 +63,7 @@ export function AddParticipantDialog({ open, onOpenChange, eventId, onSuccess }:
     try {
       const data: AddParticipantToEventRequest = {
         participant_id: participant.id,
-        volunteer_id: participant.volunteer_tg || 0, // Fallback to 0 if not available
+        volunteer_id: 1234567890, //  ID администратора
       }
 
       await addParticipantToEvent(eventId, data)

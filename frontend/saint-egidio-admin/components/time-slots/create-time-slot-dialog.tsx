@@ -171,20 +171,46 @@ export function CreateTimeSlotDialog({ open, onOpenChange, onSuccess }: CreateTi
       return
     }
 
-    // Форматируем услуги
-    const formattedServices = validServices.map((service) => {
+    // Проверяем, что вместимость услуг не превышает вместимость временного слота
+    const capacityInt = parseInt(capacity, 10)
+    for (const service of validServices) {
+      if (parseInt(service.capacity, 10) > capacityInt) {
+        setError(`Вместимость услуги (${service.capacity}) не может превышать вместимость временного слота (${capacity})`)
+        toast({
+          title: "Ошибка",
+          description: `Вместимость услуги не может превышать вместимость временного слота (${capacity})`,
+          variant: "destructive",
+        })
+        return
+      }
+    }
+
+    // Форматируем услуги и проверяем, что время услуг находится в пределах временного слота
+    const formattedServices = []
+    for (const service of validServices) {
       // Создаем дату для услуги на основе даты начала временного слота
       const serviceDate = new Date(startDateTime)
       const [hours, minutes] = service.time.split(":")
       serviceDate.setHours(Number.parseInt(hours), Number.parseInt(minutes), 0, 0)
 
-      return {
+      // Проверяем, что время услуги находится в пределах временного слота
+      if (serviceDate < startDateTime || serviceDate > endDateTime) {
+        setError("Время услуги должно быть в интервале между началом и концом временного слота")
+        toast({
+          title: "Ошибка",
+          description: "Время услуги должно быть в интервале между началом и концом временного слота",
+          variant: "destructive",
+        })
+        return
+      }
+
+      formattedServices.push({
         serviceTypeId: Number.parseInt(service.serviceTypeId),
         capacity: Number.parseInt(service.capacity),
         bookingWindow: Number.parseInt(service.bookingWindow),
         time: serviceDate.toISOString(),
-      }
-    })
+      })
+    }
 
     const timeSlotData: CreateTimeSlotRequest = {
       title,

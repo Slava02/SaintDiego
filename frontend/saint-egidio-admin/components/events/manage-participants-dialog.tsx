@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -22,7 +21,6 @@ interface ManageParticipantsDialogProps {
 
 export function ManageParticipantsDialog({ open, onOpenChange, event, onSuccess }: ManageParticipantsDialogProps) {
   const [participants, setParticipants] = useState<Participant[]>([])
-  const [selectedParticipants, setSelectedParticipants] = useState<number[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [showAddParticipant, setShowAddParticipant] = useState(false)
   const { toast } = useToast()
@@ -49,27 +47,10 @@ export function ManageParticipantsDialog({ open, onOpenChange, event, onSuccess 
     }
   }, [open, event.id])
 
-  const handleSelectAll = () => {
-    if (selectedParticipants.length === participants.length) {
-      setSelectedParticipants([])
-    } else {
-      setSelectedParticipants(participants.map((p) => p.id))
-    }
-  }
-
-  const handleSelectParticipant = (id: number) => {
-    if (selectedParticipants.includes(id)) {
-      setSelectedParticipants(selectedParticipants.filter((p) => p !== id))
-    } else {
-      setSelectedParticipants([...selectedParticipants, id])
-    }
-  }
-
   const handleRemoveParticipant = async (participantId: number) => {
     try {
       await removeParticipantFromEvent(event.id, participantId)
       setParticipants(participants.filter((p) => p.id !== participantId))
-      setSelectedParticipants(selectedParticipants.filter((id) => id !== participantId))
       toast({
         title: "Успех",
         description: "Участник успешно удален из мероприятия",
@@ -121,18 +102,7 @@ export function ManageParticipantsDialog({ open, onOpenChange, event, onSuccess 
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="selectAll"
-                  checked={selectedParticipants.length === participants.length && participants.length > 0}
-                  onCheckedChange={handleSelectAll}
-                />
-                <label htmlFor="selectAll" className="text-sm font-medium">
-                  Выбрать всех
-                </label>
-              </div>
-
+            <div className="flex justify-end">
               <Button
                 size="sm"
                 onClick={() => setShowAddParticipant(true)}
@@ -157,23 +127,15 @@ export function ManageParticipantsDialog({ open, onOpenChange, event, onSuccess 
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-12"></TableHead>
                     <TableHead>ID</TableHead>
                     <TableHead>ФИО</TableHead>
                     <TableHead>Волонтер (Telegram)</TableHead>
-                    <TableHead>Статус</TableHead>
                     <TableHead className="w-12"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {participants.map((participant) => (
                     <TableRow key={participant.id}>
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedParticipants.includes(participant.id)}
-                          onCheckedChange={() => handleSelectParticipant(participant.id)}
-                        />
-                      </TableCell>
                       <TableCell className="font-medium">p{participant.id}</TableCell>
                       <TableCell>
                         {participant.last_name} {participant.first_name} {participant.middle_name}

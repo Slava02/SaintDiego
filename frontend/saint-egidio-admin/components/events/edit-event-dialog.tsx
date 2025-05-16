@@ -24,7 +24,7 @@ export function EditEventDialog({ open, onOpenChange, event, onSuccess }: EditEv
     const date = new Date(event.datetime)
     return format(date, "yyyy-MM-dd'T'HH:mm")
   })
-  const [location, setLocation] = useState(event.locationName || "")
+  const [location, setLocation] = useState(event.location?.name || "")
   const [type, setType] = useState("Разовое") // Hardcoded for now
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()

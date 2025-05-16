@@ -236,7 +236,7 @@ select_time_window = Window(
     Format("Выберите время на {selected_date}:"),
     Column(
         Select(
-            Format("{item[datetime]:%Y-%m-%d %H:%M:%S}"),
+            Format("{item[datetime]:%H:%M}"),
             id="times",
             item_id_getter=lambda x: str(x["id"]),
             items="events",

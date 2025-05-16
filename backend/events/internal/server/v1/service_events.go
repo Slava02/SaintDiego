@@ -1,8 +1,10 @@
 package v1
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"io"
 
 	"github.com/Slava02/SaintDiego/backend/events/internal/models"
 	"github.com/Slava02/SaintDiego/backend/events/internal/usecases/events"
@@ -12,6 +14,8 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
+
+const chunkSize = 64 * 1024 // 64 КБ
 
 type IEventsUC interface {
 	GetEvents(ctx context.Context, params *events.GetEventsParams) ([]*models.Event, int64, error)
@@ -23,6 +27,7 @@ type IEventsUC interface {
 	GetAvailableEventsForClientByServiceId(ctx context.Context, params *events.GetAvailableEventsForClientByServiceIdParams) ([]*models.Event, int64, error)
 	DeleteParticipantFromEvent(ctx context.Context, req *events.DeleteParticipantFromEventRequest) error
 	GetClientsIdEvents(ctx context.Context, params *events.GetClientsIdEventsParams) ([]*models.Event, int64, error)
+	GetParticipantsByEventIdReport(ctx context.Context, eventID int64) (*bytes.Buffer, string, error)
 }
 
 func (s *Implementation) GetEvents(ctx context.Context, req *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
@@ -197,6 +202,41 @@ func (s *Implementation) GetParticipantsByEventId(ctx context.Context, req *pb.G
 		Participants: pbParticipants,
 		Total:        total,
 	}, nil
+}
+
+func (s *Implementation) GetParticipantsByEventIdReport(req *pb.GetParticipantsByEventIdReportRequest, stream pb.EventsService_GetParticipantsByEventIdReportServer) error {
+	ctx := stream.Context()
+
+	span, ctx := opentracing.StartSpanFromContext(ctx, "GetParticipantsByEventIdReport")
+	defer span.Finish()
+
+	span.SetTag("event_id", req.EventId)
+
+	report, filename, err := s.eventsUC.GetParticipantsByEventIdReport(ctx, req.EventId)
+	if err != nil {
+		return status.Errorf(codes.Internal, "failed to get participants by event id report: %v", err)
+	}
+
+	buffer := make([]byte, chunkSize)
+	for {
+		n, err := report.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return status.Errorf(codes.Internal, "failed to read report: %v", err)
+		}
+
+		// Отправляем чанк
+		if err := stream.Send(&pb.GetParticipantsByEventIdReportResponse{
+			Filename: filename,
+			Report:   buffer[:n],
+		}); err != nil {
+			return status.Errorf(codes.Internal, "failed to send report chunk: %v", err)
+		}
+	}
+
+	return nil
 }
 
 func (s *Implementation) GetAvailableEventsForClientByServiceId(ctx context.Context, req *pb.GetAvailableEventsForClientByServiceIdRequest) (*pb.GetAvailableEventsForClientByServiceIdResponse, error) {

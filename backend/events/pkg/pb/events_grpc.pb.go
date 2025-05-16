@@ -25,6 +25,7 @@ const (
 	EventsService_DeleteEvent_FullMethodName                            = "/events.EventsService/DeleteEvent"
 	EventsService_AddParticipantToEvent_FullMethodName                  = "/events.EventsService/AddParticipantToEvent"
 	EventsService_GetParticipantsByEventId_FullMethodName               = "/events.EventsService/GetParticipantsByEventId"
+	EventsService_GetParticipantsByEventIdReport_FullMethodName         = "/events.EventsService/GetParticipantsByEventIdReport"
 	EventsService_GetAvailableEventsForClientByServiceId_FullMethodName = "/events.EventsService/GetAvailableEventsForClientByServiceId"
 	EventsService_DeleteParticipantFromEvent_FullMethodName             = "/events.EventsService/DeleteParticipantFromEvent"
 	EventsService_GetClientsIdEvents_FullMethodName                     = "/events.EventsService/GetClientsIdEvents"
@@ -43,6 +44,7 @@ type EventsServiceClient interface {
 	DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...grpc.CallOption) (*DeleteEventResponse, error)
 	AddParticipantToEvent(ctx context.Context, in *AddParticipantToEventRequest, opts ...grpc.CallOption) (*AddParticipantToEventResponse, error)
 	GetParticipantsByEventId(ctx context.Context, in *GetParticipantsByEventIdRequest, opts ...grpc.CallOption) (*GetParticipantsByEventIdResponse, error)
+	GetParticipantsByEventIdReport(ctx context.Context, in *GetParticipantsByEventIdReportRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetParticipantsByEventIdReportResponse], error)
 	GetAvailableEventsForClientByServiceId(ctx context.Context, in *GetAvailableEventsForClientByServiceIdRequest, opts ...grpc.CallOption) (*GetAvailableEventsForClientByServiceIdResponse, error)
 	DeleteParticipantFromEvent(ctx context.Context, in *DeleteParticipantFromEventRequest, opts ...grpc.CallOption) (*DeleteParticipantFromEventResponse, error)
 	GetClientsIdEvents(ctx context.Context, in *GetClientsIdEventsRequest, opts ...grpc.CallOption) (*GetClientsIdEventsResponse, error)
@@ -116,6 +118,25 @@ func (c *eventsServiceClient) GetParticipantsByEventId(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *eventsServiceClient) GetParticipantsByEventIdReport(ctx context.Context, in *GetParticipantsByEventIdReportRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetParticipantsByEventIdReportResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &EventsService_ServiceDesc.Streams[0], EventsService_GetParticipantsByEventIdReport_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[GetParticipantsByEventIdReportRequest, GetParticipantsByEventIdReportResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type EventsService_GetParticipantsByEventIdReportClient = grpc.ServerStreamingClient[GetParticipantsByEventIdReportResponse]
+
 func (c *eventsServiceClient) GetAvailableEventsForClientByServiceId(ctx context.Context, in *GetAvailableEventsForClientByServiceIdRequest, opts ...grpc.CallOption) (*GetAvailableEventsForClientByServiceIdResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetAvailableEventsForClientByServiceIdResponse)
@@ -159,6 +180,7 @@ type EventsServiceServer interface {
 	DeleteEvent(context.Context, *DeleteEventRequest) (*DeleteEventResponse, error)
 	AddParticipantToEvent(context.Context, *AddParticipantToEventRequest) (*AddParticipantToEventResponse, error)
 	GetParticipantsByEventId(context.Context, *GetParticipantsByEventIdRequest) (*GetParticipantsByEventIdResponse, error)
+	GetParticipantsByEventIdReport(*GetParticipantsByEventIdReportRequest, grpc.ServerStreamingServer[GetParticipantsByEventIdReportResponse]) error
 	GetAvailableEventsForClientByServiceId(context.Context, *GetAvailableEventsForClientByServiceIdRequest) (*GetAvailableEventsForClientByServiceIdResponse, error)
 	DeleteParticipantFromEvent(context.Context, *DeleteParticipantFromEventRequest) (*DeleteParticipantFromEventResponse, error)
 	GetClientsIdEvents(context.Context, *GetClientsIdEventsRequest) (*GetClientsIdEventsResponse, error)
@@ -189,6 +211,9 @@ func (UnimplementedEventsServiceServer) AddParticipantToEvent(context.Context, *
 }
 func (UnimplementedEventsServiceServer) GetParticipantsByEventId(context.Context, *GetParticipantsByEventIdRequest) (*GetParticipantsByEventIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetParticipantsByEventId not implemented")
+}
+func (UnimplementedEventsServiceServer) GetParticipantsByEventIdReport(*GetParticipantsByEventIdReportRequest, grpc.ServerStreamingServer[GetParticipantsByEventIdReportResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method GetParticipantsByEventIdReport not implemented")
 }
 func (UnimplementedEventsServiceServer) GetAvailableEventsForClientByServiceId(context.Context, *GetAvailableEventsForClientByServiceIdRequest) (*GetAvailableEventsForClientByServiceIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAvailableEventsForClientByServiceId not implemented")
@@ -328,6 +353,17 @@ func _EventsService_GetParticipantsByEventId_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EventsService_GetParticipantsByEventIdReport_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetParticipantsByEventIdReportRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(EventsServiceServer).GetParticipantsByEventIdReport(m, &grpc.GenericServerStream[GetParticipantsByEventIdReportRequest, GetParticipantsByEventIdReportResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type EventsService_GetParticipantsByEventIdReportServer = grpc.ServerStreamingServer[GetParticipantsByEventIdReportResponse]
+
 func _EventsService_GetAvailableEventsForClientByServiceId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetAvailableEventsForClientByServiceIdRequest)
 	if err := dec(in); err != nil {
@@ -426,6 +462,12 @@ var EventsService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _EventsService_GetClientsIdEvents_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetParticipantsByEventIdReport",
+			Handler:       _EventsService_GetParticipantsByEventIdReport_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "pkg/pb/events.proto",
 }

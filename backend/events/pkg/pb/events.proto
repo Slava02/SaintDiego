@@ -16,6 +16,7 @@ service EventsService {
   rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse) {}
   rpc AddParticipantToEvent(AddParticipantToEventRequest) returns (AddParticipantToEventResponse) {}
   rpc GetParticipantsByEventId(GetParticipantsByEventIdRequest) returns (GetParticipantsByEventIdResponse) {}
+  rpc GetParticipantsByEventIdReport(GetParticipantsByEventIdReportRequest) returns (stream GetParticipantsByEventIdReportResponse) {}
   rpc GetAvailableEventsForClientByServiceId(GetAvailableEventsForClientByServiceIdRequest) returns (GetAvailableEventsForClientByServiceIdResponse) {}
   rpc DeleteParticipantFromEvent(DeleteParticipantFromEventRequest) returns (DeleteParticipantFromEventResponse) {}
   rpc GetClientsIdEvents(GetClientsIdEventsRequest) returns (GetClientsIdEventsResponse) {}
@@ -77,6 +78,10 @@ message GetParticipantsByEventIdRequest {
   int64 per_page = 3;
 }
 
+message GetParticipantsByEventIdReportRequest {
+  int64 event_id = 1;
+}
+
 // Response messages
 message DeleteParticipantFromEventResponse {
   bool success = 1;
@@ -103,6 +108,11 @@ message AddParticipantToEventResponse {
 message GetParticipantsByEventIdResponse {
   repeated Participant participants = 1;
   int64 total = 2;
+}
+
+message GetParticipantsByEventIdReportResponse {
+  bytes report = 1;
+  string filename = 2;
 }
 
 message GetAvailableEventsForClientByServiceIdResponse {
