@@ -17,7 +17,7 @@ type IClientUC interface {
 	PostClients(ctx context.Context, req *clients.CreateClientRequest) (*models.Client, error)
 	GetClientsId(ctx context.Context, id int64) (*models.Client, error)
 	PutClientsId(ctx context.Context, req *clients.BlockClientRequest) (*models.Client, error)
-	GetClientsIdServices(ctx context.Context, params *clients.GetClientsIdServicesParams) ([]*models.ServiceType, int32, string, error)
+	GetClientsIdServices(ctx context.Context, params *clients.GetClientsIdServicesParams) ([]*models.ServiceType, int32, error)
 }
 
 func (h Handlers) GetClients(ctx echo.Context, params GetClientsParams) error {
@@ -100,7 +100,7 @@ func (h Handlers) GetClientsIdServices(ctx echo.Context, id int64, params GetCli
 
 	req.ID = id
 
-	services, total, clientStatus, err := h.clientUC.GetClientsIdServices(ctx.Request().Context(), &req)
+	services, total, err := h.clientUC.GetClientsIdServices(ctx.Request().Context(), &req)
 	if err != nil {
 		switch status.Code(err) {
 		case codes.NotFound:
@@ -118,10 +118,6 @@ func (h Handlers) GetClientsIdServices(ctx echo.Context, id int64, params GetCli
 		Page:       req.Page,
 		PerPage:    req.PerPage,
 		TotalPages: int32(math.Ceil(float64(total) / float64(req.PerPage))),
-	}
-
-	if clientStatus != "" {
-		resp.Status = GetAvailableServicesResponseStatus(clientStatus)
 	}
 
 	return ctx.JSON(http.StatusOK, resp)

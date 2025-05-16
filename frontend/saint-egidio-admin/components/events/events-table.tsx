@@ -17,11 +17,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useToast } from "@/components/ui/use-toast"
-import { MoreHorizontal, Trash, Edit, Users } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Pagination } from "@/components/ui/pagination"
 import type { Event } from "@/lib/types"
-import { deleteEvent } from "@/lib/api/events"
+// Импортируем новую функцию API и иконку для кнопки
+import { deleteEvent, downloadEventParticipantsReport } from "@/lib/api/events"
+import { MoreHorizontal, Trash, Edit, Users, Download } from "lucide-react"
 import { EditEventDialog } from "./edit-event-dialog"
 import { ManageParticipantsDialog } from "./manage-participants-dialog"
 
@@ -89,6 +90,36 @@ export function EventsTable({
       title: "Успех",
       description: "Участники мероприятия успешно обновлены",
     })
+  }
+
+  // Добавляем функцию для скачивания отчета в компонент EventsTable
+  const handleDownloadReport = async (event: Event) => {
+    try {
+      const blob = await downloadEventParticipantsReport(event.id)
+
+      // Создаем ссылку для скачивания файла
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `participants-event-${event.id}.xlsx`
+      document.body.appendChild(a)
+      a.click()
+
+      // Очищаем ресурсы
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+
+      toast({
+        title: "Успех",
+        description: "Отчет успешно скачан",
+      })
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: (error as Error).message || "Не удалось скачать отчет",
+        variant: "destructive",
+      })
+    }
   }
 
   if (isLoading) {
@@ -180,6 +211,10 @@ export function EventsTable({
                       <Button variant="ghost" size="sm" onClick={() => setEventToManageParticipants(event)}>
                         <Users className="h-4 w-4" />
                         <span className="sr-only md:not-sr-only md:ml-2">Участники</span>
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleDownloadReport(event)}>
+                        <Download className="h-4 w-4" />
+                        <span className="sr-only md:not-sr-only md:ml-2">Выгрузка</span>
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

@@ -27,7 +27,7 @@ type IEventsUC interface {
 	GetAvailableEventsForClientByServiceId(ctx context.Context, params *events.GetAvailableEventsForClientByServiceIdParams) ([]*models.Event, int64, error)
 	DeleteParticipantFromEvent(ctx context.Context, req *events.DeleteParticipantFromEventRequest) error
 	GetClientsIdEvents(ctx context.Context, params *events.GetClientsIdEventsParams) ([]*models.Event, int64, error)
-	GetParticipantsByEventIdReport(ctx context.Context, eventID int64) (*bytes.Buffer, string, error)
+	GetParticipantsByEventIdReport(ctx context.Context, eventID int64) (*bytes.Buffer, error)
 }
 
 func (s *Implementation) GetEvents(ctx context.Context, req *pb.GetEventsRequest) (*pb.GetEventsResponse, error) {
@@ -212,7 +212,7 @@ func (s *Implementation) GetParticipantsByEventIdReport(req *pb.GetParticipantsB
 
 	span.SetTag("event_id", req.EventId)
 
-	report, filename, err := s.eventsUC.GetParticipantsByEventIdReport(ctx, req.EventId)
+	report, err := s.eventsUC.GetParticipantsByEventIdReport(ctx, req.EventId)
 	if err != nil {
 		return status.Errorf(codes.Internal, "failed to get participants by event id report: %v", err)
 	}
@@ -229,8 +229,7 @@ func (s *Implementation) GetParticipantsByEventIdReport(req *pb.GetParticipantsB
 
 		// Отправляем чанк
 		if err := stream.Send(&pb.GetParticipantsByEventIdReportResponse{
-			Filename: filename,
-			Report:   buffer[:n],
+			Report: buffer[:n],
 		}); err != nil {
 			return status.Errorf(codes.Internal, "failed to send report chunk: %v", err)
 		}

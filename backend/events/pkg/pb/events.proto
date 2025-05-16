@@ -112,7 +112,6 @@ message GetParticipantsByEventIdResponse {
 
 message GetParticipantsByEventIdReportResponse {
   bytes report = 1;
-  string filename = 2;
 }
 
 message GetAvailableEventsForClientByServiceIdResponse {

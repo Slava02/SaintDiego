@@ -6,7 +6,7 @@ require (
 	github.com/Slava02/SaintDiego/backend/auth v0.0.0-20250423111436-6cd4c9e44ba8
 	github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250507123536-6d5dd14dc233
 	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250421132310-f418824f9975
-	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250514075658-c95b03312b68
+	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250516121611-b5b6f905f34c
 	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250514070025-9f772c044408
 	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250425142917-915a210a0acd
 	github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250425142917-915a210a0acd
@@ -22,7 +22,7 @@ require (
 	github.com/pelletier/go-toml v1.9.5
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/sync v0.13.0
+	golang.org/x/sync v0.14.0
 	google.golang.org/grpc v1.72.0
 	google.golang.org/protobuf v1.36.6
 )
@@ -57,10 +57,10 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
-	golang.org/x/crypto v0.37.0 // indirect
-	golang.org/x/net v0.37.0 // indirect
-	golang.org/x/sys v0.32.0 // indirect
-	golang.org/x/text v0.24.0 // indirect
+	golang.org/x/crypto v0.38.0 // indirect
+	golang.org/x/net v0.40.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/text v0.25.0 // indirect
 	golang.org/x/time v0.11.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250421163800-61c742ae3ef0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

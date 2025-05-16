@@ -274,7 +274,7 @@ func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEvent
 	return participants, total, nil
 }
 
-func (u *UseCase) GetParticipantsByEventIdReport(ctx context.Context, eventID int64) (*bytes.Buffer, string, error) {
+func (u *UseCase) GetParticipantsByEventIdReport(ctx context.Context, eventID int64) (*bytes.Buffer, error) {
 	participantsList := make([]*models.Participant, 0)
 	page := int64(1)
 	perPage := int64(100)
@@ -286,7 +286,7 @@ func (u *UseCase) GetParticipantsByEventIdReport(ctx context.Context, eventID in
 			PerPage: perPage,
 		})
 		if err != nil {
-			return nil, "", fmt.Errorf("get participants: %v", err)
+			return nil, fmt.Errorf("get participants: %v", err)
 		}
 
 		participantsList = append(participantsList, participants...)
@@ -301,14 +301,10 @@ func (u *UseCase) GetParticipantsByEventIdReport(ctx context.Context, eventID in
 	// Создаем Excel отчет
 	reportBytes, err := getParticipantsByEventIdReport(participantsList)
 	if err != nil {
-		return nil, "", fmt.Errorf("get participants report: %v", err)
+		return nil, fmt.Errorf("get participants report: %v", err)
 	}
 
-	// Генерируем имя файла на основе ID события и даты
-	filename := fmt.Sprintf("participants_event_%d_%s.xlsx",
-		eventID, time.Now().Format("2006-01-02"))
-
-	return reportBytes, filename, nil
+	return reportBytes, nil
 }
 
 func (u *UseCase) GetAvailableEventsForClientByServiceId(ctx context.Context, params *GetAvailableEventsForClientByServiceIdParams) ([]*models.Event, int64, error) {
@@ -466,15 +462,13 @@ func getParticipantsByEventIdReport(participants []*models.Participant) (*bytes.
 	f.SetActiveSheet(sheetIndex)
 
 	// Define headers
-	headers := []string{"ID", "Дата рождения", "Пол", "ФИО", "Телеграм волонтера", "ФИО волонтера"}
+	headers := []string{"ID", "Пол", "ФИО", "ФИО волонтера"}
 
 	// Set column widths
 	f.SetColWidth(sheetName, "A", "A", 10)
-	f.SetColWidth(sheetName, "B", "B", 15)
-	f.SetColWidth(sheetName, "C", "C", 10)
+	f.SetColWidth(sheetName, "B", "B", 10)
+	f.SetColWidth(sheetName, "C", "C", 30)
 	f.SetColWidth(sheetName, "D", "D", 30)
-	f.SetColWidth(sheetName, "E", "E", 20)
-	f.SetColWidth(sheetName, "F", "F", 30)
 
 	// Create header style
 	headerStyle, err := f.NewStyle(&excelize.Style{
@@ -522,20 +516,6 @@ func getParticipantsByEventIdReport(participants []*models.Participant) (*bytes.
 		f.SetCellStyle(sheetName, cell, cell, headerStyle)
 	}
 
-	// Format date style
-	dateStyle, err := f.NewStyle(&excelize.Style{
-		NumFmt: 10, // date format: mm-dd-yy
-		Border: []excelize.Border{
-			{Type: "bottom", Color: "#000000", Style: 1},
-			{Type: "right", Color: "#000000", Style: 1},
-			{Type: "top", Color: "#000000", Style: 1},
-			{Type: "left", Color: "#000000", Style: 1},
-		},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error creating date style: %w", err)
-	}
-
 	// Add participant data
 	for i, p := range participants {
 		row := i + 2 // Start from row 2 (after headers)
@@ -558,29 +538,14 @@ func getParticipantsByEventIdReport(participants []*models.Participant) (*bytes.
 
 		// Set cell values
 		f.SetCellValue(sheetName, fmt.Sprintf("A%d", row), p.ID)
-		f.SetCellValue(sheetName, fmt.Sprintf("B%d", row), p.BirthDate)
-		f.SetCellValue(sheetName, fmt.Sprintf("C%d", row), gender)
-		f.SetCellValue(sheetName, fmt.Sprintf("D%d", row), fullName)
-
-		// Set volunteer TG info
-		if p.VolunteerTgLogin != "" {
-			f.SetCellValue(sheetName, fmt.Sprintf("E%d", row), "@"+p.VolunteerTgLogin)
-		} else if p.VolunteerTG != 0 {
-			f.SetCellValue(sheetName, fmt.Sprintf("E%d", row), p.VolunteerTG)
-		}
-
-		f.SetCellValue(sheetName, fmt.Sprintf("F%d", row), volunteerFullName)
+		f.SetCellValue(sheetName, fmt.Sprintf("B%d", row), gender)
+		f.SetCellValue(sheetName, fmt.Sprintf("C%d", row), fullName)
+		f.SetCellValue(sheetName, fmt.Sprintf("D%d", row), volunteerFullName)
 
 		// Apply styles
-		for col := 'A'; col <= 'F'; col++ {
+		for col := 'A'; col <= 'D'; col++ {
 			cell := fmt.Sprintf("%c%d", col, row)
-
-			// Apply date style to the birthdate column
-			if col == 'B' {
-				f.SetCellStyle(sheetName, cell, cell, dateStyle)
-			} else {
-				f.SetCellStyle(sheetName, cell, cell, cellStyle)
-			}
+			f.SetCellStyle(sheetName, cell, cell, cellStyle)
 		}
 	}
 

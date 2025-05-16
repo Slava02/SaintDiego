@@ -20,6 +20,7 @@ type IEventsClient interface {
 	GetAvailableEventsForClientByServiceId(ctx context.Context, req *pb.GetAvailableEventsForClientByServiceIdRequest) (*pb.GetAvailableEventsForClientByServiceIdResponse, error)
 	DeleteParticipantFromEvent(ctx context.Context, req *pb.DeleteParticipantFromEventRequest) (*pb.DeleteParticipantFromEventResponse, error)
 	GetClientsIdEvents(ctx context.Context, req *pb.GetClientsIdEventsRequest) (*pb.GetClientsIdEventsResponse, error)
+	GetParticipantsByEventIdReport(ctx context.Context, req *pb.GetParticipantsByEventIdReportRequest) ([]byte, error)
 }
 
 //go:generate options-gen -out-filename=usecase_options.gen.go -from-struct=Options
@@ -159,6 +160,21 @@ func (u *UseCase) GetParticipantsByEventId(ctx context.Context, params *GetEvent
 	}
 
 	return participants, int32(pbRes.Total), nil
+}
+
+func (u *UseCase) GetParticipantsByEventIdReport(ctx context.Context, eventID int64) ([]byte, string, error) {
+	pbReq := &pb.GetParticipantsByEventIdReportRequest{
+		EventId: eventID,
+	}
+
+	report, err := u.eventsClient.GetParticipantsByEventIdReport(ctx, pbReq)
+	if err != nil {
+		return nil, "", fmt.Errorf("get participants by event id report: %w", err)
+	}
+
+	filename := fmt.Sprintf("report_%d.xlsx", eventID)
+
+	return report, filename, nil
 }
 
 func (u *UseCase) GetEventsByServiceId(ctx context.Context, params *GetEventsServicesIdParams) ([]*models.Event, int32, error) {

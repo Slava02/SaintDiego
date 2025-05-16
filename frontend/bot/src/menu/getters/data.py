@@ -74,23 +74,29 @@ async def get_services_data(dialog_manager: DialogManager, **kwargs):
             "description": service.description,
             "duration": service.duration,
             "capacity": service.capacity,
-            "price": service.price
         }
         services.append(service_dict)
         logger.info(f"Created service dict: {service_dict}")
     
     dialog_manager.dialog_data["services"] = services
     
+    # Проверяем условия для too_long_ago
+    too_long_ago = False
+    if (len(services) == 1 and 
+        services[0]["id"] == 20 and 
+        not client.is_blocked):
+        too_long_ago = True
+    
     return {
         "services": services,
         "current_page": page,
         "total_pages": services_data.get("total_pages", 1),
-        "status": services_data.get("status"),
         "is_blocked": client.is_blocked,
         "blocked_at": client.blocked_at,
         "blocked_reason": client.blocked_reason,
         "is_new": client.is_new,
-        "is_already_booked": services_data.get("is_already_booked", False)
+        "is_already_booked": services_data.get("is_already_booked", False),
+        "too_long_ago": too_long_ago
     }
 
 async def get_events_data(dialog_manager: DialogManager, **kwargs):

@@ -173,3 +173,24 @@ export async function removeParticipantFromEvent(
 
   return { success: true }
 }
+
+// Добавляем новую функцию для скачивания отчета по участникам события
+export async function downloadEventParticipantsReport(eventId: number): Promise<Blob> {
+  const token = localStorage.getItem("token")
+  if (!token) throw new Error("Unauthorized")
+
+  const response = await fetch(`${API_BASE_URL}/events/${eventId}/participants/report`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error("Отчет не найден")
+    }
+    throw new Error("Не удалось скачать отчет")
+  }
+
+  return response.blob()
+}

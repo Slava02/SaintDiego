@@ -1,7 +1,9 @@
 package v1
 
 import (
+	"bytes"
 	"context"
+	"fmt"
 	"math"
 	"net/http"
 
@@ -23,6 +25,7 @@ type IEventsUC interface {
 	GetEventsByServiceId(ctx context.Context, params *events.GetEventsServicesIdParams) ([]*models.Event, int32, error)
 	GetClientsIdEvents(ctx context.Context, params *events.GetClientsIdEventsParams) ([]*models.Event, int32, error)
 	DeleteParticipantFromEvent(ctx context.Context, req *events.DeleteParticipantFromEventRequest) error
+	GetParticipantsByEventIdReport(ctx context.Context, eventID int64) ([]byte, string, error)
 }
 
 func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
@@ -162,7 +165,16 @@ func (h Handlers) GetEventsIdParticipants(c echo.Context, id int64, params GetEv
 }
 
 func (h Handlers) GetEventsIdParticipantsReport(c echo.Context, id int64) error {
-	return c.NoContent(http.StatusNoContent)
+	report, filename, err := h.eventsUC.GetParticipantsByEventIdReport(c.Request().Context(), id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Err("Internal server error", err.Error()))
+	}
+
+	c.Response().Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+	c.Response().Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	c.Response().Header().Set("Content-Length", fmt.Sprintf("%d", len(report)))
+
+	return c.Stream(http.StatusOK, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", bytes.NewReader(report))
 }
 
 // TODO: move to clients (only handler)

@@ -180,7 +180,7 @@ service_selection_template = Jinja("""
     {% if not services %}
         <i>(Клиент уже записан на эту услугу)</i>
     {% endif %}
-{% elif status == "TOO_LONG_AGO" %}
+{% elif too_long_ago %}
     <b>⚠️ Посетитель слишком давно не был у нас!</b>
     
     Доступно только <i>повторное собеседование</i>.

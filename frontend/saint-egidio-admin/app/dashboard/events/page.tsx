@@ -97,13 +97,6 @@ export default function EventsPage() {
     setPagination((prev) => ({ ...prev, page }))
   }
 
-  const handleExportData = () => {
-    toast({
-      title: "Экспорт данных",
-      description: "Функция экспорта данных находится в разработке",
-    })
-  }
-
   return (
     <div className="container mx-auto p-6">
       <div className="mb-6 flex items-center justify-between">
@@ -112,10 +105,6 @@ export default function EventsPage() {
           <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
             <Filter className="mr-2 h-4 w-4" />
             Фильтры
-          </Button>
-          <Button variant="outline" onClick={handleExportData}>
-            <Download className="mr-2 h-4 w-4" />
-            Экспорт данных
           </Button>
         </div>
       </div>

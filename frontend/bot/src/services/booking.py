@@ -54,7 +54,6 @@ class BookingService:
                         "page": page,
                         "per_page": per_page,
                         "total_pages": data.get("total_pages", 0),
-                        "status": data.get("status"),
                         "is_already_booked": False
                     }
                     self.logger.info(f"Returning result: {result}")

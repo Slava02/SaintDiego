@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"io"
 	"time"
 
 	"google.golang.org/grpc"
@@ -88,4 +89,26 @@ func (c *EventsClient) DeleteParticipantFromEvent(ctx context.Context, req *api.
 
 func (c *EventsClient) GetClientsIdEvents(ctx context.Context, req *api.GetClientsIdEventsRequest) (*api.GetClientsIdEventsResponse, error) {
 	return c.EventsServiceClient.GetClientsIdEvents(ctx, req)
+}
+
+func (c *EventsClient) GetParticipantsByEventIdReport(ctx context.Context, req *api.GetParticipantsByEventIdReportRequest) ([]byte, error) {
+	stream, err := c.EventsServiceClient.GetParticipantsByEventIdReport(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get participants by event id report: %w", err)
+	}
+
+	report := []byte{}
+
+	for {
+		chunk, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, fmt.Errorf("failed to receive report chunk: %w", err)
+		}
+		report = append(report, chunk.Report...)
+	}
+
+	return report, nil
 }
