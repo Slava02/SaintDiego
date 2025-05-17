@@ -6,7 +6,7 @@ require (
 	github.com/Slava02/SaintDiego/backend/auth v0.0.0-20250423111436-6cd4c9e44ba8
 	github.com/Slava02/SaintDiego/backend/clients v0.0.0-20250507123536-6d5dd14dc233
 	github.com/Slava02/SaintDiego/backend/common v0.0.0-20250421132310-f418824f9975
-	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250516121611-b5b6f905f34c
+	github.com/Slava02/SaintDiego/backend/events v0.0.0-20250517113229-5a3c6dcac960
 	github.com/Slava02/SaintDiego/backend/schedule v0.0.0-20250514070025-9f772c044408
 	github.com/Slava02/SaintDiego/backend/services v0.0.0-20250425142917-915a210a0acd
 	github.com/Slava02/SaintDiego/backend/volunteers v0.0.0-20250425142917-915a210a0acd

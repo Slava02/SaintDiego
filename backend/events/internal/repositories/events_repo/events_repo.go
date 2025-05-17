@@ -61,7 +61,7 @@ func (r *EventRepository) GetEvents(ctx context.Context, params *GetEventsParams
 	}
 
 	if params.Past {
-		query = query.Where("datetime <= ?", time.Now())
+		query = query.Where("datetime < ?", time.Now())
 	}
 
 	if params.ServiceID != nil {

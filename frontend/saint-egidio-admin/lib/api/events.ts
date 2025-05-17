@@ -24,6 +24,7 @@ export async function getEvents(filters?: EventFilters, page = 1, perPage = 20):
     if (filters.participant_id) params.append("participant_id", filters.participant_id.toString())
     if (filters.from_date) params.append("from_date", filters.from_date)
     if (filters.to_date) params.append("to_date", filters.to_date)
+    if (filters.open_for_registration) params.append("open_for_registration", filters.open_for_registration.toString())
 
     if (params.toString()) {
       url += `&${params.toString()}`

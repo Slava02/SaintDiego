@@ -22,7 +22,7 @@ export default function EventsPage() {
   })
   const [pagination, setPagination] = useState({
     page: 1,
-    perPage: 20,
+    perPage: 10,
     total: 0,
     totalPages: 0,
   })
@@ -33,7 +33,7 @@ export default function EventsPage() {
     setIsLoading(true)
     try {
       // Fetch upcoming events
-      const upcomingResponse = await getEvents({ ...filters, status: "upcoming" }, pagination.page, pagination.perPage)
+      const upcomingResponse = await getEvents({ ...filters, status: "upcoming", open_for_registration: true }, pagination.page, pagination.perPage)
       setUpcomingEvents(upcomingResponse.items)
 
       if (activeTab === "upcoming") {

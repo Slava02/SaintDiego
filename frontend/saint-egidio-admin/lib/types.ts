@@ -92,6 +92,7 @@ export interface EventFilters {
   participant_id?: number
   from_date?: string
   to_date?: string
+  open_for_registration?: boolean
 }
 
 export interface GetEventsResponse {

@@ -30,14 +30,15 @@ type IEventsUC interface {
 
 func (h Handlers) GetEvents(c echo.Context, params GetEventsParams) error {
 	events, total, err := h.eventsUC.GetEvents(c.Request().Context(), &events.GetEventsParams{
-		ParticipantID: params.ParticipantId,
-		Status:        pointer.Ptr(string(pointer.Indirect(params.Status))),
-		LocationID:    params.LocationId,
-		ServiceID:     params.ServiceId,
-		FromDate:      params.FromDate,
-		ToDate:        params.ToDate,
-		Page:          params.Page,
-		PerPage:       params.PerPage,
+		ParticipantID:       params.ParticipantId,
+		Status:              pointer.Ptr(string(pointer.Indirect(params.Status))),
+		LocationID:          params.LocationId,
+		ServiceID:           params.ServiceId,
+		FromDate:            params.FromDate,
+		ToDate:              params.ToDate,
+		Page:                params.Page,
+		PerPage:             params.PerPage,
+		OpenForRegistration: params.OpenForRegistration,
 	})
 
 	if err != nil {
