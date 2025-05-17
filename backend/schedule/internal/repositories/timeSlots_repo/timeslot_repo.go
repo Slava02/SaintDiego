@@ -35,7 +35,6 @@ func (r *TimeSlotRepository) InsertUpdateTimeSlot(ctx context.Context, timeSlot 
 		On("DUPLICATE KEY UPDATE").
 		Set("start_date = ?", timeSlot.StartDate).
 		Set("end_date = ?", timeSlot.EndDate).
-		Set("status = ?", timeSlot.Status).
 		Exec(ctx)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

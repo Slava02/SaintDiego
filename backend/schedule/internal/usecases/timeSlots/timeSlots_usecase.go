@@ -73,6 +73,7 @@ func (u UseCase) CreateTimeSlot(ctx context.Context, req *CreateTimeSlotReq) (*m
 		Capacity:   req.Capacity,
 		StartDate:  req.StartDate,
 		EndDate:    req.EndDate,
+		// TODO: выпилить статус нафиг
 		Status:     "active",
 		Services:   req.Services,
 		Recurrence: req.Recurrence,

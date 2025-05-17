@@ -158,8 +158,9 @@ func (u UseCase) UpdateTimeSlot(ctx context.Context, req *models.TimeSlot) (*mod
 		Capacity:   req.Capacity,
 		StartDate:  timestamppb.New(req.StartDate),
 		EndDate:    timestamppb.New(req.EndDate),
-		Status:     req.Status,
-		Services:   make([]*pb.TimeSlotService, len(req.Services)),
+		// TODO: выпилить статус нафиг
+		Status:   "active",
+		Services: make([]*pb.TimeSlotService, len(req.Services)),
 	}
 
 	if req.Recurrence != nil {

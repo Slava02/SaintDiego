@@ -17,7 +17,6 @@ export interface TimeSlot {
   capacity: number
   startDate: string
   endDate: string
-  status: "active" | "archived"
   services: TimeSlotService[]
   recurrence?: Recurrence
 }
@@ -38,7 +37,6 @@ export interface Recurrence {
 }
 
 export interface TimeSlotFilters {
-  status?: "active" | "archived"
   startDate?: string
   endDate?: string
 }

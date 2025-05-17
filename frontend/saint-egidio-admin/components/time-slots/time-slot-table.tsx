@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -15,77 +15,102 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useToast } from "@/components/ui/use-toast"
-import { MoreHorizontal, Archive, Trash, Edit, RefreshCw } from "lucide-react"
+import { MoreHorizontal, Trash, Edit, Loader2 } from "lucide-react"
 import { format } from "date-fns"
 import { ru } from "date-fns/locale"
-import type { TimeSlot } from "@/lib/types"
-import { archiveTimeSlot, deleteTimeSlot } from "@/lib/api/time-slots"
+import type { TimeSlot, Location } from "@/lib/types"
+import { deleteTimeSlot } from "@/lib/api/time-slots"
+import { getLocations } from "@/lib/api/locations"
 import { EditTimeSlotDialog } from "./edit-time-slot-dialog"
-import { ActivateTimeSlotDialog } from "./activate-time-slot-dialog"
 
 interface TimeSlotTableProps {
   timeSlots: TimeSlot[]
   isLoading: boolean
-  status: "active" | "archived"
   onActionComplete: () => void
 }
 
-export function TimeSlotTable({ timeSlots, isLoading, status, onActionComplete }: TimeSlotTableProps) {
+export function TimeSlotTable({ timeSlots, isLoading, onActionComplete }: TimeSlotTableProps) {
   const [timeSlotToDelete, setTimeSlotToDelete] = useState<TimeSlot | null>(null)
-  const [timeSlotToArchive, setTimeSlotToArchive] = useState<TimeSlot | null>(null)
-  const [timeSlotToActivate, setTimeSlotToActivate] = useState<TimeSlot | null>(null)
   const [timeSlotToEdit, setTimeSlotToEdit] = useState<TimeSlot | null>(null)
+  const [processingIds, setProcessingIds] = useState<number[]>([]) // Track items being processed
+  const [locations, setLocations] = useState<Location[]>([])
   const { toast } = useToast()
+
+  // Загрузка локаций при монтировании компонента
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const locationsData = await getLocations()
+        setLocations(locationsData)
+      } catch (error) {
+        console.error("Error fetching locations:", error)
+      }
+    }
+
+    fetchLocations()
+  }, [])
+
+  // Функция для получения названия локации по ID
+  const getLocationName = (locationId: number) => {
+    const location = locations.find((loc) => loc.id === locationId)
+    return location ? location.name : `Место #${locationId}`
+  }
+
+  // Helper to mark an item as being processed
+  const markAsProcessing = (id: number) => {
+    setProcessingIds((prev) => [...prev, id])
+  }
+
+  // Helper to unmark an item as being processed
+  const unmarkAsProcessing = (id: number) => {
+    setProcessingIds((prev) => prev.filter((itemId) => itemId !== id))
+  }
+
+  // Check if an item is being processed
+  const isProcessing = (id: number) => processingIds.includes(id)
 
   const handleDelete = async () => {
     if (!timeSlotToDelete) return
 
+    const id = timeSlotToDelete.id
+    markAsProcessing(id)
+
     try {
-      await deleteTimeSlot(timeSlotToDelete.id)
+      // Close the dialog immediately for better UX
+      setTimeSlotToDelete(null)
+
+      // Show a loading toast
+      const { update } = toast({
+        title: "Удаление...",
+        description: "Временной слот удаляется",
+      })
+
+      // Perform the actual deletion
+      await deleteTimeSlot(id)
+
+      // Optimistically update UI - refresh the data
+      onActionComplete()
+
+      // Update the toast to show success
       toast({
         title: "Успех",
         description: "Временной слот успешно удален",
       })
-      onActionComplete()
     } catch (error) {
+      console.error("Error deleting time slot:", error)
+
+      // Show error toast
       toast({
         title: "Ошибка",
-        description: "Не удалось удалить временной слот",
+        description: "Не удалось удалить временной слот. Попробуйте обновить страницу.",
         variant: "destructive",
       })
-    } finally {
-      setTimeSlotToDelete(null)
-    }
-  }
 
-  const handleArchive = async () => {
-    if (!timeSlotToArchive) return
-
-    try {
-      await archiveTimeSlot(timeSlotToArchive.id)
-      toast({
-        title: "Успех",
-        description: "Временной слот успешно архивирован",
-      })
+      // Refresh data to ensure UI is in sync with backend
       onActionComplete()
-    } catch (error) {
-      toast({
-        title: "Ошибка",
-        description: "Не удалось архивировать временной слот",
-        variant: "destructive",
-      })
     } finally {
-      setTimeSlotToArchive(null)
+      unmarkAsProcessing(id)
     }
-  }
-
-  const handleActivateSuccess = () => {
-    setTimeSlotToActivate(null)
-    onActionComplete()
-    toast({
-      title: "Успех",
-      description: "Временной слот успешно активирован",
-    })
   }
 
   const handleEditSuccess = () => {
@@ -104,9 +129,7 @@ export function TimeSlotTable({ timeSlots, isLoading, status, onActionComplete }
   if (timeSlots.length === 0) {
     return (
       <div className="rounded-md border p-8 text-center">
-        <p className="text-muted-foreground">
-          {status === "active" ? "Нет активных временных слотов" : "Нет архивных временных слотов"}
-        </p>
+        <p className="text-muted-foreground">Нет временных слотов</p>
       </div>
     )
   }
@@ -128,45 +151,38 @@ export function TimeSlotTable({ timeSlots, isLoading, status, onActionComplete }
           </TableHeader>
           <TableBody>
             {timeSlots.map((slot) => (
-              <TableRow key={slot.id}>
+              <TableRow key={slot.id} className={isProcessing(slot.id) ? "opacity-50" : ""}>
                 <TableCell className="font-medium">{slot.title}</TableCell>
                 <TableCell>{slot.type === "single" ? "Разовое" : "Повторяющееся"}</TableCell>
-                <TableCell>{slot.locationId}</TableCell>
+                <TableCell>{getLocationName(slot.locationId)}</TableCell>
                 <TableCell>{format(new Date(slot.startDate), "dd.MM.yyyy HH:mm", { locale: ru })}</TableCell>
                 <TableCell>{slot.capacity}</TableCell>
                 <TableCell>{slot.services.length}</TableCell>
                 <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Открыть меню</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {status === "active" ? (
-                        <>
-                          <DropdownMenuItem onClick={() => setTimeSlotToEdit(slot)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Редактировать
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setTimeSlotToArchive(slot)}>
-                            <Archive className="mr-2 h-4 w-4" />
-                            Архивировать
-                          </DropdownMenuItem>
-                        </>
-                      ) : (
-                        <DropdownMenuItem onClick={() => setTimeSlotToActivate(slot)}>
-                          <RefreshCw className="mr-2 h-4 w-4" />
-                          Активировать
+                  {isProcessing(slot.id) ? (
+                    <Button variant="ghost" className="h-8 w-8 p-0" disabled>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    </Button>
+                  ) : (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Открыть меню</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => setTimeSlotToEdit(slot)}>
+                          <Edit className="mr-2 h-4 w-4" />
+                          Редактировать
                         </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem onClick={() => setTimeSlotToDelete(slot)} className="text-red-600">
-                        <Trash className="mr-2 h-4 w-4" />
-                        Удалить
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                        <DropdownMenuItem onClick={() => setTimeSlotToDelete(slot)} className="text-red-600">
+                          <Trash className="mr-2 h-4 w-4" />
+                          Удалить
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
@@ -180,7 +196,15 @@ export function TimeSlotTable({ timeSlots, isLoading, status, onActionComplete }
           <AlertDialogHeader>
             <AlertDialogTitle>Вы уверены?</AlertDialogTitle>
             <AlertDialogDescription>
-              Это действие нельзя отменить. Временной слот будет удален навсегда.
+              <p>Это действие нельзя отменить. Временной слот будет удален навсегда.</p>
+              <p className="mt-2 font-semibold text-red-600">
+                ВНИМАНИЕ! Будут удалены все события, связанные с этим временным слотом, включая те, на которые уже
+                записаны люди.
+              </p>
+              <p className="mt-2">
+                Пожалуйста, убедитесь, что на события этого временного слота нет активных записей, или предупредите всех
+                записавшихся людей об отмене.
+              </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -192,22 +216,6 @@ export function TimeSlotTable({ timeSlots, isLoading, status, onActionComplete }
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Archive Confirmation Dialog */}
-      <AlertDialog open={!!timeSlotToArchive} onOpenChange={(open) => !open && setTimeSlotToArchive(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Архивировать временной слот?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Временной слот будет перемещен в архив и не будет отображаться в активных слотах.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Отмена</AlertDialogCancel>
-            <AlertDialogAction onClick={handleArchive}>Архивировать</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
       {/* Edit Time Slot Dialog */}
       {timeSlotToEdit && (
         <EditTimeSlotDialog
@@ -215,16 +223,6 @@ export function TimeSlotTable({ timeSlots, isLoading, status, onActionComplete }
           onOpenChange={(open) => !open && setTimeSlotToEdit(null)}
           timeSlot={timeSlotToEdit}
           onSuccess={handleEditSuccess}
-        />
-      )}
-
-      {/* Activate Time Slot Dialog */}
-      {timeSlotToActivate && (
-        <ActivateTimeSlotDialog
-          open={!!timeSlotToActivate}
-          onOpenChange={(open) => !open && setTimeSlotToActivate(null)}
-          timeSlot={timeSlotToActivate}
-          onSuccess={handleActivateSuccess}
         />
       )}
     </>

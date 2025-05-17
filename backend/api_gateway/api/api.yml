@@ -1981,11 +1981,6 @@ components:
         endDate:
           type: string
           format: date-time
-        status:
-          type: string
-          enum:
-            - active
-            - archived
         services:
           type: array
           items:
@@ -2000,7 +1995,6 @@ components:
         - capacity
         - startDate
         - endDate
-        - status
         - services
       example:
         id: 1

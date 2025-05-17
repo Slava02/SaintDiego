@@ -58,11 +58,13 @@ export function EventsTable({
 
     try {
       await deleteEvent(eventToDelete.id)
-      toast({
-        title: "Успех",
-        description: "Мероприятие успешно удалено",
-      })
-      onActionComplete()
+      setTimeout(() => {
+        onActionComplete()
+        toast({
+          title: "Успех",
+          description: "Мероприятие успешно удалено",
+        })
+      }, 300)
     } catch (error) {
       toast({
         title: "Ошибка",

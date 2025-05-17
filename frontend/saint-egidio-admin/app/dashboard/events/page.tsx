@@ -85,8 +85,14 @@ export default function EventsPage() {
   }
 
   const handleFilterChange = (newFilters: EventFiltersType) => {
-    setFilters({ ...filters, ...newFilters })
-    setPagination((prev) => ({ ...prev, page: 1 })) // Reset to first page on filter change
+    // Reset to first page when filters change
+    setPagination((prev) => ({ ...prev, page: 1 }))
+
+    // Apply new filters
+    setFilters(newFilters)
+
+    // Force a data refresh
+    fetchEvents()
   }
 
   const handleActionComplete = () => {

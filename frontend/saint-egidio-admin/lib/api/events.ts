@@ -8,6 +8,27 @@ import type {
   AddParticipantToEventRequest,
 } from "@/lib/types"
 
+// Helper function to safely parse JSON
+async function safeJsonParse(response: Response) {
+  // Check if response has content
+  const contentType = response.headers.get("content-type")
+  const hasJsonContent = contentType && contentType.includes("application/json")
+
+  // If no content or empty response, return empty object
+  if (response.status === 204 || !hasJsonContent) {
+    return {}
+  }
+
+  // Try to parse as JSON, fallback to empty object if it fails
+  try {
+    const text = await response.text()
+    return text ? JSON.parse(text) : {}
+  } catch (error) {
+    console.error("Failed to parse JSON response:", error)
+    return {}
+  }
+}
+
 // Получение списка мероприятий
 export async function getEvents(filters?: EventFilters, page = 1, perPage = 20): Promise<GetEventsResponse> {
   const token = localStorage.getItem("token")
@@ -36,13 +57,14 @@ export async function getEvents(filters?: EventFilters, page = 1, perPage = 20):
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
+    cache: "no-store",
   })
 
   if (!response.ok) {
     throw new Error("Failed to fetch events")
   }
 
-  return response.json()
+  return (await safeJsonParse(response)) as GetEventsResponse
 }
 
 // Получение мероприятия по ID
@@ -55,13 +77,14 @@ export async function getEvent(id: number): Promise<Event> {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
+    cache: "no-store",
   })
 
   if (!response.ok) {
     throw new Error("Failed to fetch event")
   }
 
-  return response.json()
+  return (await safeJsonParse(response)) as Event
 }
 
 // Обновление мероприятия
@@ -76,14 +99,15 @@ export async function updateEvent(id: number, data: UpdateEventRequest): Promise
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
+    cache: "no-store",
   })
 
   if (!response.ok) {
-    const errorData = await response.json()
+    const errorData = await safeJsonParse(response)
     throw new Error(errorData.message || "Failed to update event")
   }
 
-  return response.json()
+  return (await safeJsonParse(response)) as Event
 }
 
 // Удаление мероприятия
@@ -91,20 +115,32 @@ export async function deleteEvent(id: number): Promise<{ success: boolean }> {
   const token = localStorage.getItem("token")
   if (!token) throw new Error("Unauthorized")
 
-  const response = await fetch(`${API_BASE_URL}/events/${id}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  })
+  try {
+    const response = await fetch(`${API_BASE_URL}/events/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    })
 
-  if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.message || "Failed to delete event")
+    // If the response is 404, the item might be already deleted
+    if (response.status === 404) {
+      console.log("Event not found, might be already deleted:", id)
+      return { success: true }
+    }
+
+    if (!response.ok) {
+      const errorData = await safeJsonParse(response)
+      throw new Error(errorData.message || "Failed to delete event")
+    }
+
+    return { success: true }
+  } catch (error) {
+    console.error("Error in deleteEvent:", error)
+    throw error
   }
-
-  return response.json()
 }
 
 // Получение участников мероприятия
@@ -117,13 +153,14 @@ export async function getEventParticipants(id: number, page = 1, perPage = 20): 
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
+    cache: "no-store",
   })
 
   if (!response.ok) {
     throw new Error("Failed to fetch event participants")
   }
 
-  return response.json()
+  return (await safeJsonParse(response)) as GetParticipantsResponse
 }
 
 // Добавление участника к мероприятию
@@ -141,10 +178,11 @@ export async function addParticipantToEvent(
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
+    cache: "no-store",
   })
 
   if (!response.ok) {
-    const errorData = await response.json()
+    const errorData = await safeJsonParse(response)
     throw new Error(errorData.message || "Failed to add participant to event")
   }
 
@@ -159,23 +197,35 @@ export async function removeParticipantFromEvent(
   const token = localStorage.getItem("token")
   if (!token) throw new Error("Unauthorized")
 
-  const response = await fetch(`${API_BASE_URL}/events/${eventId}/participants/${participantId}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  })
+  try {
+    const response = await fetch(`${API_BASE_URL}/events/${eventId}/participants/${participantId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    })
 
-  if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.message || "Failed to remove participant from event")
+    // If the response is 404, the participant might be already removed
+    if (response.status === 404) {
+      console.log("Participant not found, might be already removed:", participantId)
+      return { success: true }
+    }
+
+    if (!response.ok) {
+      const errorData = await safeJsonParse(response)
+      throw new Error(errorData.message || "Failed to remove participant from event")
+    }
+
+    return { success: true }
+  } catch (error) {
+    console.error("Error in removeParticipantFromEvent:", error)
+    throw error
   }
-
-  return { success: true }
 }
 
-// Добавляем новую функцию для скачивания отчета по участникам события
+// Скачивание отчета по участникам события
 export async function downloadEventParticipantsReport(eventId: number): Promise<Blob> {
   const token = localStorage.getItem("token")
   if (!token) throw new Error("Unauthorized")
@@ -184,6 +234,7 @@ export async function downloadEventParticipantsReport(eventId: number): Promise<
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    cache: "no-store",
   })
 
   if (!response.ok) {

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PlusCircle, Filter } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { TimeSlotTable } from "@/components/time-slots/time-slot-table"
@@ -13,14 +12,10 @@ import { getTimeSlots } from "@/lib/api/time-slots"
 import type { TimeSlot, TimeSlotFilters as TimeSlotFiltersType } from "@/lib/types"
 
 export default function TimeSlotsPage() {
-  const [activeTimeSlots, setActiveTimeSlots] = useState<TimeSlot[]>([])
-  const [archivedTimeSlots, setArchivedTimeSlots] = useState<TimeSlot[]>([])
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState("active")
   const [showFilters, setShowFilters] = useState(false)
-  const [filters, setFilters] = useState<TimeSlotFiltersType>({
-    status: "active",
-  })
+  const [filters, setFilters] = useState<TimeSlotFiltersType>({})
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
@@ -28,13 +23,11 @@ export default function TimeSlotsPage() {
   const fetchTimeSlots = async () => {
     setIsLoading(true)
     try {
-      // Fetch active time slots
-      const activeSlots = await getTimeSlots({ status: "active", ...filters })
-      setActiveTimeSlots(activeSlots)
+      console.log("Fetching time slots with filters:", filters)
 
-      // Fetch archived time slots
-      const archivedSlots = await getTimeSlots({ status: "archived", ...filters })
-      setArchivedTimeSlots(archivedSlots)
+      // Fetch all time slots
+      const slots = await getTimeSlots(filters)
+      setTimeSlots(slots)
     } catch (error) {
       console.error("Error fetching time slots:", error)
       toast({
@@ -56,11 +49,6 @@ export default function TimeSlotsPage() {
     fetchTimeSlots()
   }, [filters])
 
-  const handleTabChange = (value: string) => {
-    setActiveTab(value)
-    setFilters((prev) => ({ ...prev, status: value as "active" | "archived" }))
-  }
-
   const handleCreateSuccess = () => {
     setShowCreateDialog(false)
     fetchTimeSlots()
@@ -71,11 +59,22 @@ export default function TimeSlotsPage() {
   }
 
   const handleFilterChange = (newFilters: TimeSlotFiltersType) => {
-    setFilters({ ...filters, ...newFilters })
+    console.log("Filter change:", newFilters)
+
+    // Apply new filters
+    setFilters({ ...newFilters })
+
+    // Force a data refresh
+    setTimeout(() => {
+      fetchTimeSlots()
+    }, 0)
   }
 
   const handleActionComplete = () => {
-    fetchTimeSlots()
+    // Add a delay before refreshing to allow backend to complete the operation
+    setTimeout(() => {
+      fetchTimeSlots()
+    }, 500)
   }
 
   return (
@@ -98,30 +97,7 @@ export default function TimeSlotsPage() {
         <TimeSlotFilters filters={filters} onFilterChange={handleFilterChange} onClose={() => setShowFilters(false)} />
       )}
 
-      <Tabs defaultValue="active" value={activeTab} onValueChange={handleTabChange}>
-        <TabsList className="mb-4">
-          <TabsTrigger value="active">Активные</TabsTrigger>
-          <TabsTrigger value="archived">Архивные</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="active">
-          <TimeSlotTable
-            timeSlots={activeTimeSlots}
-            isLoading={isLoading}
-            status="active"
-            onActionComplete={handleActionComplete}
-          />
-        </TabsContent>
-
-        <TabsContent value="archived">
-          <TimeSlotTable
-            timeSlots={archivedTimeSlots}
-            isLoading={isLoading}
-            status="archived"
-            onActionComplete={handleActionComplete}
-          />
-        </TabsContent>
-      </Tabs>
+      <TimeSlotTable timeSlots={timeSlots} isLoading={isLoading} onActionComplete={handleActionComplete} />
 
       <CreateTimeSlotDialog
         open={showCreateDialog}

@@ -52,6 +52,9 @@ export function EventFilters({ filters, onFilterChange, onClose }: EventFiltersP
     if (filters.location_id) {
       setSelectedLocation(filters.location_id.toString())
     }
+    if (filters.participant_id) {
+      setParticipantSearch(filters.participant_id.toString())
+    }
   }, [filters])
 
   const handleApplyFilters = () => {

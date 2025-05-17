@@ -21,36 +21,43 @@ export function TimeSlotFilters({ filters, onFilterChange, onClose }: TimeSlotFi
   useEffect(() => {
     if (filters.startDate) {
       setStartDate(filters.startDate.split("T")[0])
+    } else {
+      setStartDate("")
     }
+
     if (filters.endDate) {
       setEndDate(filters.endDate.split("T")[0])
+    } else {
+      setEndDate("")
     }
   }, [filters])
 
   const handleApplyFilters = () => {
-    const newFilters: TimeSlotFiltersType = {
-      ...filters,
-    }
+    const newFilters: TimeSlotFiltersType = {}
 
     if (startDate) {
       newFilters.startDate = `${startDate}T00:00:00Z`
-    } else {
-      delete newFilters.startDate
     }
 
     if (endDate) {
       newFilters.endDate = `${endDate}T23:59:59Z`
-    } else {
-      delete newFilters.endDate
     }
 
     onFilterChange(newFilters)
   }
 
   const handleResetFilters = () => {
+    // Clear local state
     setStartDate("")
     setEndDate("")
-    onFilterChange({ status: filters.status })
+
+    // Reset filters to empty object
+    onFilterChange({})
+
+    // Force immediate data refresh
+    setTimeout(() => {
+      onFilterChange({})
+    }, 0)
   }
 
   return (
