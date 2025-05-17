@@ -65,7 +65,7 @@ func (r *EventRepository) GetEvents(ctx context.Context, params *GetEventsParams
 	}
 
 	if params.ServiceID != nil {
-		query = query.Where("service_type_id = ?", *params.ServiceID)
+		query = query.Where("e.service_type_id = ?", *params.ServiceID)
 	}
 
 	if params.FromDate != nil {
