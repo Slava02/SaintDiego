@@ -41,10 +41,15 @@ func (r *EventRepository) GetEvents(ctx context.Context, params *GetEventsParams
 		Group("e.id")
 
 	// Применяем фильтры к обоим запросам
-	if params.LocationID != nil {
+	if params.LocationID != nil || params.OpenForRegistration != nil {
 		joinClause := "JOIN time_slot_service ON e.time_slot_service_id = time_slot_service.id JOIN time_slot ON time_slot_service.time_slot_id = time_slot.id JOIN service_type ON e.service_type_id = service_type.id"
 		query = query.Join(joinClause)
-		query = query.Where("time_slot.location_id = ?", *params.LocationID)
+		if params.LocationID != nil {
+			query = query.Where("time_slot.location_id = ?", *params.LocationID)
+		}
+		if params.OpenForRegistration != nil {
+			query = query.Where("e.datetime <= DATE_ADD(CURDATE(), INTERVAL time_slot_service.booking_window DAY)")
+		}
 	}
 
 	if params.ParticipantID != nil {

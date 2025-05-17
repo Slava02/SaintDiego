@@ -44,12 +44,13 @@ func New(opts Options) (*UseCase, error) {
 
 func (u *UseCase) GetEvents(ctx context.Context, req *GetEventsParams) ([]*models.Event, int32, error) {
 	pbReq := &pb.GetEventsRequest{
-		ParticipantId: req.ParticipantID,
-		Status:        req.Status,
-		LocationId:    req.LocationID,
-		ServiceId:     req.ServiceID,
-		Page:          int64(req.Page),
-		PerPage:       int64(req.PerPage),
+		ParticipantId:       req.ParticipantID,
+		Status:              req.Status,
+		LocationId:          req.LocationID,
+		ServiceId:           req.ServiceID,
+		Page:                int64(req.Page),
+		PerPage:             int64(req.PerPage),
+		OpenForRegistration: req.OpenForRegistration,
 	}
 
 	if req.FromDate != nil {

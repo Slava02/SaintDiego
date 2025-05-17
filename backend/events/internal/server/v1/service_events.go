@@ -35,12 +35,13 @@ func (s *Implementation) GetEvents(ctx context.Context, req *pb.GetEventsRequest
 	defer span.Finish()
 
 	eventParams := &events.GetEventsParams{
-		ParticipantID: req.ParticipantId,
-		Status:        req.Status,
-		LocationID:    req.LocationId,
-		ServiceID:     req.ServiceId,
-		Page:          req.Page,
-		PerPage:       req.PerPage,
+		ParticipantID:       req.ParticipantId,
+		Status:              req.Status,
+		LocationID:          req.LocationId,
+		ServiceID:           req.ServiceId,
+		OpenForRegistration: req.OpenForRegistration,
+		Page:                req.Page,
+		PerPage:             req.PerPage,
 	}
 
 	if req.FromDate != nil {

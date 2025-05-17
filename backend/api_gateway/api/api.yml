@@ -761,6 +761,11 @@ paths:
           schema:
             type: string
             format: date-time
+        - name: open_for_registration
+          in: query
+          required: false
+          schema:
+            type: boolean
       tags:
         - events
       summary: Получение списка событий

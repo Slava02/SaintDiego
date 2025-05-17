@@ -89,13 +89,14 @@ func New(opts Options) (*UseCase, error) {
 
 func (u *UseCase) GetEvents(ctx context.Context, params *GetEventsParams) ([]*models.Event, int64, error) {
 	getEventsParams := &events_repo.GetEventsParams{
-		ParticipantID: params.ParticipantID,
-		LocationID:    params.LocationID,
-		ServiceID:     params.ServiceID,
-		FromDate:      params.FromDate,
-		ToDate:        params.ToDate,
-		PerPage:       int32(params.PerPage),
-		Page:          int32(params.Page),
+		ParticipantID:       params.ParticipantID,
+		LocationID:          params.LocationID,
+		ServiceID:           params.ServiceID,
+		FromDate:            params.FromDate,
+		ToDate:              params.ToDate,
+		PerPage:             int32(params.PerPage),
+		Page:                int32(params.Page),
+		OpenForRegistration: params.OpenForRegistration,
 	}
 
 	if params.Status != nil {
